@@ -2,24 +2,24 @@ export function registerSettings(callbacks) {
     const { updateTray, updateTrayState, resetScroll } = callbacks;
 
     function isTrayAlwaysOn() {
-        const config = game.settings.get("action-pack", "tray-display");
+        const config = game.settings.get("action-pack-enhanced", "tray-display");
         return config === "always";
     }
 
     game.settings.register(
-        "action-pack",
+        "action-pack-enhanced",
         "tray-display",
         {
-            name: "action-pack.settings.tray-display",
-            hint: "action-pack.settings.tray-display-hint",
+            name: "action-pack-enhanced.settings.tray-display",
+            hint: "action-pack-enhanced.settings.tray-display-hint",
             scope: "client",
             config: true,
             default: "auto",
             choices: {
-                auto: "action-pack.settings.tray-display-auto",
-                toggle: "action-pack.settings.tray-display-toggle",
-                selected: "action-pack.settings.tray-display-selected",
-                always: "action-pack.settings.tray-display-always"
+                auto: "action-pack-enhanced.settings.tray-display-auto",
+                toggle: "action-pack-enhanced.settings.tray-display-toggle",
+                selected: "action-pack-enhanced.settings.tray-display-selected",
+                always: "action-pack-enhanced.settings.tray-display-always"
             },
             type: String,
             onChange: () => {
@@ -30,11 +30,11 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "action-pack",
+        "action-pack-enhanced",
         "assume-default-character",
         {
-            name: "action-pack.settings.assume-default-character",
-            hint: "action-pack.settings.assume-default-character-hint",
+            name: "action-pack-enhanced.settings.assume-default-character",
+            hint: "action-pack-enhanced.settings.assume-default-character-hint",
             scope: "client",
             config: true,
             default: true,
@@ -44,17 +44,17 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "action-pack",
+        "action-pack-enhanced",
         "icon-size",
         {
-            name: "action-pack.settings.icon-size",
+            name: "action-pack-enhanced.settings.icon-size",
             scope: "client",
             config: true,
             default: "medium",
             choices: {
-                small: "action-pack.settings.icon-size-small",
-                medium: "action-pack.settings.icon-size-medium",
-                large: "action-pack.settings.icon-size-large"
+                small: "action-pack-enhanced.settings.icon-size-small",
+                medium: "action-pack-enhanced.settings.icon-size-medium",
+                large: "action-pack-enhanced.settings.icon-size-large"
             },
             type: String,
             onChange: () => updateTray()
@@ -62,17 +62,17 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "action-pack",
+        "action-pack-enhanced",
         "tray-size",
         {
-            name: "action-pack.settings.tray-size",
+            name: "action-pack-enhanced.settings.tray-size",
             scope: "client",
             config: true,
             default: "large",
             choices: {
-                small: "action-pack.settings.tray-size-small",
-                medium: "action-pack.settings.tray-size-medium",
-                large: "action-pack.settings.tray-size-large"
+                small: "action-pack-enhanced.settings.tray-size-small",
+                medium: "action-pack-enhanced.settings.tray-size-medium",
+                large: "action-pack-enhanced.settings.tray-size-large"
             },
             type: String,
             onChange: () => updateTray()
@@ -80,17 +80,17 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "action-pack",
+        "action-pack-enhanced",
         "skill-mode",
         {
-            name: "action-pack.settings.skill-mode",
-            hint: "action-pack.settings.skill-mode-hint",
+            name: "action-pack-enhanced.settings.skill-mode",
+            hint: "action-pack-enhanced.settings.skill-mode-hint",
             scope: "client",
             config: true,
             default: "dropdown",
             choices: {
-                dropdown: "action-pack.settings.skill-mode-dropdown",
-                append: "action-pack.settings.skill-mode-append"
+                dropdown: "action-pack-enhanced.settings.skill-mode-dropdown",
+                append: "action-pack-enhanced.settings.skill-mode-append"
             },
             type: String,
             onChange: () => updateTray()
@@ -98,10 +98,10 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "action-pack",
+        "action-pack-enhanced",
         "show-spell-dots",
         {
-            name: "action-pack.settings.show-spell-dots",
+            name: "action-pack-enhanced.settings.show-spell-dots",
             scope: "client",
             config: true,
             default: true,
@@ -111,10 +111,10 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "action-pack",
+        "action-pack-enhanced",
         "show-no-uses",
         {
-            name: "action-pack.settings.show-no-uses",
+            name: "action-pack-enhanced.settings.show-no-uses",
             scope: "client",
             config: true,
             default: false,
@@ -124,10 +124,10 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "action-pack",
+        "action-pack-enhanced",
         "sort-alphabetic",
         {
-            name: "action-pack.settings.sort-alphabetic",
+            name: "action-pack-enhanced.settings.sort-alphabetic",
             scope: "client",
             config: true,
             default: false,
@@ -137,10 +137,10 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "action-pack",
+        "action-pack-enhanced",
         "show-unprepared-cantrips",
         {
-            name: "action-pack.settings.show-unprepared-cantrips",
+            name: "action-pack-enhanced.settings.show-unprepared-cantrips",
             scope: "client",
             config: true,
             default: false,
@@ -150,10 +150,10 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "action-pack",
+        "action-pack-enhanced",
         "use-control-button",
         {
-            name: "action-pack.settings.use-control-button",
+            name: "action-pack-enhanced.settings.use-control-button",
             scope: "client",
             config: true,
             default: true,
@@ -162,8 +162,8 @@ export function registerSettings(callbacks) {
         }
     );
 
-    game.keybindings.register("action-pack", "toggle-tray", {
-        name: "action-pack.keybindings.toggle-tray",
+    game.keybindings.register("action-pack-enhanced", "toggle-tray", {
+        name: "action-pack-enhanced.keybindings.toggle-tray",
         editable: [
             { key: "KeyE", modifiers: [] }
         ],
@@ -175,14 +175,14 @@ export function registerSettings(callbacks) {
         }
     });
 
-    game.keybindings.register("action-pack", "toggle-skills", {
-        name: "action-pack.keybindings.toggle-skills",
-        hint: "action-pack.keybindings.toggle-skills-hint",
+    game.keybindings.register("action-pack-enhanced", "toggle-skills", {
+        name: "action-pack-enhanced.keybindings.toggle-skills",
+        hint: "action-pack-enhanced.keybindings.toggle-skills-hint",
         editable: [
             { key: "KeyK", modifiers: [] }
         ],
         onDown: (ctx) => {
-            if (game.settings.get("action-pack", "skill-mode") === "dropdown") {
+            if (game.settings.get("action-pack-enhanced", "skill-mode") === "dropdown") {
                 const wasSkillsOpen = $('#action-pack .action-pack__skill-container').hasClass("is-open");
                 if ($('#action-pack').hasClass("is-open")) {
                     $('#action-pack .action-pack__skill-container').toggleClass("is-open");

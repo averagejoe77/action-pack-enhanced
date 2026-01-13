@@ -47,7 +47,7 @@ export class ActionPackRenderer {
 
         const endTurnDiv = document.createElement('div');
         endTurnDiv.className = 'action-pack__end-turn';
-        endTurnDiv.textContent = game.i18n.localize("action-pack.end-turn");
+        endTurnDiv.textContent = game.i18n.localize("action-pack-enhanced.end-turn");
         endTurnDiv.addEventListener('click', this.callbacks.onEndTurn);
 
         container.appendChild(endTurnDiv);
@@ -106,7 +106,7 @@ export class ActionPackRenderer {
         if (actorData.needsInitiative) {
             const initLink = document.createElement('a');
             initLink.className = 'action-pack__initiative flexrow';
-            initLink.innerHTML = `<i class="flex0 fas fa-swords action-pack__initiative-icon"></i><div>${game.i18n.localize("action-pack.roll-initiative")}</div>`;
+            initLink.innerHTML = `<i class="flex0 fas fa-swords action-pack__initiative-icon"></i><div>${game.i18n.localize("action-pack-enhanced.roll-initiative")}</div>`;
             initLink.addEventListener('click', (e) => this.callbacks.onInitiative(e, actorData.actor));
             actorDiv.appendChild(initLink);
         }
@@ -304,7 +304,7 @@ export class ActionPackRenderer {
 		ac.className = 'action-pack__actor-ac';
 		const acIcon = document.createElement('img');
 		acIcon.className = 'action-pack__actor-ac-icon';
-		acIcon.src = 'modules/action-pack/images/ac-icon.svg';
+		acIcon.src = 'modules/action-pack-enhanced/images/ac-icon.svg';
         
         const val = actor.system.attributes.ac.value;
         const displayHtml = `<span class="action-pack__actor-ac-display">${val}</span>`;
@@ -565,35 +565,35 @@ export class ActionPackRenderer {
         if (sys.properties.has("ritual")) {
             const f = document.createElement('div');
             f.className = 'ritual flag';
-            f.title = game.i18n.localize("action-pack.flag.ritual-title");
+            f.title = game.i18n.localize("action-pack-enhanced.flag.ritual-title");
             div.appendChild(f);
         }
         if (sys.properties.has("concentration")) {
             const f = document.createElement('div');
             f.className = 'concentration flag';
-            f.title = game.i18n.localize("action-pack.flag.concentration-title");
+            f.title = game.i18n.localize("action-pack-enhanced.flag.concentration-title");
             div.appendChild(f);
         }
         
         if (sys.activation?.type === 'bonus') {
             const f = document.createElement('div');
             f.className = 'bonus flag';
-            f.title = game.i18n.localize("action-pack.flag.bonus-title");
-            f.textContent = game.i18n.localize("action-pack.flag.bonus");
+            f.title = game.i18n.localize("action-pack-enhanced.flag.bonus-title");
+            f.textContent = game.i18n.localize("action-pack-enhanced.flag.bonus");
             div.appendChild(f);
         }
         if (sys.activation?.type === 'reaction') {
             const f = document.createElement('div');
             f.className = 'reaction flag';
-            f.title = game.i18n.localize("action-pack.flag.reaction-title");
-            f.textContent = game.i18n.localize("action-pack.flag.reaction");
+            f.title = game.i18n.localize("action-pack-enhanced.flag.reaction-title");
+            f.textContent = game.i18n.localize("action-pack-enhanced.flag.reaction");
             div.appendChild(f);
         }
         if (sys.activation?.type === 'legendary') {
             const f = document.createElement('div');
             f.className = 'legendary flag';
-            f.title = game.i18n.localize("action-pack.flag.legendary-title");
-            f.textContent = game.i18n.localize("action-pack.flag.legendary");
+            f.title = game.i18n.localize("action-pack-enhanced.flag.legendary-title");
+            f.textContent = game.i18n.localize("action-pack-enhanced.flag.legendary");
             div.appendChild(f);
         }
 
@@ -620,7 +620,7 @@ export class ActionPackRenderer {
         if (sys.method === 'prepared' && !sys.prepared && sys.level !== 0 && !canCastUnpreparedRituals) {
             const f = document.createElement('div');
             f.className = 'unprepared flag';
-            f.title = game.i18n.localize("action-pack.flag.unprepared-title");
+            f.title = game.i18n.localize("action-pack-enhanced.flag.unprepared-title");
             div.appendChild(f);
         }
 
@@ -634,7 +634,7 @@ export class ActionPackRenderer {
         dragHandle.className = 'item-drag-handle';
         dragHandle.innerHTML = '<i class="fas fa-grip-vertical"></i>';
         dragHandle.draggable = true;
-        dragHandle.title = game.i18n.localize("action-pack.drag-to-target");
+        dragHandle.title = game.i18n.localize("action-pack-enhanced.drag-to-target");
         
         dragHandle.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData("text/plain", JSON.stringify({
@@ -838,7 +838,7 @@ export class ActionPackRenderer {
             if (!existingInit) {
 				const initLink = document.createElement('a');
 				initLink.className = 'action-pack__initiative flexrow';
-				initLink.innerHTML = `<i class="flex0 fas fa-swords action-pack__initiative-icon"></i><div>${game.i18n.localize("action-pack.roll-initiative")}</div>`;
+				initLink.innerHTML = `<i class="flex0 fas fa-swords action-pack__initiative-icon"></i><div>${game.i18n.localize("action-pack-enhanced.roll-initiative")}</div>`;
 				initLink.addEventListener('click', (e) => this.callbacks.onInitiative(e, actorData.actor));
 				
 				// Insert after DeathSaves or H1

@@ -2,10 +2,10 @@ import { calculateUsesForItem } from "./item-uses.js";
 
 export class ActionPackDataBuilder {
     constructor() {
-        this.settingShowNoUses = game.settings.get("action-pack", "show-no-uses");
-        this.settingShowUnpreparedCantrips = game.settings.get("action-pack", "show-unprepared-cantrips");
-        this.settingSkillMode = game.settings.get("action-pack", "skill-mode");
-        this.settingSortAlphabetically = game.settings.get("action-pack", "sort-alphabetic");
+        this.settingShowNoUses = game.settings.get("action-pack-enhanced", "show-no-uses");
+        this.settingShowUnpreparedCantrips = game.settings.get("action-pack-enhanced", "show-unprepared-cantrips");
+        this.settingSkillMode = game.settings.get("action-pack-enhanced", "skill-mode");
+        this.settingSortAlphabetically = game.settings.get("action-pack-enhanced", "sort-alphabetic");
     }
 
     build(actors, scrollPosition) {
@@ -17,30 +17,30 @@ export class ActionPackDataBuilder {
         const canCastUnpreparedRituals = !!actor.itemTypes.feat.find(i => i.name === "Ritual Adept");
 
         let sections = {
-            equipped: { items: [], title: "action-pack.category.equipped" },
+            equipped: { items: [], title: "action-pack-enhanced.category.equipped" },
             inventory: {
-                title: "action-pack.category.inventory",
+                title: "action-pack-enhanced.category.inventory",
                 groups: {
-                    weapon: { items: [], title: "action-pack.category.weapon" },
-                    equipment: { items: [], title: "action-pack.category.equipment" },
-                    consumable: { items: [], title: "action-pack.category.consumable" },
-                    other: { items: [], title: "action-pack.category.other" }
+                    weapon: { items: [], title: "action-pack-enhanced.category.weapon" },
+                    equipment: { items: [], title: "action-pack-enhanced.category.equipment" },
+                    consumable: { items: [], title: "action-pack-enhanced.category.consumable" },
+                    other: { items: [], title: "action-pack-enhanced.category.other" }
                 }
             },
-            feature: { items: [], title: "action-pack.category.feature", groups: this.systemFeatureGroups() },
+            feature: { items: [], title: "action-pack-enhanced.category.feature", groups: this.systemFeatureGroups() },
             spell: {
-                title: "action-pack.category.spell",
+                title: "action-pack-enhanced.category.spell",
                 groups: {
-                    innate: { items: [], title: "action-pack.category.innate" },
-                    atwill: { items: [], title: "action-pack.category.atwill" },
-                    pact: { items: [], title: "action-pack.category.pact" },
+                    innate: { items: [], title: "action-pack-enhanced.category.innate" },
+                    atwill: { items: [], title: "action-pack-enhanced.category.atwill" },
+                    pact: { items: [], title: "action-pack-enhanced.category.pact" },
                     ...[...Array(10).keys()].reduce((prev, cur) => {
-                        prev[`spell${cur}`] = { items: [], title: `action-pack.category.spell${cur}` }
+                        prev[`spell${cur}`] = { items: [], title: `action-pack-enhanced.category.spell${cur}` }
                         return prev;
                     }, {})
                 }
             },
-            passive: { items: [], title: "action-pack.category.passive" }
+            passive: { items: [], title: "action-pack-enhanced.category.passive" }
         };
 
         const itemMap = ["consumable", "container", "equipment", "feat", "loot", "spell", "tool", "weapon"];
@@ -80,7 +80,7 @@ export class ActionPackDataBuilder {
 
         const hasUses = this.settingShowNoUses || !uses || uses.available;
         const hasActivities = itemData?.activities?.size > 0 ? true : false;
-        const isHidden = item.getFlag("action-pack", "hidden");
+        const isHidden = item.getFlag("action-pack-enhanced", "hidden");
 
         if (hasUses && hasActivities && !isHidden) {
             switch (type) {

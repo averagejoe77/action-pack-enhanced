@@ -68,12 +68,12 @@ Hooks.on("ready", () => {
 });
 
 function isTrayAutoHide() {
-    const config = game.settings.get("action-pack", "tray-display");
+    const config = game.settings.get("action-pack-enhanced", "tray-display");
     return config === "selected" || config === "auto";
 }
 
 function isTrayAlwaysOn() {
-    const config = game.settings.get("action-pack", "tray-display");
+    const config = game.settings.get("action-pack-enhanced", "tray-display");
     return config === "always";
 }
 
@@ -82,7 +82,7 @@ function getActiveActors() {
     if (controlled.length) {
         return controlled.map(token => token.actor);
     }
-    if (game.user.character && game.settings.get("action-pack", "assume-default-character")) {
+    if (game.user.character && game.settings.get("action-pack-enhanced", "assume-default-character")) {
         return [game.user.character];
     }
     return [];
@@ -154,7 +154,7 @@ Hooks.on("init", () => {
 
 Hooks.on('getSceneControlButtons', (controls) => {
     console.log("getSceneControlButtons", controls);
-    if (game.settings.get("action-pack", "use-control-button") && !isTrayAlwaysOn()) {
+    if (game.settings.get("action-pack-enhanced", "use-control-button") && !isTrayAlwaysOn()) {
         const tokenTools = controls.tokens.tools;
         if (tokenTools) {
             tokenTools.actionPack = {
@@ -205,9 +205,9 @@ async function updateTray() {
         return tgt ? [str, tgt].join("-") : tgt;
     }
 
-    const iconSize = prefix(game.settings.get("action-pack", "icon-size"), "icon");
-    const traySize = prefix(game.settings.get("action-pack", "tray-size"), "tray");
-    const showSpellDots = game.settings.get("action-pack", "show-spell-dots");
+    const iconSize = prefix(game.settings.get("action-pack-enhanced", "icon-size"), "icon");
+    const traySize = prefix(game.settings.get("action-pack-enhanced", "tray-size"), "tray");
+    const showSpellDots = game.settings.get("action-pack-enhanced", "show-spell-dots");
     const allAbilities = Object.entries(CONFIG.DND5E.abilities);
     const abilityColumns = [
         allAbilities.slice(0, 3).map(([key, config]) => ({ key, label: config.label })),
@@ -231,7 +231,7 @@ async function updateTray() {
 
     // Wrap the container in jQuery for legacy hook support if needed, or just pass the element
     const $container = $('#action-pack'); 
-    Hooks.call('action-pack.updateTray', $container, builtData); // Passing builtData for compatibility with render.js expectation?
+    Hooks.call('action-pack-enhanced.updateTray', $container, builtData); // Passing builtData for compatibility with render.js expectation?
     // Wait, ActionsPackRenderer expects { actors: [ ... ] }.
     // builtData is array of actors.
     // The previous code passed { actors, ... } to render.
@@ -244,21 +244,21 @@ async function updateTray() {
 
 Hooks.on("dnd5e.getItemContextOptions", (item, options) => {
     if (item.system.activation?.type && item.system.activation.type !== "none") {
-        if (item.getFlag("action-pack", "hidden")) {
+        if (item.getFlag("action-pack-enhanced", "hidden")) {
             options.push({
-                name: "action-pack.item-context.show",
+                name: "action-pack-enhanced.item-context.show",
                 icon: "<i class='fas fa-eye'></i>",
-                callback: () => {
-                    item.setFlag("action-pack", "hidden", false);
+                callback: async () => {
+                    await item.setFlag("action-pack-enhanced", "hidden", false);
                     updateTray();
                 }
             });
         } else {
             options.push({
-                name: "action-pack.item-context.hide",
+                name: "action-pack-enhanced.item-context.hide",
                 icon: "<i class='fas fa-eye-slash'></i>",
-                callback: () => {
-                    item.setFlag("action-pack", "hidden", true);
+                callback: async () => {
+                    await item.setFlag("action-pack-enhanced", "hidden", true);
                     updateTray();
                 }
             });
