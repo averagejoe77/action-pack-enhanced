@@ -124,6 +124,7 @@ export class ActionPackDataBuilder {
     }
 
     _prepareSpell(item, itemData, uses, sections, canCastUnpreparedRituals) {
+        // dnd5e wants me to update this to use itemData.method instead of itemData.preparation.mode, but itemData.method does not currently have the correct values, but rather simply "spell" for all spells. Will need to keep an eye on each system update and see if this changes. Same goes for the itemData.preparation.prepared property below.
         const mode = itemData?.preparation?.mode;
         switch (mode) {
             case "prepared":
