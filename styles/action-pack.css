@@ -1,0 +1,768 @@
+#action-pack {
+    --action-pack-width: 300px;
+    container-type: inline-size;
+    container-name: action-pack;
+
+    &.tray-medium {
+        --action-pack-width: 240px;
+
+        .action-pack__container {
+            --action-pack-icon: 30px;
+
+            &.icon-small {
+                --action-pack-icon: 26px;
+            }
+
+            &.icon-large {
+                --action-pack-icon: 36px;
+            }
+        }
+    }
+
+    &.tray-small {
+        --action-pack-width: 200px;
+
+        .action-pack__container {
+            --action-pack-icon: 30px;
+
+            &.icon-small {
+                --action-pack-icon: 24px;
+            }
+
+            &.icon-large {
+                --action-pack-icon: 36px;
+            }
+        }
+    }
+
+    &.always-on {
+        transition: width 0s;
+    }
+
+    &.is-current-combatant {
+        .action-pack__container {
+            bottom: 50px;
+        }
+
+        .action-pack__end-turn {
+            display: block;
+        }
+    }
+
+    &.action-pack__container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        margin-left: calc(-1 * var(--action-pack-width));
+        height: 100vh;
+        width: var(--action-pack-width);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        z-index: 1;
+        overflow: auto;
+        transition: margin-left 0.3s;
+        --action-pack-icon: 36px;
+        --die-icon-size: 24px;
+
+        &.is-open {
+            margin-left: 0;
+            transition: margin-left 0.3s;
+        }
+
+        &.icon-small {
+            --action-pack-icon: 30px;
+            --die-icon-size: 20px;
+        }
+
+        &.icon-large {
+            --action-pack-icon: 42px;
+            --die-icon-size: 28px;
+        }
+
+        h1 {
+            border: 0;
+            font-family: "Modesto Condensed", "Palatino Linotype", serif;
+            margin: 5px 0 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h2 {
+            background-color: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 1px 6px;
+            margin: 10px -5px 4px -5px;
+            border-radius: 3px;
+            font-family: "Modesto Condensed", "Palatino Linotype", serif;
+            font-size: 18px;
+        }
+
+        h3 {
+            border: 0;
+            font-size: 15px;
+            margin: 5px 0 3px 0;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    }
+
+    .action-pack__actors {
+        padding: 10px;
+    }
+
+    .action-pack__actor {
+        &+.action-pack__actor {
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
+            margin-top: 15px;
+            padding-top: 10px;
+        }
+
+        .group-uses {
+            flex: 0;
+            align-self: flex-end;
+            background: rgba(255, 255, 255, 0.8);
+            color: black;
+            padding: 3px 6px;
+            border-radius: 5px;
+        }
+
+        .group-dots {
+            display: flex;
+            gap: 2px;
+
+            .dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                cursor: pointer;
+                background-color: rgba(255, 100, 0, 1);
+
+                &.empty {
+                    background-color: rgba(255, 255, 255, 0.2);
+                }
+            }
+        }
+    }
+
+    @container action-pack (width > 240px) {
+        .action-pack__actor-name {
+            font-size: 2.5rem;
+        }
+    }
+
+    @container action-pack (width <=240px) {
+        .action-pack__actor-name {
+            font-size: 2rem;
+        }
+    }
+
+    @container action-pack (width <=200px) {
+        .action-pack__actor-name {
+            font-size: 1.5rem;
+        }
+    }
+
+    .action-pack__abilities {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin: 5px 0;
+
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            gap: 3px;
+        }
+
+        .action-pack__ability {
+            flex: 1 0 auto;
+            padding: 3px 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            text-transform: capitalize;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            >a {
+                align-items: center;
+                display: flex;
+                flex: 1 0 30px;
+                height: 30px;
+                justify-content: center;
+                padding: 5px;
+                position: relative;
+
+                span {
+                    opacity: 1;
+                    transition: opacity 0.3s;
+                }
+
+                &:hover span {
+                    opacity: 0;
+                    transition: opacity 0.3s;
+                }
+
+                &:before {
+                    color: #404040;
+                    font-size: 30px;
+                    position: absolute;
+                    z-index: 1;
+                    transition: color 0.3s;
+                }
+
+                &:hover:before {
+                    color: #a9a9a9;
+                    transition: color 0.3s;
+                }
+            }
+        }
+
+        .action-pack__ability-hdr {
+            font-size: 0.9rem;
+            text-align: center;
+            flex: 1 0 auto;
+        }
+
+        .action-pack__ability-label {
+            flex: 1 0 20px;
+        }
+
+        .action-pack__ability-text {
+            position: relative;
+            z-index: 2;
+        }
+    }
+
+    .action-pack__items {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .action-pack__item {
+        margin-bottom: 3px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+
+        .item-name {
+            align-items: center;
+            flex: 1;
+            padding-right: 5px;
+
+            h4 {
+                margin: 0;
+            }
+
+            .uncommon {
+                color: #155127;
+            }
+
+            .rare {
+                color: #7851a9;
+            }
+
+            .veryRare {
+                color: #c39a3a;
+            }
+
+            .item-image {
+                flex: 0 0 var(--action-pack-icon);
+                height: var(--action-pack-icon);
+                margin-right: 5px;
+                background-repeat: no-repeat;
+                background-size: contain;
+                background-position: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 5px;
+                cursor: pointer;
+
+                i {
+                    display: none;
+                    font-size: var(--die-icon-size);
+                    opacity: 0.5;
+                }
+
+                &:hover i {
+                    opacity: 1;
+                }
+
+                &.uncommon {
+                    border: 2px solid #155127;
+                }
+
+                &.rare {
+                    border: 2px solid #7851a9;
+                }
+
+                &.veryRare {
+                    border: 2px solid #c39a3a;
+                }
+            }
+
+            &:hover .item-image {
+                background-image: none !important;
+
+                &.uncommon,
+                &.rare,
+                &.veryRare {
+                    border: none;
+                }
+
+                i {
+                    display: initial;
+                }
+            }
+        }
+
+        .item-drag-handle {
+            flex: 0 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            color: rgba(255, 255, 255, 0.3);
+            transition: color 0.2s;
+            padding: 0 5px;
+            width: 20px;
+
+            &:hover {
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+            &:active {
+                cursor: grabbing;
+            }
+        }
+
+        .flag {
+            flex: 0 0 20px;
+            height: 20px;
+            border-radius: 50%;
+            line-height: 21px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .item-recharge {
+            white-space: nowrap;
+        }
+
+        .bonus,
+        .reaction {
+            background: rgba(255, 255, 255, 0.8);
+            color: black;
+        }
+
+        .legendary {
+            background: rgba(255, 241, 166, 0.8);
+            color: black;
+        }
+
+        .concentration,
+        .ritual {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+        }
+
+        .concentration {
+            background: url("/systems/dnd5e/icons/svg/statuses/concentrating.svg") 0 0 / 20px 20px no-repeat;
+            color: white;
+        }
+
+        .ritual {
+            background: url("/systems/dnd5e/icons/svg/items/spell.svg") 0 0 / 20px 20px no-repeat;
+            color: black;
+        }
+
+        .prepared {
+            background-color: rgba(47, 233, 47, 0.5);
+            color: black;
+        }
+
+        .unprepared {
+            background: rgba(233, 47, 47, 0.5);
+            color: white;
+        }
+
+        .item-summary {
+            display: none;
+            padding: 3px 10px;
+            margin: 4px 0 10px 0;
+            background: rgba(0, 0, 0, 0.5);
+            color: rgba(255, 255, 255, 0.8);
+            flex: 1 0 100%;
+
+            p {
+                font-size: 1rem;
+                line-height: 1.4;
+            }
+
+            .item-properties .tag {
+                display: inline-block;
+                white-space: nowrap;
+                background: rgba(255, 255, 255, 0.7);
+                color: black;
+                margin: 0 3px 3px 0;
+                padding: 3px;
+                line-height: 1;
+                border-radius: 3px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 100%;
+            }
+        }
+    }
+
+    .tray-small .action-pack__item .flag {
+        flex: 0 0 16px;
+        height: 16px;
+        font-size: 85%;
+        line-height: 16px;
+    }
+
+    .action-pack__initiative {
+        align-items: center;
+        padding: 5px 9px;
+        gap: 7px;
+        background-color: rgba(255, 255, 255, 0.7);
+        margin: 12px 0;
+        border: 1px solid black;
+        border-radius: 3px;
+        color: black;
+        font-size: 14px;
+        box-shadow: 0 0 0 1.7px white;
+    }
+
+    .action-pack__initiative-icon {
+        animation: infinite forwards 1.8s init-jiggle;
+    }
+
+    .action-pack__skill-container {
+
+        &.is-open .action-pack__skills,
+        &.append .action-pack__skills {
+            display: initial;
+        }
+
+        &.append {
+            margin-top: 15px;
+
+            .action-pack__skill-header i {
+                display: none;
+            }
+        }
+
+        .action-pack__skill-header {
+            display: block;
+            padding: 1px 6px;
+            margin: 6px -5px 0px -5px;
+            font-family: "Modesto Condensed", "Palatino Linotype", serif;
+            font-size: 18px;
+
+            i {
+                transition: transform 0.5s;
+                float: right;
+            }
+        }
+
+        &.is-open .action-pack__skill-header i {
+            transform: rotate(-180deg);
+        }
+
+        .action-pack__skills {
+            margin: 0 -3px 5px 0;
+            display: none;
+        }
+
+        .action-pack__skill-row {
+            padding: 3px 5px;
+            gap: 5px;
+            align-items: baseline;
+
+            i {
+                font-size: 10px;
+            }
+
+            span {
+                font-size: 13px;
+            }
+
+            &.proficient span {
+                font-weight: bold;
+            }
+
+            &:nth-child(even) {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        .action-pack__skill-label {
+            flex: 5;
+        }
+
+        .action-pack__skill-bonus {
+            text-align: center;
+        }
+
+        .action-pack__skill-passive {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+    }
+
+    .action-pack__death-saving {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        justify-content: center;
+        margin: 20px 0;
+        padding: 20px 0;
+        background-color: rgba(255, 255, 255, 0.1);
+
+        .action-pack__death-throws {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 5px;
+            width: 80px;
+
+            &.failed .action-pack__death-dot.filled {
+                background-color: #5b0707;
+                border-color: #5b0707;
+            }
+
+            &.saved .action-pack__death-dot.filled {
+                background-color: #075b07;
+                border-color: #075b07;
+            }
+        }
+
+        .action-pack__death-dot {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-pack__death-icon {
+            background-color: #525252;
+            cursor: pointer;
+            mask: url("../../../systems/dnd5e/icons/svg/statuses/dead.svg") 0 0 / 50px 50px no-repeat;
+            display: block;
+            width: 50px;
+            height: 50px;
+            transition: background-color 0.3s;
+
+            &:hover {
+                background-color: #a4a4a4;
+                transition: background-color 0.3s;
+            }
+        }
+    }
+
+    .action-pack__empty-tray {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        i {
+            font-size: 8rem;
+            opacity: 0.2;
+        }
+    }
+
+    .action-pack__end-turn {
+        height: 50px;
+        width: 100%;
+        z-index: 2;
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        text-align: center;
+        line-height: 50px;
+        font-size: 22px;
+        transition: height 0.3s;
+        display: none;
+    }
+
+
+    .action-pack__actor-ac {
+        display: grid;
+        grid-template: 45px / 45px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .action-pack__actor-ac-icon {
+        grid-area: 1 / 1;
+        filter: invert(1);
+    }
+
+    .action-pack__actor-ac-display,
+    input.action-pack__actor-ac-input {
+        grid-area: 1 / 1;
+        text-align: center;
+        line-height: normal;
+        font-size: 25px;
+        z-index: 2;
+    }
+
+    .action-pack__actor-ac-display {
+        cursor: pointer;
+    }
+
+    input.action-pack__actor-ac-input {
+        background: transparent;
+        border: none;
+        color: inherit;
+        font-family: inherit;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+
+        &:focus {
+            outline: none;
+            background: rgba(0, 0, 0, 0.5);
+        }
+    }
+
+    .action-pack__actor-hp-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 10px 0 20px;
+    }
+
+    .action-pack__actor-hp {
+        height: 30px;
+        position: relative;
+        width: 75%;
+
+        &:before {
+            background: #008403;
+            border-radius: 18px;
+            box-shadow: inset 0 0 15px 6px black;
+            content: "";
+            display: block;
+            height: 100%;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: var(--bar-percent);
+            z-index: 1;
+        }
+
+        >span {
+            align-items: center;
+            cursor: pointer;
+            display: flex;
+            height: 100%;
+            justify-content: center;
+            position: relative;
+            width: 100%;
+            z-index: 2;
+
+            .action-pack__actor-hp-display {
+                align-items: inherit;
+                display: inherit;
+                height: inherit;
+                justify-content: inherit;
+                width: 100%;
+            }
+
+            input.action-pack__actor-hp-input {
+                background: transparent;
+                border: none;
+                color: inherit;
+                font-family: inherit;
+                font-size: inherit;
+                margin: 0;
+                padding: 0;
+                text-align: center;
+                width: 100%;
+
+                &:focus {
+                    outline: none;
+                    background: black;
+                }
+            }
+        }
+    }
+
+    .action-pack__actor-temp {
+        text-align: center;
+        width: 25%;
+    }
+
+    .action-pack__actor-rest-buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        padding: 20px 0;
+    }
+
+    .action-pack__actor-rest-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 25px;
+        height: 25px;
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .action-pack__actor-rest-button:hover {
+        background-color: rgba(255, 255, 255, 0.4);
+        transition: background-color 0.3s;
+    }
+}
+
+@keyframes init-jiggle {
+    0% {
+        transform: rotate(0);
+    }
+
+    3% {
+        transform: rotate(10deg);
+    }
+
+    9% {
+        transform: rotate(-10deg);
+    }
+
+    15% {
+        transform: rotate(10deg);
+    }
+
+    21% {
+        transform: rotate(-10deg);
+    }
+
+    25% {
+        transform: rotate(0);
+    }
+}
