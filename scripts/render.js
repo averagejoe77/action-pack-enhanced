@@ -139,39 +139,40 @@ export class ActionPackRenderer {
 
 	generateRaceClassDisplay(itemTypes) {
 		// in the format (Human - Wizard [Abjurer], Fighter [Defense])
-		let raceClass = [];
+		let raceClass = {};
 		let races = itemTypes.race;
 		let classes = itemTypes.class;
 		let subClasses = itemTypes.subclass;
 		
 		if (classes.length === subClasses.length) {
+            let obj = {race: races[0].name, classes: []};
 			for (let i = 0; i < classes.length; i++) {
-				raceClass.push({race: races[0].name, classes: [{ name: classes[i].name, level: classes[i].system.levels }], subclass: [{ name: subClasses[i].name }]});
+				obj.classes[i] = {name: classes[i].name, level: classes[i].system.levels, subclass: {name: subClasses[i].name}};
 			}
+			raceClass = obj;
 		} else {
+            let obj = {race: races[0].name, classes: []};
 			for (let i = 0; i < classes.length; i++) {
-				raceClass.push({race: races[0].name, classes: [{ name: classes[i].name, level: classes[i].system.levels }], subclass: []});
+				obj.classes[i] = {name: classes[i].name, level: classes[i].system.levels, subclass: {name: ''}};
 				for(let j = 0; j < subClasses.length; j++) {
-					raceClass[i].subclass.push({ name: subClasses[j].name});
+					obj.classes[i].subclass.name = subClasses[j].name;
 				}
 			}
+			raceClass = obj;
 		}
-        
-		let raceClassText = '';
-		raceClass.forEach((race, index) => {
-			let aClass = '';
-			let aSubclass = '';
-			race.classes.forEach((c, i) => {
-				aClass += `<span class="action-pack__actor-class">${c.name}(${c.level})</span>`;
-				if (i < race.subclass.length) {
-					if(race.subclass[i] !== '' || race.subclass[i] !== null || race.subclass[i]    !== undefined) {
-						aSubclass += `<span class="action-pack__actor-subclass"> - ${race.subclass[i].name}</span>`;
-					}
-				}
-			});
-			raceClassText += `${race.race}, ${aClass} ${aSubclass}`;
-		});
-		return raceClassText;
+
+        // create the race, class(lvl) - subclass, class(lvl) - subclass format from the data
+        let raceClassText = `${raceClass.race}, `;
+        for (let i = 0; i < raceClass.classes.length; i++) {
+			raceClassText += `<span class="action-pack__actor-class">${raceClass.classes[i].name}(${raceClass.classes[i].level})</span>`;
+			if (raceClass.classes[i].subclass.name !== '' ) {
+				raceClassText += `<span class="action-pack__actor-subclass"> - ${raceClass.classes[i].subclass.name}</span>`;
+			}
+            if(i < raceClass.classes.length - 1) {
+                raceClassText += `, `;
+            }
+        }
+        return raceClassText;
 	}
 
     createActorMeta(actor) {
