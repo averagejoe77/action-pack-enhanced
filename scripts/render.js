@@ -305,7 +305,7 @@ export class ActionPackRenderer {
 		ac.className = 'action-pack__actor-ac';
 		const acIcon = document.createElement('img');
 		acIcon.className = 'action-pack__actor-ac-icon';
-		acIcon.src = 'modules/action-pack-enhanced/images/ac-icon.svg';
+		acIcon.src = '/modules/action-pack-enhanced/images/ac-icon.svg';
         
         const val = actor.system.attributes.ac.value;
         const displayHtml = `<span class="action-pack__actor-ac-display">${val}</span>`;

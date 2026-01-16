@@ -562,7 +562,7 @@
         .action-pack__death-icon {
             background-color: #525252;
             cursor: pointer;
-            mask: url("../../../systems/dnd5e/icons/svg/statuses/dead.svg") 0 0 / 50px 50px no-repeat;
+            mask: url("/systems/dnd5e/icons/svg/statuses/dead.svg") 0 0 / 50px 50px no-repeat;
             display: block;
             width: 50px;
             height: 50px;
