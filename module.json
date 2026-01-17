@@ -1,5 +1,5 @@
 {
-  "id": "action-pack-enhanced",
+  "id": "ape",
   "title": "Action Pack Enhanced",
   "description": "Enhances the Action Pack module by adding additional features and automations as well as updating the module to support FoundryVTT v13+.",
   "version": "1.0.3",
@@ -26,10 +26,10 @@
     ]
   },
   "esmodules": [
-    "scripts/action-pack.js"
+    "dist/ape.mjs"
   ],
   "styles": [
-    "styles/action-pack.css"
+    "styles/ape-styles.css"
   ],
   "languages": [
     {
