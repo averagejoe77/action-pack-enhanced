@@ -1,25 +1,28 @@
-import { ActionPackRenderer } from "./render.js";
 import { ActionPackDataBuilder } from "./data-builder.js";
-import { ActionPackInteractions } from "./interactions.js";
+import { ActionPackAPI } from "./api.js";
 import { registerSettings } from "./settings.js";
+import "./components/ape-app.js";
 
 let lastKnownActiveActor;
 let currentlyActiveActor;
-
-// Single instance of interactions to maintain state
-let interactions;
+let api;
 let dataBuilder;
 
+// Helper to resolve UUID
 function fromUuid(uuid) {
     if (!uuid || uuid === '') return null;
     let parts = uuid.split('.');
-    let doc;
+    
+    // Check if it's a compendium uuid
+    if (parts[0] === 'Compendium') {
+        return null; // We generally don't handle compendium UUIDs here for active actors
+    }
 
     const [docName, docId] = parts.slice(0, 2);
     parts = parts.slice(2);
     const collection = CONFIG[docName]?.collection.instance;
     if (!collection) return null;
-    doc = collection.get(docId);
+    let doc = collection.get(docId);
 
     // Embedded Documents
     while (doc && parts.length > 1) {
@@ -31,49 +34,63 @@ function fromUuid(uuid) {
 }
 
 export function fudgeToActor(candidate) {
-    // Token actors have the same UUID for the token document and the actor, try to get the actor
     if (candidate instanceof CONFIG.Actor.documentClass) {
         return candidate;
     } else if (candidate instanceof CONFIG.Token.documentClass) {
         return candidate.object.actor;
     } else {
-        console.warn('Expected', candidate, 'to be actor');
+        // console.warn('Expected', candidate, 'to be actor');
     }
 }
 
 function updateCombatStatus() {
     const actors = canvas.tokens.controlled.map(t => t.actor);
+    const app = document.querySelector('ape-app');
+    if (!app) return;
+
+    // We can just add/remove classes on the custom element itself if we want
     if (game.combat && actors.includes(currentlyActiveActor)) {
-        $('#action-pack').addClass("is-current-combatant");
+        app.classList.add("is-current-combatant");
     } else {
-        $('#action-pack').removeClass("is-current-combatant");
+        app.classList.remove("is-current-combatant");
     }
 }
 
 Hooks.on("ready", () => {
-    const trayHtml = `
-        <div id="action-pack">
-        </div>
-    `;
-    $('body').prepend(trayHtml);
+    // Mount the Lit App
+    // Check if already exists to avoid duplicate on reloads if not full reload
+    if (!document.querySelector('ape-app')) {
+        const app = document.createElement('ape-app');
+        app.id = 'ape-app'; // Keep ID for CSS
+        app.classList.add("ape-container");
+        // insert the app into the DOM before the element with id 'interface'
+        const interfaceElement = document.getElementById('interface');
+        if(interfaceElement) {
+            document.body.insertBefore(app, interfaceElement);
+        }   
+        
+        // Initialize API
+        api = new ActionPackAPI();
+        app.api = api;
+    }
 
     lastKnownActiveActor = game.combat?.turns.find(c => c.id == game.combat?.current.combatantId)?.actor;
     currentlyActiveActor = lastKnownActiveActor;
 
     if (isTrayAlwaysOn()) {
-        $('#action-pack').addClass("is-open always-on");
+        $('#ape-app').addClass("is-open always-on");
     }
 
     updateTrayState();
 });
 
 function isTrayAutoHide() {
-    const config = game.settings.get("action-pack-enhanced", "tray-display");
+    const config = game.settings.get("ape", "tray-display");
     return config === "selected" || config === "auto";
 }
 
 function isTrayAlwaysOn() {
-    const config = game.settings.get("action-pack-enhanced", "tray-display");
+    const config = game.settings.get("ape", "tray-display");
     return config === "always";
 }
 
@@ -82,7 +99,7 @@ function getActiveActors() {
     if (controlled.length) {
         return controlled.map(token => token.actor);
     }
-    if (game.user.character && game.settings.get("action-pack-enhanced", "assume-default-character")) {
+    if (game.user.character && game.settings.get("ape", "assume-default-character")) {
         return [game.user.character];
     }
     return [];
@@ -147,24 +164,24 @@ Hooks.on("init", () => {
         updateTray,
         updateTrayState,
         resetScroll: () => {
-            if (interactions) interactions.scrollPosition = {};
+            const app = document.querySelector('ape-app');
+            // scroll reset handled by app reactivity or re-render
         }
     });
 });
 
 Hooks.on('getSceneControlButtons', (controls) => {
-    console.log("getSceneControlButtons", controls);
-    if (game.settings.get("action-pack-enhanced", "use-control-button") && !isTrayAlwaysOn()) {
+    if (game.settings.get("ape", "use-control-button") && !isTrayAlwaysOn()) {
         const tokenTools = controls.tokens.tools;
         if (tokenTools) {
-            tokenTools.actionPack = {
-                name: "actionPack",
-                title: "action-pack.control-icon",
-                icon: 'fas fa-hand-point-left',
+            tokenTools.apeApp = {
+                name: "apeApp",
+                title: game.i18n.localize("ape.control-icon"),
+                icon: 'fas fa-user-shield',
                 visible: true,
                 onClick: () => {
-                    $('#action-pack').toggleClass("is-open");
-                    $('#action-pack .action-pack__skill-container').removeClass("is-open");
+                    $('#ape-app').toggleClass("is-open");
+                    $('#ape-app .ape-skill-container').removeClass("is-open");
                 },
                 button: 1
             };
@@ -173,19 +190,20 @@ Hooks.on('getSceneControlButtons', (controls) => {
 });
 
 function updateTrayState() {
+    const $app = $('#ape-app');
     if (isTrayAutoHide()) {
         const controlled = canvas.tokens.controlled.filter(t => ["character", "npc"].includes(t.actor?.type));
         if (controlled.length) {
-            $('#action-pack').addClass("is-open");
+            $app.addClass("is-open");
         } else {
-            $('#action-pack').removeClass("is-open");
+            $app.removeClass("is-open");
         }
     }
 
     if (isTrayAlwaysOn()) {
-        $('#action-pack').addClass("is-open always-on");
+        $app.addClass("is-open always-on");
     } else {
-        $('#action-pack').removeClass("always-on");
+        $app.removeClass("always-on");
     }
 
     updateCombatStatus();
@@ -194,71 +212,59 @@ function updateTrayState() {
 
 async function updateTray() {
     if (!dataBuilder) dataBuilder = new ActionPackDataBuilder();
-    if (!interactions) interactions = new ActionPackInteractions(updateTray, getActiveActors);
+    // No interactions class needed, handled by Lit+API
 
     const actors = getActiveActors();
 
-    // Use current settings/data to build actor data
-    const builtData = dataBuilder.build(actors, interactions.scrollPosition);
+    const builtData = dataBuilder.build(actors, { /* scrollPosition stub */ });
 
     function prefix(tgt, str) {
         return tgt ? [str, tgt].join("-") : tgt;
     }
 
-    const iconSize = prefix(game.settings.get("action-pack-enhanced", "icon-size"), "icon");
-    const traySize = prefix(game.settings.get("action-pack-enhanced", "tray-size"), "tray");
-    const showSpellDots = game.settings.get("action-pack-enhanced", "show-spell-dots");
+    const iconSize = prefix(game.settings.get("ape", "icon-size"), "icon");
+    const traySize = prefix(game.settings.get("ape", "tray-size"), "tray");
+    const showSpellDots = game.settings.get("ape", "show-spell-dots");
+    const showSpellUses = game.settings.get("ape", "show-spell-uses");
     const allAbilities = Object.entries(CONFIG.DND5E.abilities);
     const abilityColumns = [
         allAbilities.slice(0, 3).map(([key, config]) => ({ key, label: config.label })),
         allAbilities.slice(3, 6).map(([key, config]) => ({ key, label: config.label }))
     ];
 
-    const callbacks = interactions.getCallbacks();
-
-    const container = document.getElementById('action-pack');
-    if (container) {
-        const renderer = new ActionPackRenderer(callbacks);
-        renderer.render(container, {
-            actors: builtData, 
-            iconSize, 
-            traySize, 
-            showSpellDots, 
+    const app = document.querySelector('ape-app');
+    app.classList.add(iconSize);
+    app.classList.add(traySize);
+    if (app) {
+        app.data = {
+            actors: builtData,
+        };
+        app.globalData = {
             abilityColumns,
-            scrollPosition: interactions.scrollPosition
-        });
+            showSpellDots,
+            showSpellUses
+        };
+        // API is already set on init
     }
-
-    // Wrap the container in jQuery for legacy hook support if needed, or just pass the element
-    const $container = $('#action-pack'); 
-    Hooks.call('action-pack-enhanced.updateTray', $container, builtData); // Passing builtData for compatibility with render.js expectation?
-    // Wait, ActionsPackRenderer expects { actors: [ ... ] }.
-    // builtData is array of actors.
-    // The previous code passed { actors, ... } to render.
-    // My new code passes { actors: builtData, ... } to render.
-    // But the Hook call previously passed raw DOM container + actors?
-    // Original Hook call: Hooks.call('action-pack.updateTray', $container, actors);
-    // where actors was `getActiveActors().map(...)`.
-    // So `builtData` is the correct equivalent.
 }
 
 Hooks.on("dnd5e.getItemContextOptions", (item, options) => {
     if (item.system.activation?.type && item.system.activation.type !== "none") {
-        if (item.getFlag("action-pack-enhanced", "hidden")) {
+        if (item.getFlag("ape", "hidden")) {
             options.push({
-                name: "action-pack-enhanced.item-context.show",
+                name: game.i18n.localize("ape.item-context.show"),
                 icon: "<i class='fas fa-eye'></i>",
                 callback: async () => {
-                    await item.setFlag("action-pack-enhanced", "hidden", false);
+                    await item.setFlag("ape", "hidden", false);
                     updateTray();
                 }
             });
         } else {
             options.push({
-                name: "action-pack-enhanced.item-context.hide",
+                name: game.i18n.localize("ape.item-context.hide"),
                 icon: "<i class='fas fa-eye-slash'></i>",
                 callback: async () => {
-                    await item.setFlag("action-pack-enhanced", "hidden", true);
+                    await item.setFlag("ape", "hidden", true);
                     updateTray();
                 }
             });
@@ -283,3 +289,4 @@ Hooks.on("dropCanvasData", (canvas, data) => {
         }
     }
 });
+
