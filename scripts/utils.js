@@ -1,3 +1,84 @@
+import { ActionPackAPI } from "./api.js";
+
+export function formatNumber(val) {
+    if (val === undefined || val === null) return "0";
+    const sign = val >= 0 ? '+' : '';
+    return `${sign}${val}`;
+}
+
+export function getItemDetails(item) {
+    const castingTime = _formatCastingTime(item);
+    const range = _formatRange(item);
+    const duration = _formatDuration(item);
+    return { castingTime, range, duration };
+}
+
+function _formatCastingTime(item) {
+    const activationType = item.system?.activation?.type || "";
+    const activationValue = item.system?.activation?.value || "";
+
+    if (activationValue === "" && activationType !== "") {
+        return game.i18n.localize(`ape.action-type.${activationType}`);
+    } else if (activationValue && activationType) {
+        return `${activationValue} ${activationType.charAt(0).toUpperCase() + activationType.slice(1)}`;
+    }
+    return "";
+}
+
+function _formatRange(item) {
+    const value = item.system?.range?.value;
+    const units = item.system?.range?.units;
+    if (value && units) return `${value} ${units}`;
+    if (units) return game.i18n.localize(`ape.range.${units}`);
+    return "";
+}
+
+function _formatDuration(item) {
+    const value = item.system?.duration?.value;
+    const units = item.system?.duration?.units;
+    if (value && units) return `${value} ${value > 1 ? units + 's' : units}`;
+    if (units) return game.i18n.localize(`ape.duration.${units}`);
+    return "";
+}
+
+export function generateRaceClassDisplay(itemTypes) {
+    // in the format (Human - Wizard [Abjurer], Fighter [Defense])
+    let raceClass = {};
+    let races = itemTypes.race;
+    let classes = itemTypes.class;
+    let subClasses = itemTypes.subclass;
+    
+    if (classes.length === subClasses.length) {
+        let obj = {race: races[0]?.name || "Unknown", classes: []};
+        for (let i = 0; i < classes.length; i++) {
+            obj.classes[i] = {name: classes[i].name, level: classes[i].system.levels, subclass: {name: subClasses[i].name}};
+        }
+        raceClass = obj;
+    } else {
+        let obj = {race: races[0]?.name || "Unknown", classes: []};
+        for (let i = 0; i < classes.length; i++) {
+            obj.classes[i] = {name: classes[i].name, level: classes[i].system.levels, subclass: {name: ''}};
+            for(let j = 0; j < subClasses.length; j++) {
+                obj.classes[i].subclass.name = subClasses[j].name;
+            }
+        }
+        raceClass = obj;
+    }
+
+    // create the race, class(lvl) - subclass, class(lvl) - subclass format from the data
+    let raceClassText = `${raceClass.race}, `;
+    for (let i = 0; i < raceClass.classes.length; i++) {
+        raceClassText += `<span class="ape-actor-class">${raceClass.classes[i].name}(${raceClass.classes[i].level})</span>`;
+        if (raceClass.classes[i].subclass.name !== '' ) {
+            raceClassText += `<span class="ape-actor-subclass"> - ${raceClass.classes[i].subclass.name}</span>`;
+        }
+        if(i < raceClass.classes.length - 1) {
+            raceClassText += `, `;
+        }
+    }
+    return raceClassText;
+}
+
 // From Illandril's NPC Quick Actions by Joe Spandrusyszyn
 
 export const calculateUsesForItem = (item) => {
