@@ -18,6 +18,12 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Module
+        run: npm run build
+
       - name: Update Version from Tag
         run: |
           TAG_VERSION=${GITHUB_REF#refs/tags/}
@@ -53,7 +59,7 @@ jobs:
 
       - name: Package Module
         run: |
-          zip -r module.zip lang/ module.json scripts/ styles/ README.md LICENSE
+          zip -r module.zip dist/ images/ lang/ styles/ module.json README.md LICENSE
 
       - name: Upload Release Asset
         id: upload-release-asset
