@@ -2,24 +2,24 @@ export function registerSettings(callbacks) {
     const { updateTray, updateTrayState, resetScroll } = callbacks;
 
     function isTrayAlwaysOn() {
-        const config = game.settings.get("ape", "tray-display");
+        const config = game.settings.get("action-pack-enhanced", "tray-display");
         return config === "always";
     }
 
     game.settings.register(
-        "ape",
+        "action-pack-enhanced",
         "tray-display",
         {
-            name: "ape.settings.tray-display",
-            hint: "ape.settings.tray-display-hint",
+            name: "action-pack-enhanced.settings.tray-display",
+            hint: "action-pack-enhanced.settings.tray-display-hint",
             scope: "client",
             config: true,
             default: "auto",
             choices: {
-                auto: "ape.settings.tray-display-auto",
-                toggle: "ape.settings.tray-display-toggle",
-                selected: "ape.settings.tray-display-selected",
-                always: "ape.settings.tray-display-always"
+                auto: "action-pack-enhanced.settings.tray-display-auto",
+                toggle: "action-pack-enhanced.settings.tray-display-toggle",
+                selected: "action-pack-enhanced.settings.tray-display-selected",
+                always: "action-pack-enhanced.settings.tray-display-always"
             },
             type: String,
             onChange: () => {
@@ -30,11 +30,11 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "ape",
+        "action-pack-enhanced",
         "assume-default-character",
         {
-            name: "ape.settings.assume-default-character",
-            hint: "ape.settings.assume-default-character-hint",
+            name: "action-pack-enhanced.settings.assume-default-character",
+            hint: "action-pack-enhanced.settings.assume-default-character-hint",
             scope: "client",
             config: true,
             default: true,
@@ -44,17 +44,17 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "ape",
+        "action-pack-enhanced",
         "icon-size",
         {
-            name: "ape.settings.icon-size",
+            name: "action-pack-enhanced.settings.icon-size",
             scope: "client",
             config: true,
             default: "medium",
             choices: {
-                small: "ape.settings.icon-size-small",
-                medium: "ape.settings.icon-size-medium",
-                large: "ape.settings.icon-size-large"
+                small: "action-pack-enhanced.settings.icon-size-small",
+                medium: "action-pack-enhanced.settings.icon-size-medium",
+                large: "action-pack-enhanced.settings.icon-size-large"
             },
             type: String,
             onChange: () => updateTray()
@@ -62,17 +62,17 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "ape",
+        "action-pack-enhanced",
         "tray-size",
         {
-            name: "ape.settings.tray-size",
+            name: "action-pack-enhanced.settings.tray-size",
             scope: "client",
             config: true,
             default: "large",
             choices: {
-                small: "ape.settings.tray-size-small",
-                medium: "ape.settings.tray-size-medium",
-                large: "ape.settings.tray-size-large"
+                small: "action-pack-enhanced.settings.tray-size-small",
+                medium: "action-pack-enhanced.settings.tray-size-medium",
+                large: "action-pack-enhanced.settings.tray-size-large"
             },
             type: String,
             onChange: () => updateTray()
@@ -80,17 +80,17 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "ape",
+        "action-pack-enhanced",
         "skill-mode",
         {
-            name: "ape.settings.skill-mode",
-            hint: "ape.settings.skill-mode-hint",
+            name: "action-pack-enhanced.settings.skill-mode",
+            hint: "action-pack-enhanced.settings.skill-mode-hint",
             scope: "client",
             config: true,
             default: "dropdown",
             choices: {
-                dropdown: "ape.settings.skill-mode-dropdown",
-                append: "ape.settings.skill-mode-append"
+                dropdown: "action-pack-enhanced.settings.skill-mode-dropdown",
+                append: "action-pack-enhanced.settings.skill-mode-append"
             },
             type: String,
             onChange: () => updateTray()
@@ -98,10 +98,24 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "ape",
+        "action-pack-enhanced",
+        "show-xp-info",
+        {
+            name: "action-pack-enhanced.settings.show-xp-info",
+            hint: "action-pack-enhanced.settings.show-xp-info-hint",
+            scope: "client",
+            config: true,
+            default: true,
+            type: Boolean,
+            onChange: () => updateTray()
+        }
+    );
+
+    game.settings.register(
+        "action-pack-enhanced",
         "show-spell-dots",
         {
-            name: "ape.settings.show-spell-dots",
+            name: "action-pack-enhanced.settings.show-spell-dots",
             scope: "client",
             config: true,
             default: true,
@@ -111,10 +125,10 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "ape",
+        "action-pack-enhanced",
         "show-spell-uses",
         {
-            name: "ape.settings.show-spell-uses",
+            name: "action-pack-enhanced.settings.show-spell-uses",
             scope: "client",
             config: true,
             default: true,
@@ -124,10 +138,10 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "ape",
+        "action-pack-enhanced",
         "show-no-uses",
         {
-            name: "ape.settings.show-no-uses",
+            name: "action-pack-enhanced.settings.show-no-uses",
             scope: "client",
             config: true,
             default: false,
@@ -137,10 +151,10 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "ape",
+        "action-pack-enhanced",
         "sort-alphabetic",
         {
-            name: "ape.settings.sort-alphabetic",
+            name: "action-pack-enhanced.settings.sort-alphabetic",
             scope: "client",
             config: true,
             default: false,
@@ -150,10 +164,10 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "ape",
+        "action-pack-enhanced",
         "show-unprepared-cantrips",
         {
-            name: "ape.settings.show-unprepared-cantrips",
+            name: "action-pack-enhanced.settings.show-unprepared-cantrips",
             scope: "client",
             config: true,
             default: false,
@@ -163,10 +177,23 @@ export function registerSettings(callbacks) {
     );
 
     game.settings.register(
-        "ape",
+        "action-pack-enhanced",
+        "show-unprepared-spells",
+        {
+            name: "action-pack-enhanced.settings.show-unprepared-spells",
+            scope: "client",
+            config: true,
+            default: false,
+            type: Boolean,
+            onChange: () => updateTray()
+        }
+    );
+
+    game.settings.register(
+        "action-pack-enhanced",
         "use-control-button",
         {
-            name: "ape.settings.use-control-button",
+            name: "action-pack-enhanced.settings.use-control-button",
             scope: "client",
             config: true,
             default: true,
@@ -175,8 +202,8 @@ export function registerSettings(callbacks) {
         }
     );
 
-    game.keybindings.register("ape", "toggle-tray", {
-        name: "ape.keybindings.toggle-tray",
+    game.keybindings.register("action-pack-enhanced", "toggle-tray", {
+        name: "action-pack-enhanced.keybindings.toggle-tray",
         editable: [
             { key: "KeyE", modifiers: [] }
         ],
@@ -188,14 +215,14 @@ export function registerSettings(callbacks) {
         }
     });
 
-    game.keybindings.register("ape", "toggle-skills", {
-        name: "ape.keybindings.toggle-skills",
-        hint: "ape.keybindings.toggle-skills-hint",
+    game.keybindings.register("action-pack-enhanced", "toggle-skills", {
+        name: "action-pack-enhanced.keybindings.toggle-skills",
+        hint: "action-pack-enhanced.keybindings.toggle-skills-hint",
         editable: [
             { key: "KeyK", modifiers: [] }
         ],
         onDown: (ctx) => {
-            if (game.settings.get("ape", "skill-mode") === "dropdown") {
+            if (game.settings.get("action-pack-enhanced", "skill-mode") === "dropdown") {
                 const wasSkillsOpen = $('#ape-app .ape-skill-container').hasClass("is-open");
                 if ($('#ape-app').hasClass("is-open")) {
                     $('#ape-app .ape-skill-container').toggleClass("is-open");

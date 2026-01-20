@@ -68,11 +68,11 @@ export class ApeItem extends LitElement {
         
         // Unprepared Check (simplistic)
         const canCastUnpreparedRituals = !!this.item.parent.itemTypes.feat.find(i => i.name === "Ritual Adept");
-        const isUnprepared = sys.method === 'prepared' && !sys.prepared && sys.level !== 0 && !canCastUnpreparedRituals;
+        const isUnprepared = sys.prepared === 0 && !(isRitual && canCastUnpreparedRituals);
 
         return html`
-            <div class="item-name rollable flexrow">
-                <div class="item-image ${rarity}" 
+            <div class="item-name rollable flexrow ${isUnprepared ? 'unprepared' : ''}">
+                <div class="item-image ${rarity}${isUnprepared ? ' unprepared' : ''}" 
                         style="background-image: url('${this.item.img}')"
                         @mousedown="${this._onRoll}">
                     <i class="fa fa-dice-d20"></i>
@@ -83,23 +83,23 @@ export class ApeItem extends LitElement {
                     ${showUses ? html` (${this.uses.available}${this.uses.maximum ? '/' + this.uses.maximum : ''})` : nothing}
                 </h4>
 
-                ${isRitual ? html`<div class="ritual flag" title="${game.i18n.localize("ape.flag.ritual-title")}"></div>` : nothing}
-                ${isConcentration ? html`<div class="concentration flag" title="${game.i18n.localize("ape.flag.concentration-title")}"></div>` : nothing}
-                ${isBonus ? html`<div class="bonus flag" title="${game.i18n.localize("ape.flag.bonus-title")}">${game.i18n.localize("ape.flag.bonus")}</div>` : nothing}
-                ${isReaction ? html`<div class="reaction flag" title="${game.i18n.localize("ape.flag.reaction-title")}">${game.i18n.localize("ape.flag.reaction")}</div>` : nothing}
-                ${isLegendary ? html`<div class="legendary flag" title="${game.i18n.localize("ape.flag.legendary-title")}">${game.i18n.localize("ape.flag.legendary")}</div>` : nothing}
+                ${isRitual ? html`<div class="ritual flag" title="${game.i18n.localize("action-pack-enhanced.flag.ritual-title")}"></div>` : nothing}
+                ${isConcentration ? html`<div class="concentration flag" title="${game.i18n.localize("action-pack-enhanced.flag.concentration-title")}"></div>` : nothing}
+                ${isBonus ? html`<div class="bonus flag" title="${game.i18n.localize("action-pack-enhanced.flag.bonus-title")}">${game.i18n.localize("action-pack-enhanced.flag.bonus")}</div>` : nothing}
+                ${isReaction ? html`<div class="reaction flag" title="${game.i18n.localize("action-pack-enhanced.flag.reaction-title")}">${game.i18n.localize("action-pack-enhanced.flag.reaction")}</div>` : nothing}
+                ${isLegendary ? html`<div class="legendary flag" title="${game.i18n.localize("action-pack-enhanced.flag.legendary-title")}">${game.i18n.localize("action-pack-enhanced.flag.legendary")}</div>` : nothing}
 
                 ${isRecharge ? (isCharged ? 
                     html`<div class="flag"><i class="fas fa-bolt"></i></div>` : 
                     html`<div class="flag"><a class="rollable item-recharge" @mousedown="${this._onRecharge}"><i class="fas fa-dice-six"></i> ${sys.recharge.value}+</a></div>`
                 ) : nothing}
 
-                ${isUnprepared ? html`<div class="unprepared flag" title="${game.i18n.localize("ape.flag.unprepared-title")}"></div>` : nothing}
+                ${isUnprepared ? html`<div class="unprepared flag" title="${game.i18n.localize("action-pack-enhanced.flag.unprepared-title")}">${game.i18n.localize("action-pack-enhanced.flag.unprepared")}</div>` : nothing}
             </div>
             
             <div class="item-drag-handle" 
                     draggable="true" 
-                    title="${game.i18n.localize("ape.drag-to-target")}"
+                    title="${game.i18n.localize("action-pack-enhanced.drag-to-target")}"
                     @dragstart="${this._onDragStart}">
                 <i class="fas fa-grip-vertical"></i>
             </div>

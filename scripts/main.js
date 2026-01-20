@@ -45,7 +45,7 @@ export function fudgeToActor(candidate) {
 
 function updateCombatStatus() {
     const actors = canvas.tokens.controlled.map(t => t.actor);
-    const app = document.querySelector('ape-app');
+    const app = document.querySelector('#ape-app');
     if (!app) return;
 
     // We can just add/remove classes on the custom element itself if we want
@@ -59,7 +59,7 @@ function updateCombatStatus() {
 Hooks.on("ready", () => {
     // Mount the Lit App
     // Check if already exists to avoid duplicate on reloads if not full reload
-    if (!document.querySelector('ape-app')) {
+    if (!document.querySelector('#ape-app')) {
         const app = document.createElement('ape-app');
         app.id = 'ape-app'; // Keep ID for CSS
         app.classList.add("ape-container");
@@ -85,12 +85,12 @@ Hooks.on("ready", () => {
 });
 
 function isTrayAutoHide() {
-    const config = game.settings.get("ape", "tray-display");
+    const config = game.settings.get("action-pack-enhanced", "tray-display");
     return config === "selected" || config === "auto";
 }
 
 function isTrayAlwaysOn() {
-    const config = game.settings.get("ape", "tray-display");
+    const config = game.settings.get("action-pack-enhanced", "tray-display");
     return config === "always";
 }
 
@@ -99,7 +99,7 @@ function getActiveActors() {
     if (controlled.length) {
         return controlled.map(token => token.actor);
     }
-    if (game.user.character && game.settings.get("ape", "assume-default-character")) {
+    if (game.user.character && game.settings.get("action-pack-enhanced", "assume-default-character")) {
         return [game.user.character];
     }
     return [];
@@ -171,12 +171,12 @@ Hooks.on("init", () => {
 });
 
 Hooks.on('getSceneControlButtons', (controls) => {
-    if (game.settings.get("ape", "use-control-button") && !isTrayAlwaysOn()) {
+    if (game.settings.get("action-pack-enhanced", "use-control-button") && !isTrayAlwaysOn()) {
         const tokenTools = controls.tokens.tools;
         if (tokenTools) {
             tokenTools.apeApp = {
                 name: "apeApp",
-                title: game.i18n.localize("ape.control-icon"),
+                title: game.i18n.localize("action-pack-enhanced.control-icon"),
                 icon: 'fas fa-user-shield',
                 visible: true,
                 onClick: () => {
@@ -212,7 +212,6 @@ function updateTrayState() {
 
 async function updateTray() {
     if (!dataBuilder) dataBuilder = new ActionPackDataBuilder();
-    // No interactions class needed, handled by Lit+API
 
     const actors = getActiveActors();
 
@@ -222,17 +221,21 @@ async function updateTray() {
         return tgt ? [str, tgt].join("-") : tgt;
     }
 
-    const iconSize = prefix(game.settings.get("ape", "icon-size"), "icon");
-    const traySize = prefix(game.settings.get("ape", "tray-size"), "tray");
-    const showSpellDots = game.settings.get("ape", "show-spell-dots");
-    const showSpellUses = game.settings.get("ape", "show-spell-uses");
+    const iconSize = prefix(game.settings.get("action-pack-enhanced", "icon-size"), "icon");
+    const traySize = prefix(game.settings.get("action-pack-enhanced", "tray-size"), "tray");
+    const showSpellDots = game.settings.get("action-pack-enhanced", "show-spell-dots");
+    const showSpellUses = game.settings.get("action-pack-enhanced", "show-spell-uses");
     const allAbilities = Object.entries(CONFIG.DND5E.abilities);
     const abilityColumns = [
         allAbilities.slice(0, 3).map(([key, config]) => ({ key, label: config.label })),
         allAbilities.slice(3, 6).map(([key, config]) => ({ key, label: config.label }))
     ];
 
-    const app = document.querySelector('ape-app');
+    const app = document.querySelector('#ape-app');
+    // remove all the tray-* and icon-* classes
+    Array.from(app.classList).forEach(c => {
+        if (c.startsWith("tray-") || c.startsWith("icon-")) app.classList.remove(c);
+    });
     app.classList.add(iconSize);
     app.classList.add(traySize);
     if (app) {
@@ -250,18 +253,18 @@ async function updateTray() {
 
 Hooks.on("dnd5e.getItemContextOptions", (item, options) => {
     if (item.system.activation?.type && item.system.activation.type !== "none") {
-        if (item.getFlag("ape", "hidden")) {
+        if (item.getFlag("action-pack-enhanced", "hidden")) {
             options.push({
-                name: game.i18n.localize("ape.item-context.show"),
+                name: game.i18n.localize("action-pack-enhanced.item-context.show"),
                 icon: "<i class='fas fa-eye'></i>",
                 callback: async () => {
-                    await item.setFlag("ape", "hidden", false);
+                    await item.setFlag("action-pack-enhanced", "hidden", false);
                     updateTray();
                 }
             });
         } else {
             options.push({
-                name: game.i18n.localize("ape.item-context.hide"),
+                name: game.i18n.localize("action-pack-enhanced.item-context.hide"),
                 icon: "<i class='fas fa-eye-slash'></i>",
                 callback: async () => {
                     await item.setFlag("ape", "hidden", true);

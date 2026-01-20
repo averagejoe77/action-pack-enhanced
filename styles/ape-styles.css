@@ -155,12 +155,12 @@
 
         .group-dots {
             display: flex;
-            gap: 2px;
+            gap: 4px;
             max-width: fit-content;
 
             .dot {
-                width: 10px;
-                height: 10px;
+                width: 15px;
+                height: 15px;
                 border-radius: 50%;
                 cursor: pointer;
                 background-color: rgba(255, 100, 0, 1);
@@ -184,8 +184,7 @@
         filter: invert(1);
     }
 
-    .ape-actor-ac-display,
-    input.ape-actor-ac-input {
+    .ape-actor-ac-display {
         grid-area: 1 / 1;
         text-align: center;
         line-height: normal;
@@ -193,23 +192,112 @@
         z-index: 2;
     }
 
-    .ape-actor-ac-display {
-        cursor: pointer;
+    .ape-actor-xp {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 10px 0;
+        position: relative;
+        overflow: visible;
     }
 
-    input.ape-actor-ac-input {
-        background: transparent;
-        border: none;
-        color: inherit;
-        font-family: inherit;
-        padding: 0;
-        margin: 0;
+    .ape-actor-xp-bar {
+        height: 10px;
+        margin-bottom: 10px;
+        position: relative;
         width: 100%;
 
-        &:focus {
-            outline: none;
-            background: rgba(0, 0, 0, 0.5);
+        &:before {
+            background: red;
+            content: "";
+            display: block;
+            height: 5px;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: var(--bar-percent);
         }
+    }
+
+    .ape-actor-xp-info {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 5px;
+        position: relative;
+        width: 100%;
+    }
+
+    .ape-actor-xp-current {
+        font-size: 14px;
+        text-align: right;
+        border: 0 none;
+        min-height: unset;
+        height: unset;
+        padding: 0;
+        color: white;
+
+        &:hover,
+        &:active,
+        &:focus {
+            background-color: transparent;
+            cursor: pointer;
+            border: none;
+            color: white;
+        }
+    }
+
+    .ape-actor-xp-actions {
+        background: black;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #880000;
+        padding: 20px;
+        border-radius: 13px;
+        gap: 10px;
+        align-items: center;
+        position: absolute;
+
+        &.inactive {
+            left: -100%;
+            opacity: 0;
+            top: 150%;
+            transition: opacity 0.3s, top 0.3s, left 0.1s linear 0.6s;
+        }
+
+        &.active {
+            left: 0;
+            opacity: 1;
+            top: 100%;
+            transition: opacity 0.3s linear 0.3s, top 0.3s linear 0.3s, left 0.1s linear;
+            z-index: 30;
+        }
+
+        p {
+            text-align: center;
+            color: #e7d1b1;
+        }
+    }
+
+    .ape-actor-xp-increment,
+    .ape-actor-xp-decrement {
+        display: flex;
+        gap: 6px;
+    }
+
+    button.ape-actor-xp-button {
+        width: 50px;
+        text-align: center;
+    }
+
+    .ape-actor-xp-separator {
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .ape-actor-xp-max {
+        font-size: 14px;
+        text-align: left;
     }
 
     .ape-actor-hp-wrapper {
@@ -217,6 +305,32 @@
         justify-content: center;
         align-items: center;
         margin: 10px 0 20px;
+    }
+
+    .ape-actor-rest-buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        padding: 20px 0;
+    }
+
+    .ape-actor-rest-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 25px;
+        height: 25px;
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .ape-actor-rest-button:hover {
+        background-color: rgba(255, 255, 255, 0.4);
+        transition: background-color 0.3s;
     }
 
     .ape-actor-hp {
@@ -280,30 +394,58 @@
         width: 25%;
     }
 
-    .ape-actor-rest-buttons {
+    .ape-death-saving {
         display: flex;
-        justify-content: center;
         align-items: center;
-        gap: 10px;
+        gap: 5px;
+        justify-content: center;
+        margin: 20px 0;
         padding: 20px 0;
-    }
+        background-color: rgba(255, 255, 255, 0.1);
 
-    .ape-actor-rest-button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 25px;
-        height: 25px;
-        border-radius: 5px;
-        background-color: rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
+        .ape-death-throws {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 5px;
+            width: 80px;
 
-    .ape-actor-rest-button:hover {
-        background-color: rgba(255, 255, 255, 0.4);
-        transition: background-color 0.3s;
+            &.failed .ape-death-dot.filled {
+                background-color: #5b0707;
+                border-color: #5b0707;
+            }
+
+            &.saved .ape-death-dot.filled {
+                background-color: #075b07;
+                border-color: #075b07;
+            }
+        }
+
+        .ape-death-dot {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ape-death-icon {
+            background-color: #525252;
+            cursor: pointer;
+            mask: url("/systems/dnd5e/icons/svg/statuses/dead.svg") 0 0 / 50px 50px no-repeat;
+            display: block;
+            width: 50px;
+            height: 50px;
+            transition: background-color 0.3s;
+
+            &:hover {
+                background-color: #a4a4a4;
+                transition: background-color 0.3s;
+            }
+        }
     }
 
     .ape-abilities {
@@ -378,6 +520,90 @@
         }
     }
 
+    .ape-skill-container {
+
+        &.is-open .ape-skills,
+        &.append .ape-skills {
+            display: initial;
+        }
+
+        &.append {
+            margin-top: 15px;
+
+            .ape-skill-header i {
+                display: none;
+            }
+        }
+
+        .ape-skill-header {
+            display: block;
+            background-color: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 1px 6px;
+            margin: 6px -5px 0px -5px;
+            border-radius: 3px;
+            font-family: "Modesto Condensed", "Palatino Linotype", serif;
+            font-size: 1.5rem;
+            cursor: pointer;
+
+            i {
+                display: inline-block;
+                margin-right: 2px;
+                text-align: center;
+                transform: rotate(-90deg);
+                transition: transform 0.2s;
+                width: 15px;
+            }
+        }
+
+        &.is-open .ape-skill-header i {
+            transform: rotate(0deg);
+        }
+
+        .ape-skills {
+            display: none;
+        }
+
+        .ape-skill-row {
+            padding: 5px;
+            gap: 5px;
+            align-items: center;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+
+            &.proficient,
+            &.expert {
+                font-weight: bold;
+            }
+
+            &.proficient {
+                color: green;
+            }
+
+            &.expert {
+                color: gold;
+            }
+
+            &:nth-child(even) {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        .ape-skill-label {
+            flex: 5;
+        }
+
+        .ape-skill-bonus {
+            text-align: center;
+        }
+
+        .ape-skill-passive {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+    }
+
     .ape-group-header {
         cursor: pointer;
         display: flex;
@@ -392,6 +618,7 @@
         /* If we have dots but NOT uses, push dots to the right */
         &.has-dots:not(.has-uses) .group-dots {
             margin-left: auto;
+            flex-direction: row-reverse;
         }
     }
 
@@ -472,6 +699,11 @@
                 border-radius: 5px;
                 cursor: pointer;
 
+                &.unprepared {
+                    border: 1px solid white;
+                    filter: grayscale(1);
+                }
+
                 i {
                     display: none;
                     font-size: var(--die-icon-size);
@@ -497,6 +729,8 @@
 
             &:hover .item-image {
                 background-image: none !important;
+                border: none;
+                filter: none;
 
                 &.uncommon,
                 &.rare,
@@ -631,144 +865,6 @@
 
     .ape-initiative-icon {
         animation: infinite forwards 1.8s init-jiggle;
-    }
-
-    .ape-skill-container {
-
-        &.is-open .ape-skills,
-        &.append .ape-skills {
-            display: initial;
-        }
-
-        &.append {
-            margin-top: 15px;
-
-            .ape-skill-header i {
-                display: none;
-            }
-        }
-
-        .ape-skill-header {
-            display: block;
-            background-color: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 1px 6px;
-            margin: 6px -5px 0px -5px;
-            border-radius: 3px;
-            font-family: "Modesto Condensed", "Palatino Linotype", serif;
-            font-size: 1.5rem;
-            cursor: pointer;
-
-            i {
-                display: inline-block;
-                margin-right: 2px;
-                text-align: center;
-                transform: rotate(-90deg);
-                transition: transform 0.2s;
-                width: 15px;
-            }
-        }
-
-        &.is-open .ape-skill-header i {
-            transform: rotate(0deg);
-        }
-
-        .ape-skills {
-            display: none;
-        }
-
-        .ape-skill-row {
-            padding: 5px;
-            gap: 5px;
-            align-items: center;
-            font-size: 1rem;
-            color: white;
-            cursor: pointer;
-
-            &.proficient,
-            &.expert {
-                font-weight: bold;
-            }
-
-            &.proficient {
-                color: green;
-            }
-
-            &.expert {
-                color: gold;
-            }
-
-            &:nth-child(even) {
-                background-color: rgba(255, 255, 255, 0.1);
-            }
-        }
-
-        .ape-skill-label {
-            flex: 5;
-        }
-
-        .ape-skill-bonus {
-            text-align: center;
-        }
-
-        .ape-skill-passive {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.6);
-        }
-    }
-
-    .ape-death-saving {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        justify-content: center;
-        margin: 20px 0;
-        padding: 20px 0;
-        background-color: rgba(255, 255, 255, 0.1);
-
-        .ape-death-throws {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 5px;
-            width: 80px;
-
-            &.failed .ape-death-dot.filled {
-                background-color: #5b0707;
-                border-color: #5b0707;
-            }
-
-            &.saved .ape-death-dot.filled {
-                background-color: #075b07;
-                border-color: #075b07;
-            }
-        }
-
-        .ape-death-dot {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .ape-death-icon {
-            background-color: #525252;
-            cursor: pointer;
-            mask: url("/systems/dnd5e/icons/svg/statuses/dead.svg") 0 0 / 50px 50px no-repeat;
-            display: block;
-            width: 50px;
-            height: 50px;
-            transition: background-color 0.3s;
-
-            &:hover {
-                background-color: #a4a4a4;
-                transition: background-color 0.3s;
-            }
-        }
     }
 
     .ape-empty-tray {

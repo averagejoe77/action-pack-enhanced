@@ -18,7 +18,7 @@ function _formatCastingTime(item) {
     const activationValue = item.system?.activation?.value || "";
 
     if (activationValue === "" && activationType !== "") {
-        return game.i18n.localize(`ape.action-type.${activationType}`);
+        return game.i18n.localize(`action-pack-enhanced.action-type.${activationType}`);
     } else if (activationValue && activationType) {
         return `${activationValue} ${activationType.charAt(0).toUpperCase() + activationType.slice(1)}`;
     }
@@ -26,10 +26,12 @@ function _formatCastingTime(item) {
 }
 
 function _formatRange(item) {
-    const value = item.system?.range?.value;
+    const value = item.system?.range?.value || item.system?.range?.reach || 5;
+    const long = item.system?.range?.long || null;
     const units = item.system?.range?.units;
+    if (value && long && units) return `${value} ${units} / ${long} ${units}`;
     if (value && units) return `${value} ${units}`;
-    if (units) return game.i18n.localize(`ape.range.${units}`);
+    if (units) return game.i18n.localize(`action-pack-enhanced.range.${units}`);
     return "";
 }
 
@@ -37,25 +39,26 @@ function _formatDuration(item) {
     const value = item.system?.duration?.value;
     const units = item.system?.duration?.units;
     if (value && units) return `${value} ${value > 1 ? units + 's' : units}`;
-    if (units) return game.i18n.localize(`ape.duration.${units}`);
+    if (units) return game.i18n.localize(`action-pack-enhanced.duration.${units}`);
     return "";
 }
 
-export function generateRaceClassDisplay(itemTypes) {
+export function generateRaceClassDisplay(actor) {
     // in the format (Human - Wizard [Abjurer], Fighter [Defense])
     let raceClass = {};
-    let races = itemTypes.race;
-    let classes = itemTypes.class;
-    let subClasses = itemTypes.subclass;
+    let races = actor.itemTypes.race;
+    let classes = actor.itemTypes.class;
+    let subClasses = actor.itemTypes.subclass;
+    const level = actor.system.details.level;
     
     if (classes.length === subClasses.length) {
-        let obj = {race: races[0]?.name || "Unknown", classes: []};
+        let obj = {race: `<span>${races[0]?.name} - ${level}</span>` || "Unknown", classes: []};
         for (let i = 0; i < classes.length; i++) {
             obj.classes[i] = {name: classes[i].name, level: classes[i].system.levels, subclass: {name: subClasses[i].name}};
         }
         raceClass = obj;
     } else {
-        let obj = {race: races[0]?.name || "Unknown", classes: []};
+        let obj = {race: `<span>${races[0]?.name} - ${level}</span>` || "Unknown", classes: []};
         for (let i = 0; i < classes.length; i++) {
             obj.classes[i] = {name: classes[i].name, level: classes[i].system.levels, subclass: {name: ''}};
             for(let j = 0; j < subClasses.length; j++) {

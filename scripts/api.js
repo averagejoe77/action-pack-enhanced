@@ -24,6 +24,16 @@ export class ActionPackAPI {
     }
 
     /**
+     * Updates an actor's XP
+     * @param {Actor} actor 
+     * @param {number} value 
+     */
+    async updateXP(actor, value) {
+        if (!actor) return;
+        return actor.update({ "system.details.xp.value": value });
+    }
+
+    /**
      * Performs a Short Rest
      * @param {Actor} actor 
      */

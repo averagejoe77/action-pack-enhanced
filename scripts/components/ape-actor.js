@@ -7,7 +7,7 @@ export class ApeActor extends LitElement {
         actorData: { type: Object }, // The object returned by data-builder
         globalData: { type: Object }, // Global settings/options
         api: { type: Object },
-        // Internal state for UI toggles if needed, though most are handled by sub-components or CSS
+        _xpActionsOpen: { state: false }
     };
 
     createRenderRoot() { return this; }
@@ -31,25 +31,26 @@ export class ApeActor extends LitElement {
                 <h1>
                     <a class="ape-actor-name" @click="${(e) => this.api.openSheet(actor)}">${name.split(' ')[0]}</a>
                     <span class="ape-actor-ac">
-                        <img class="ape-actor-ac-icon" src="/modules/ape/images/ac-icon.svg">
+                        <img class="ape-actor-ac-icon" src="/modules/action-pack-enhanced/images/ac-icon.svg">
                         <span class="ape-actor-ac-display">${ac}</span>
                     </span>
                 </h1>
-                
-                <div class="ape-actor-meta">
-                    ${type === "character" ? html`
-                        <div class="ape-actor-race-class">
-                            ${this._renderRaceClass(actor.itemTypes)}
-                        </div>
-                    ` : nothing}
 
-                    <div class="ape-actor-rest-buttons">
-                        <button class="ape-actor-rest-button" @click="${() => this.api.shortRest(actor)}"><span class="fas fa-fork-knife"></span></button>
-                        <button class="ape-actor-rest-button" @click="${() => this.api.longRest(actor)}"><span class="fas fa-tent"></span></button>
+                ${type === "character" ? html`
+                    <div class="ape-actor-race-class">
+                        ${this._renderRaceClass(actor)}
                     </div>
+                ` : nothing}
 
-                    ${this._renderHpBar(actor, hp)}
+                ${game.settings.get("action-pack-enhanced", "show-xp-info") && type === "character" ? this._renderExperience(actor) : nothing}
+
+                <div class="ape-actor-rest-buttons">
+                    <button class="ape-actor-rest-button" @click="${() => this.api.shortRest(actor)}"><span class="fas fa-fork-knife"></span></button>
+                    <button class="ape-actor-rest-button" @click="${() => this.api.longRest(actor)}"><span class="fas fa-tent"></span></button>
                 </div>
+
+                ${this._renderHpBar(actor, hp)}
+                
             </div>
 
             ${isDead ? this._renderDeathSaves(actor) : nothing}
@@ -57,7 +58,7 @@ export class ApeActor extends LitElement {
             ${needsInitiative ? html`
                 <div class="ape-initiative" @click="${() => this.api.rollInitiative(actor)}">
                     <i class="fas fa-swords ape-initiative-icon"></i>
-                    <span class="ape-initiative-text">${game.i18n.localize("ape.roll-initiative")}</span>
+                    <span class="ape-initiative-text">${game.i18n.localize("action-pack-enhanced.roll-initiative")}</span>
                 </div>
             ` : nothing}
 
@@ -72,8 +73,51 @@ export class ApeActor extends LitElement {
         `;
     }
 
-    _renderRaceClass(itemTypes) {
-        const htmlString = generateRaceClassDisplay(itemTypes);
+    _renderExperience(actor) {
+        const details = actor.system.details;
+        const percent = details.xp.pct;
+        const maxXP = details.xp.max;
+        const minXP = details.xp.min;
+        const currentXP = details.xp.value;
+        return html`
+            <div class="ape-actor-xp">
+                <div class="ape-actor-xp-bar" style="--bar-percent: ${percent}%"></div>
+                <div class="ape-actor-xp-info">
+                    <span class="ape-actor-xp-current" @click="${this._toggleXpActions}">${currentXP}</span>
+                    <span class="ape-actor-xp-separator">/</span>
+                    <span class="ape-actor-xp-max">${maxXP}</span>
+                </div>
+                <div class="ape-actor-xp-actions ${this._xpActionsOpen ? 'active' : 'inactive'}">
+                    <button class="ape-actor-xp-close" @click="${this._toggleXpActions}">close</button>
+                    <p>Choose an amount to add to or subtract from ${actor.name}'s XP</p>
+                    <div class="ape-actor-xp-increment">
+                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, currentXP + 1)}">+1</button>
+                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, currentXP + 10)}">+10</button>
+                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, currentXP + 100)}">+100</button>
+                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, currentXP + 1000)}">+1000</button>
+                    </div>
+                    <div class="ape-actor-xp-decrement">
+                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, currentXP - 1)}">-1</button>
+                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, currentXP - 10)}">-10</button>
+                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, currentXP - 100)}">-100</button>
+                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, currentXP - 1000)}">-1000</button>
+                    </div>
+                    <div class="ape-actor-xp-max">
+                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, maxXP)}">Max</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+
+
+    _toggleXpActions() {
+        this._xpActionsOpen = !this._xpActionsOpen;
+    }
+
+    _renderRaceClass(actor) {
+        const htmlString = generateRaceClassDisplay(actor);
         return html`<div style="display:contents" .innerHTML="${htmlString.replace(/,/g, '<br />')}"></div>`;
     }
 

@@ -2,13 +2,15 @@ import { calculateUsesForItem } from "./utils.js";
 
 export class ActionPackDataBuilder {
     constructor() {
-        this.settingShowNoUses = game.settings.get("ape", "show-no-uses");
-        this.settingShowUnpreparedCantrips = game.settings.get("ape", "show-unprepared-cantrips");
-        this.settingSkillMode = game.settings.get("ape", "skill-mode");
-        this.settingSortAlphabetically = game.settings.get("ape", "sort-alphabetic");
     }
 
     build(actors, scrollPosition) {
+        this.settingShowNoUses = game.settings.get("action-pack-enhanced", "show-no-uses");
+        this.settingShowUnpreparedCantrips = game.settings.get("action-pack-enhanced", "show-unprepared-cantrips");
+        this.settingShowUnpreparedSpells = game.settings.get("action-pack-enhanced", "show-unprepared-spells");
+        this.settingSkillMode = game.settings.get("action-pack-enhanced", "skill-mode");
+        this.settingSortAlphabetically = game.settings.get("action-pack-enhanced", "sort-alphabetic");
+
         return actors.map(actor => this.prepareActor(actor, scrollPosition));
     }
 
@@ -17,30 +19,30 @@ export class ActionPackDataBuilder {
         const canCastUnpreparedRituals = !!actor.itemTypes.feat.find(i => i.name === "Ritual Adept");
 
         let sections = {
-            equipped: { items: [], title: "ape.category.equipped" },
+            equipped: { items: [], title: "action-pack-enhanced.category.equipped" },
             inventory: {
-                title: "ape.category.inventory",
+                title: "action-pack-enhanced.category.inventory",
                 groups: {
-                    weapon: { items: [], title: "ape.category.weapon" },
-                    equipment: { items: [], title: "ape.category.equipment" },
-                    consumable: { items: [], title: "ape.category.consumable" },
-                    other: { items: [], title: "ape.category.other" }
+                    weapon: { items: [], title: "action-pack-enhanced.category.weapon" },
+                    equipment: { items: [], title: "action-pack-enhanced.category.equipment" },
+                    consumable: { items: [], title: "action-pack-enhanced.category.consumable" },
+                    other: { items: [], title: "action-pack-enhanced.category.other" }
                 }
             },
-            feature: { items: [], title: "ape.category.feature", groups: this.systemFeatureGroups() },
+            feature: { items: [], title: "action-pack-enhanced.category.feature", groups: this.systemFeatureGroups() },
             spell: {
-                title: "ape.category.spell",
+                title: "action-pack-enhanced.category.spell",
                 groups: {
-                    innate: { items: [], title: "ape.category.innate" },
-                    atwill: { items: [], title: "ape.category.atwill" },
-                    pact: { items: [], title: "ape.category.pact" },
+                    innate: { items: [], title: "action-pack-enhanced.category.innate" },
+                    atwill: { items: [], title: "action-pack-enhanced.category.atwill" },
+                    pact: { items: [], title: "action-pack-enhanced.category.pact" },
                     ...[...Array(10).keys()].reduce((prev, cur) => {
-                        prev[`spell${cur}`] = { items: [], title: `ape.category.spell${cur}` }
+                        prev[`spell${cur}`] = { items: [], title: `action-pack-enhanced.category.spell${cur}` }
                         return prev;
                     }, {})
                 }
             },
-            passive: { items: [], title: "ape.category.passive" }
+            passive: { items: [], title: "action-pack-enhanced.category.passive" }
         };
 
         const itemMap = ["consumable", "container", "equipment", "feat", "loot", "spell", "tool", "weapon"];
@@ -80,7 +82,7 @@ export class ActionPackDataBuilder {
 
         const hasUses = this.settingShowNoUses || !uses || uses.available;
         const hasActivities = itemData?.activities?.size > 0 ? true : false;
-        const isHidden = item.getFlag("ape", "hidden");
+        const isHidden = item.getFlag("action-pack-enhanced", "hidden");
 
         if (hasUses && hasActivities && !isHidden) {
             switch (type) {
@@ -124,16 +126,17 @@ export class ActionPackDataBuilder {
     }
 
     _prepareSpell(item, itemData, uses, sections, canCastUnpreparedRituals) {
-        // dnd5e wants me to update this to use itemData.method instead of itemData.preparation.mode, but itemData.method does not currently have the correct values, but rather simply "spell" for all spells. Will need to keep an eye on each system update and see if this changes. Same goes for the itemData.preparation.prepared property below.
-        const mode = itemData?.preparation?.mode;
+
+        const mode = itemData?.method;
+
         switch (mode) {
-            case "prepared":
-            case "always":
-                const isAlways = mode !== "prepared";
-                const isPrepared = itemData?.preparation?.prepared;
+            case "spell":
+                const isPrepared = itemData?.prepared === 1;
+                const isAlways = itemData?.prepared === 2;
                 const isCastableRitual = (canCastUnpreparedRituals && itemData.properties?.has("ritual"));
                 const isDisplayableCantrip = itemData.level == 0 && this.settingShowUnpreparedCantrips;
-                if (isAlways || isPrepared || isCastableRitual || isDisplayableCantrip) {
+                const isDisplayableUnpreparedSpell = itemData.level > 0 && this.settingShowUnpreparedSpells;
+                if (isAlways || isPrepared || isCastableRitual || isDisplayableCantrip || isDisplayableUnpreparedSpell) {
                     sections.spell.groups[`spell${itemData.level}`].items.push({ item, uses });
                 }
                 break;

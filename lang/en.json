@@ -1,5 +1,5 @@
 {
-    "ape": {
+    "action-pack-enhanced": {
         "control-icon": "Toggle APE display",
         "end-turn": "End Turn",
         "roll-initiative": "Roll initiative!",
@@ -14,6 +14,7 @@
             "special": "Special"
         },
         "range": {
+            "ft": "Ft.",
             "self": "Self",
             "touch": "Touch",
             "spec": "Special",
@@ -59,6 +60,7 @@
             "innate": "Innate Ability",
             "atwill": "At-Will",
             "pact": "Pact Magic",
+            "unprepared": "Unprepared",
             "spell0": "Cantrip",
             "spell1": "Level 1",
             "spell2": "Level 2",
@@ -94,9 +96,12 @@
             "tray-size-medium": "Medium",
             "tray-size-large": "Large",
             "use-control-button": "Include a toggle button in token controls",
+            "show-xp-info": "Show experience point progress",
+            "show-xp-info-hint": "Uncheck if you are using milestone leveling. Check to show current and next level XP with xp progress bar.",
             "show-no-uses": "Show items with no uses left",
             "sort-alphabetic": "Sort items alphabetically",
             "show-unprepared-cantrips": "Show cantrips even if they are not prepared",
+            "show-unprepared-spells": "Show spells even if they are not prepared",
             "show-spell-dots": "Show spell slot dots",
             "show-spell-uses": "Show spell slot uses",
             "skill-mode": "Skill list placement",
