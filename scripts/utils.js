@@ -26,9 +26,14 @@ function _formatCastingTime(item) {
 }
 
 function _formatRange(item) {
-    const value = item.system?.range?.value || item.system?.range?.reach || 5;
     const long = item.system?.range?.long || null;
     const units = item.system?.range?.units;
+    let value;
+    if(units !== "touch" && units !== "self") {
+        value = item.system?.range?.value || item.system?.range?.reach || 5;
+    } else {
+        value = null;
+    }
     if (value && long && units) return `${value} ${units} / ${long} ${units}`;
     if (value && units) return `${value} ${units}`;
     if (units) return game.i18n.localize(`action-pack-enhanced.range.${units}`);

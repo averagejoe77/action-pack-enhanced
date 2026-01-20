@@ -180,8 +180,9 @@ function je(i) {
 }
 function Be(i) {
   var a, n, o, r, l, c, p, u;
-  const e = ((n = (a = i.system) == null ? void 0 : a.range) == null ? void 0 : n.value) || ((r = (o = i.system) == null ? void 0 : o.range) == null ? void 0 : r.reach) || 5, t = ((c = (l = i.system) == null ? void 0 : l.range) == null ? void 0 : c.long) || null, s = (u = (p = i.system) == null ? void 0 : p.range) == null ? void 0 : u.units;
-  return t && s ? `${e} ${s} / ${t} ${s}` : s ? `${e} ${s}` : s ? game.i18n.localize(`action-pack-enhanced.range.${s}`) : "";
+  const e = ((n = (a = i.system) == null ? void 0 : a.range) == null ? void 0 : n.long) || null, t = (r = (o = i.system) == null ? void 0 : o.range) == null ? void 0 : r.units;
+  let s;
+  return t !== "touch" && t !== "self" ? s = ((c = (l = i.system) == null ? void 0 : l.range) == null ? void 0 : c.value) || ((u = (p = i.system) == null ? void 0 : p.range) == null ? void 0 : u.reach) || 5 : s = null, s && e && t ? `${s} ${t} / ${e} ${t}` : s && t ? `${s} ${t}` : t ? game.i18n.localize(`action-pack-enhanced.range.${t}`) : "";
 }
 function Le(i) {
   var s, a, n, o;
