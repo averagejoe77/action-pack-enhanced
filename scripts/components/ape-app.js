@@ -70,7 +70,7 @@ export class ApeApp extends LitElement {
                 </div>
 
                 <div class="ape-end-turn" @click="${() => this.api.endTurn()}">
-                    ${game.i18n.localize("ape.end-turn")}
+                    ${game.i18n.localize("action-pack-enhanced.end-turn")}
                 </div>
             </div>
         `;
