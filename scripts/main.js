@@ -225,6 +225,7 @@ async function updateTray() {
     const traySize = prefix(game.settings.get("action-pack-enhanced", "tray-size"), "tray");
     const showSpellDots = game.settings.get("action-pack-enhanced", "show-spell-dots");
     const showSpellUses = game.settings.get("action-pack-enhanced", "show-spell-uses");
+    const showWeaponMastery = game.settings.get("action-pack-enhanced", "show-weapon-mastery");
     const allAbilities = Object.entries(CONFIG.DND5E.abilities);
     const abilityColumns = [
         allAbilities.slice(0, 3).map(([key, config]) => ({ key, label: config.label })),
@@ -245,7 +246,8 @@ async function updateTray() {
         app.globalData = {
             abilityColumns,
             showSpellDots,
-            showSpellUses
+            showSpellUses,
+            showWeaponMastery
         };
         // API is already set on init
     }
@@ -286,7 +288,12 @@ Hooks.on("dropCanvasData", (canvas, data) => {
         });
 
         if (dropTarget) {
-            dropTarget.setTarget(true, { user: game.user, releaseOthers: true, groupSelection: false });
+            // Check if item supports multiple targets
+            const target = item.system.target;
+            const isMultiTarget = target && target.value > 1;
+            
+            // releaseOthers: true if single target (replace), false if multi-target (add)
+            dropTarget.setTarget(true, { user: game.user, releaseOthers: !isMultiTarget, groupSelection: true });
             item.use();
             return false;
         }

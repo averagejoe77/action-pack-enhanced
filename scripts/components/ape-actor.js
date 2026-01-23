@@ -25,11 +25,21 @@ export class ApeActor extends LitElement {
         const ac = actor.system.attributes.ac.value;
         const type = actor.type;
         const isDead = hp.value <= 0 && type === "character";
+        const isInspired = actor.system.attributes.inspiration;
 
         return html`
             <div class="ape-actor-header">
                 <h1>
                     <a class="ape-actor-name" @click="${(e) => this.api.openSheet(actor)}">${name.split(' ')[0]}</a>
+                    <a class="ape-actor-inspiration ${isInspired ? 'ape-actor-inspiration-active' : ''}" title="${name} is ${isInspired ? 'inspired' : 'not inspired'}!" @mousedown="${(e) => this.api.toggleInspiration(actor, e)}">
+                        <svg width="100%" height="100%" viewBox="0 0 163 191" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+                            <path class="${game.settings.get("action-pack-enhanced", "show-inspiration-animation") ? "animated" : ""}" d="M58.699,71.415l0,63.404"/>
+                            <path class="${game.settings.get("action-pack-enhanced", "show-inspiration-animation") ? "animated" : ""}" d="M78.624,71.415l0,63.404"/>
+                            <path class="${game.settings.get("action-pack-enhanced", "show-inspiration-animation") ? "animated" : ""}" d="M97.63,71.415l0,63.404"/>
+                            <path class="${game.settings.get("action-pack-enhanced", "show-inspiration-animation") ? "animated" : ""}" d="M35.88,149.717c-4.526,3.624 -16.665,18.643 -20.574,22.552c30.949,15.518 96.969,17.912 122.372,-1.233c-4.18,-4.18 -18.011,-21.744 -18.295,-22.22c-0.881,9.201 -82.394,9.898 -83.502,0.9Zm-0.489,-101.365l83.626,0.267c0,0 0.366,79.504 0.366,100.197c0,9.081 -83.502,9.982 -83.502,0.9c0,-14.9 -0.489,-101.365 -0.489,-101.365Zm83.714,16.03c0,0 29.622,-0.424 33.244,2.76c4.154,3.651 6.015,31.36 0.334,41.72c-5.681,10.36 -33.166,19.636 -33.166,19.636l-0.412,-64.116Z"/>
+                            <path id="foam" class="ape-actor-inspiration-foam ${isInspired ? 'ape-actor-inspiration-foam-active' : 'ape-actor-inspiration-foam-hidden'} ${game.settings.get("action-pack-enhanced", "show-inspiration-animation") ? "animated" : ""}" d="M26.53,76.061c0,0 -24.573,-12.245 -19.621,-37.499c4.953,-25.254 36.384,-1.701 38.194,-0.34c1.81,1.361 -8.286,-33.928 21.049,-31.887c29.336,2.041 31.382,19.982 31.478,26.19c0.095,6.207 8.138,-23.223 34.718,-8.503c17.811,9.864 8.665,25.224 5.33,29.251c-3.364,4.062 -9.328,9.305 -14.471,11.091c-4.583,1.591 -20.853,3.096 -29.719,-11.516c-1.238,-2.041 -0.932,15.302 -9.097,16.357c-3.908,0.505 -14.578,3.667 -23.477,-13.095c-10.105,33.947 -34.384,19.951 -34.384,19.951Z"/>
+                        </svg>
+                    </a>
                     <span class="ape-actor-ac">
                         <img class="ape-actor-ac-icon" src="/modules/action-pack-enhanced/images/ac-icon.svg">
                         <span class="ape-actor-ac-display">${ac}</span>
@@ -317,6 +327,7 @@ export class ApeActor extends LitElement {
                     .actor="${actor}"
                     .showSpellDots="${this.globalData.showSpellDots}"
                     .showSpellUses="${this.globalData.showSpellUses}"
+                    .showWeaponMastery="${this.globalData.showWeaponMastery}"
                     .forceOpen="${data.forceOpen}">
                 </ape-section>
             `;

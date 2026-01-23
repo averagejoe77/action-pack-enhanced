@@ -13,7 +13,8 @@ export class ApeSection extends LitElement {
         showSpellUses: { type: Boolean },
         actor: { type: Object },
         masteries: { type: Object },
-        forceOpen: { type: Boolean }
+        forceOpen: { type: Boolean },
+        showWeaponMastery: { type: Boolean }
     };
 
     _openJournal(uuid) {
@@ -62,7 +63,8 @@ export class ApeSection extends LitElement {
                             .item="${entry.item}" 
                             .uses="${entry.uses}" 
                             .api="${this.api}"
-                            .masteryIds="${this.actor?.system?.traits?.weaponProf?.mastery?.value}">
+                            .masteryIds="${this.actor?.system?.traits?.weaponProf?.mastery?.value}"
+                            .showWeaponMastery="${this.showWeaponMastery}">
                         </ape-item>
                     `)}
                 </div>

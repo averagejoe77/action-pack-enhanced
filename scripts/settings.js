@@ -99,6 +99,20 @@ export function registerSettings(callbacks) {
 
     game.settings.register(
         "action-pack-enhanced",
+        "show-inspiration-animation",
+        {
+            name: "action-pack-enhanced.settings.show-inspiration-animation",
+            hint: "action-pack-enhanced.settings.show-inspiration-animation-hint",
+            scope: "client",
+            config: true,
+            default: true,
+            type: Boolean,
+            onChange: () => updateTray()
+        }
+    );
+
+    game.settings.register(
+        "action-pack-enhanced",
         "show-xp-info",
         {
             name: "action-pack-enhanced.settings.show-xp-info",

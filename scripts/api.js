@@ -377,6 +377,15 @@ export class ActionPackAPI {
         };
     }
 
+    /**
+     * Toggles inspiration on an actor
+     * @param {Actor} actor 
+     */
+    async toggleInspiration(actor) {
+        if (!actor) return;
+        return actor.update({ "system.attributes.inspiration": !actor.system.attributes.inspiration });
+    }
+
     _formatRange(item) {
         const value = item.system?.range?.value;
         const units = item.system?.range?.units;

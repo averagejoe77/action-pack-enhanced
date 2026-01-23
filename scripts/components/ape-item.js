@@ -9,7 +9,8 @@ export class ApeItem extends LitElement {
         api: { type: Object },
         masteryIds: { type: Array },
         expanded: { type: Boolean, state: true },
-        description: { type: Object, state: true }
+        description: { type: Object, state: true },
+        showWeaponMastery: { type: Boolean }
     };
 
     // Use Light DOM to inherit global styles
@@ -39,11 +40,6 @@ export class ApeItem extends LitElement {
     }
 
     async _onClick(e) {
-        if (e.shiftKey) { 
-            this.api.rollItem(this.item, e);
-            return;
-        }
-        
         this.expanded = !this.expanded;
         if (this.expanded && !this.description) {
             this.description = await this.api.getItemDescription(this.item);
@@ -101,8 +97,7 @@ export class ApeItem extends LitElement {
                         <span class="item-text ${rarity}">${this.item.name}</span>
                         ${showUses ? html` (${this.uses.available}${this.uses.maximum ? '/' + this.uses.maximum : ''})` : nothing}
                     </h4>
-
-                    ${game.modules.find(i => i.id === 'wm5e') && game.modules.get('wm5e')?.active && itemMastery ? html`<div class="mastery ${isMastered ? 'active' : 'inactive'} flag">${localizedMastery}</div>` : nothing}
+                    ${this.showWeaponMastery ? this._renderWeaponMastery(itemMastery, isMastered, localizedMastery) : nothing}
                 </div>
 
                 ${isRitual ? html`<div class="ritual flag" title="${game.i18n.localize("action-pack-enhanced.flag.ritual-title")}"></div>` : nothing}
@@ -142,6 +137,15 @@ export class ApeItem extends LitElement {
             ${details.range ? html`<p><strong>Range:</strong> ${details.range}</p>` : nothing}
             ${details.duration ? html`<p><strong>Duration:</strong> ${details.duration}</p>` : nothing}
         `;
+    }
+
+    _renderWeaponMastery(itemMastery, isMastered, localizedMastery) {
+        if (game.modules.get('wm5e')?.active) {
+            if(!itemMastery) return nothing;
+
+            return html`<div class="mastery ${isMastered ? 'active' : 'inactive'} flag">${localizedMastery}</div>`;
+        }
+        return nothing;
     }
 }
 customElements.define('ape-item', ApeItem);

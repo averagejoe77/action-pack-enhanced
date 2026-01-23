@@ -10,6 +10,7 @@ export class ActionPackDataBuilder {
         this.settingShowUnpreparedSpells = game.settings.get("action-pack-enhanced", "show-unprepared-spells");
         this.settingSkillMode = game.settings.get("action-pack-enhanced", "skill-mode");
         this.settingSortAlphabetically = game.settings.get("action-pack-enhanced", "sort-alphabetic");
+        this.settingShowWeaponMastery = game.settings.get("action-pack-enhanced", "show-weapon-mastery");
 
         return actors.map(actor => this.prepareActor(actor, scrollPosition));
     }
