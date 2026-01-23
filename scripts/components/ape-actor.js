@@ -316,7 +316,8 @@ export class ApeActor extends LitElement {
                     .api="${this.api}"
                     .actor="${actor}"
                     .showSpellDots="${this.globalData.showSpellDots}"
-                    .showSpellUses="${this.globalData.showSpellUses}">
+                    .showSpellUses="${this.globalData.showSpellUses}"
+                    .forceOpen="${data.forceOpen}">
                 </ape-section>
             `;
         });

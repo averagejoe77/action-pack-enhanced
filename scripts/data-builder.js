@@ -56,6 +56,16 @@ export class ActionPackDataBuilder {
             }
         }
 
+        const wm5eActive = game.modules.find(m => m.id === "wm5e") && game.modules.get("wm5e")?.active;
+        if (actor.type === "character" && wm5eActive) {
+            const weaponMaster = actor.itemTypes.feat.find(i => i.name === "Weapon Mastery" || i.name === "Weapon Master");
+            if (weaponMaster) {
+               // Determine if we should force open the section (e.g. pending selection)
+                const isPending = actor.getFlag("action-pack-enhanced", "masterySelectionPending");
+                sections.equipped.forceOpen = isPending;
+            }
+        }
+
         const combatant = game.combat?.combatants.find(c => c.actor === actor);
         const needsInitiative = combatant && !combatant.initiative;
 

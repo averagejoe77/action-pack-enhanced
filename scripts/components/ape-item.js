@@ -7,6 +7,7 @@ export class ApeItem extends LitElement {
         item: { type: Object },
         uses: { type: Object },
         api: { type: Object },
+        masteryIds: { type: Array },
         expanded: { type: Boolean, state: true },
         description: { type: Object, state: true }
     };
@@ -39,8 +40,8 @@ export class ApeItem extends LitElement {
 
     async _onClick(e) {
         if (e.shiftKey) { 
-             this.api.rollItem(this.item, e);
-             return;
+            this.api.rollItem(this.item, e);
+            return;
         }
         
         this.expanded = !this.expanded;
@@ -52,7 +53,8 @@ export class ApeItem extends LitElement {
     render() {
         if (!this.item) return nothing;
         const sys = this.item.system;
-        const rarity = sys.rarity || '';
+        const actor = this.item.actor;
+        const rarity = sys.rarity !== '' ? sys.rarity : this.item.type === 'weapon' ? 'common' : '';
         const isSpell = this.item.type === 'spell';
         const isInnate = sys.method === 'innate';
         const showUses = this.uses && (!isSpell || isInnate);
@@ -65,9 +67,25 @@ export class ApeItem extends LitElement {
         const isLegendary = sys.activation?.type === 'legendary';
         const isRecharge = sys.recharge?.value;
         const isCharged = sys.recharge?.charged;
+
+        let itemMastery = false;
+        let isMastered = false;
+        let localizedMastery = '';
+
+        if(game.modules.find(i => i.id === 'wm5e') && game.modules.get('wm5e')?.active) {   
+            itemMastery = sys.mastery || false;
+
+            if (itemMastery && this.item.type === 'weapon') {
+                const baseItem = sys.type?.baseItem;
+                // Use the passed masteryIds if available, otherwise fallback to actor data
+                const currentMasteries = new Set(this.masteryIds || actor.system.traits?.weaponProf?.mastery?.value || []);
+                isMastered = baseItem && currentMasteries.has(baseItem);
+                localizedMastery = game.i18n.localize(`action-pack-enhanced.masteries.${itemMastery}`);
+            }
+        }
         
         // Unprepared Check (simplistic)
-        const canCastUnpreparedRituals = !!this.item.parent.itemTypes.feat.find(i => i.name === "Ritual Adept");
+        const canCastUnpreparedRituals = !!actor.itemTypes.feat.find(i => i.name === "Ritual Adept");
         const isUnprepared = sys.prepared === 0 && !(isRitual && canCastUnpreparedRituals);
 
         return html`
@@ -78,10 +96,14 @@ export class ApeItem extends LitElement {
                     <i class="fa fa-dice-d20"></i>
                 </div>
                 
-                <h4 @mousedown="${this._onClick}">
-                    <span class="item-text ${rarity}">${this.item.name}</span>
-                    ${showUses ? html` (${this.uses.available}${this.uses.maximum ? '/' + this.uses.maximum : ''})` : nothing}
-                </h4>
+                <div class="item-name-wrap flexrow">
+                    <h4 @mousedown="${this._onClick}">
+                        <span class="item-text ${rarity}">${this.item.name}</span>
+                        ${showUses ? html` (${this.uses.available}${this.uses.maximum ? '/' + this.uses.maximum : ''})` : nothing}
+                    </h4>
+
+                    ${game.modules.find(i => i.id === 'wm5e') && game.modules.get('wm5e')?.active && itemMastery ? html`<div class="mastery ${isMastered ? 'active' : 'inactive'} flag">${localizedMastery}</div>` : nothing}
+                </div>
 
                 ${isRitual ? html`<div class="ritual flag" title="${game.i18n.localize("action-pack-enhanced.flag.ritual-title")}"></div>` : nothing}
                 ${isConcentration ? html`<div class="concentration flag" title="${game.i18n.localize("action-pack-enhanced.flag.concentration-title")}"></div>` : nothing}

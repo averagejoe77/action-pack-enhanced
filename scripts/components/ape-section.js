@@ -11,8 +11,14 @@ export class ApeSection extends LitElement {
         api: { type: Object },
         showSpellDots: { type: Boolean },
         showSpellUses: { type: Boolean },
-        actor: { type: Object }
+        actor: { type: Object },
+        masteries: { type: Object },
+        forceOpen: { type: Boolean }
     };
+
+    _openJournal(uuid) {
+        fromUuid(uuid).then(doc => doc?.sheet?.render(true));
+    }
 
     constructor() {
         super();
@@ -24,8 +30,14 @@ export class ApeSection extends LitElement {
     }
 
     updated(changedProperties) {
-        if (changedProperties.has('isOpen')) {
-            this.classList.toggle('is-open', this.isOpen);
+        // Always sync class state to ensure visual correctness
+        this.classList.toggle('is-open', this.isOpen);
+
+        if (changedProperties.has('forceOpen') && this.forceOpen) {
+            // Only force open if not already open
+            if (!this.isOpen) {
+               this.isOpen = true;
+            }
         }
     }
 
@@ -45,7 +57,13 @@ export class ApeSection extends LitElement {
             ${this.items && this.items.length > 0 ? html`
                 <div class="ape-items">
                     ${this.items.map(entry => html`
-                        <ape-item class="ape-item item" data-item-uuid="${entry.item.uuid}" .item="${entry.item}" .uses="${entry.uses}" .api="${this.api}"></ape-item>
+                        <ape-item class="ape-item item" 
+                            data-item-uuid="${entry.item.uuid}" 
+                            .item="${entry.item}" 
+                            .uses="${entry.uses}" 
+                            .api="${this.api}"
+                            .masteryIds="${this.actor?.system?.traits?.weaponProf?.mastery?.value}">
+                        </ape-item>
                     `)}
                 </div>
             ` : nothing}
@@ -74,7 +92,8 @@ export class ApeGroup extends LitElement {
         actor: { type: Object },
         showSpellDots: { type: Boolean },
         showSpellUses: { type: Boolean },
-        isOpen: { type: Boolean, state: true }
+        isOpen: { type: Boolean, state: true },
+        forceOpen: { type: Boolean }
     };
     
     constructor() {

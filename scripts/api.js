@@ -1,7 +1,30 @@
 import { formatNumber } from "./utils.js";
 
 export class ActionPackAPI {
-    constructor() {}
+    constructor() {
+        this.masteryTable = [
+            {"level": 1, "mastery": 3},
+            {"level": 2, "mastery": 3},
+            {"level": 3, "mastery": 3},
+            {"level": 4, "mastery": 4},
+            {"level": 5, "mastery": 4},
+            {"level": 6, "mastery": 4},
+            {"level": 7, "mastery": 4},
+            {"level": 8, "mastery": 4},
+            {"level": 9, "mastery": 4},
+            {"level": 10, "mastery": 5},
+            {"level": 11, "mastery": 5},
+            {"level": 12, "mastery": 5},
+            {"level": 13, "mastery": 5},
+            {"level": 14, "mastery": 5},
+            {"level": 15, "mastery": 5},
+            {"level": 16, "mastery": 6},
+            {"level": 17, "mastery": 6},
+            {"level": 18, "mastery": 6},
+            {"level": 19, "mastery": 6},
+            {"level": 20, "mastery": 6}
+        ]
+    }
 
     /**
      * Updates an actor's HP
@@ -48,7 +71,174 @@ export class ActionPackAPI {
      */
     async longRest(actor) {
         if (!actor) return;
-        return actor.longRest();
+        
+        // 1. Perform the standard Long Rest
+        const result = await actor.longRest();
+
+        // 2. Check for WM5e Module
+        const wm5eActive = game.modules.get('wm5e') && game.modules.get("wm5e")?.active;
+
+        if (wm5eActive && actor.itemTypes.feat.find(f => f.name === "Weapon Mastery" || f.name === "Weapon Master")) {
+
+            // 3. Gather Unique Mastery Choices
+            await actor.setFlag("action-pack-enhanced", "masterySelectionPending", true);
+
+            const equippedWeapons = actor.itemTypes.weapon.filter(w => w.system.equipped);
+            const choices = new Map();
+
+            const currentMasteries = actor.system.traits.weaponProf.mastery.value;
+
+            equippedWeapons.forEach(w => {
+                const mastery = w.system.mastery;
+                const baseItem = w.system.type?.baseItem;
+                
+                if (mastery && baseItem && !choices.has(baseItem)) {
+                    choices.set(baseItem, {
+                        id: baseItem,
+                        label: baseItem.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                        masteryLabel: CONFIG.DND5E.weaponMasteries[mastery]?.label || mastery,
+                        selected: currentMasteries.find(m => m === baseItem)
+                    });
+                }
+            });
+
+            // 4. Logic Branch
+            const isFighter = actor.itemTypes.class.find(c => c.name === "Fighter");
+            const fighterLvl = isFighter ? actor.itemTypes.class.find(c => c.name === "Fighter").system.levels : 0; 
+
+            const isRogue = actor.itemTypes.class.find(c => c.name === "Rogue");
+
+            if(isFighter){
+                const masteryLevel = this.masteryTable.find(m => m.level <= fighterLvl);
+                if (masteryLevel) {
+                    await this.promptMasterySelection(actor, choices, masteryLevel.mastery);
+                }
+            } else if (isRogue){    
+                await this.promptMasterySelection(actor, choices, 2);
+            } else {
+                await this.promptMasterySelection(actor, choices, 1);
+            }
+        } else {
+            // If module not active, just ensure we are locked (not pending)
+            await actor.setFlag("action-pack-enhanced", "masterySelectionPending", false);
+            // 2. Clear Weapon Mastery selection to prevent chat log clutter
+            await actor.update({ "system.traits.weaponProf.mastery.value": [] });
+        }
+
+        return result;
+    }
+
+    async promptMasterySelection(actor, choices, maxMasteries) {
+        const { DialogV2 } = foundry.applications.api;
+        
+        let content = `<p>Select up to ${maxMasteries} Weapon ${maxMasteries === 1 ? "Mastery" : "Masteries"} for the day:</p>`;
+        content += `<form class="ape-mastery-dialog">`;
+        
+        for (const [id, data] of choices) {
+            content += `
+            <div class="ape-mastery-switch form-group">
+                <input id="${id}" class="ape-mastery-checkbox" type="checkbox" name="mastery" value="${id}" data-dtype="String" ${data.selected ? "checked" : ""}>
+                <label for="${id}" class="ape-mastery-label">${data.label} (${data.masteryLabel})</label>
+            </div>`;
+        }
+        content += `</form>`;
+        
+        // Add script for interactivity (limit selection)
+        content += `
+        <script>
+            (function() {
+                const form = document.querySelector('.ape-mastery-dialog');
+                if (!form) return;
+                const inputs = form.querySelectorAll('input[name="mastery"]');
+                const max = ${maxMasteries};
+                
+                function updateState() {
+                    const checked = Array.from(inputs).filter(i => i.checked);
+                    inputs.forEach(i => {
+                        if (!i.checked) {
+                            i.disabled = checked.length >= max;
+                        } else {
+                            i.disabled = false;
+                        }
+                    });
+                }
+                
+                inputs.forEach(i => i.addEventListener('change', updateState));
+                updateState(); // Initial check
+            })();
+        </script>
+        `;
+
+        return DialogV2.wait({
+            window: { title: "Weapon Mastery Selection" },
+            content: content,
+            buttons: [{
+                action: "update",
+                label: "Update",
+                default: true,
+                callback: async (event, button, dialog) => {
+                    const selected = [];
+                    // Use dialog.element to scope the query
+                    dialog.element.querySelectorAll('input[name="mastery"]:checked').forEach(el => {
+                        selected.push(el.value);
+                    });
+
+                    if (selected.length > maxMasteries) {
+                        ui.notifications.warn(`You selected more than ${maxMasteries} masteries. Only the first ${maxMasteries} will be applied.`);
+                        selected.splice(maxMasteries);
+                    }
+
+                    // Update actor data via update() first
+                    await actor.update({ "system.traits.weaponProf.mastery.value": selected });
+                    
+                    await actor.setFlag("action-pack-enhanced", "masterySelectionPending", false);
+                    return true; 
+                }
+            }, {
+                action: "cancel",
+                label: "Cancel",
+                callback: async () => {
+                    await actor.setFlag("action-pack-enhanced", "masterySelectionPending", false);
+                    return false;
+                }
+            }],
+            submit: (event) => {
+                // Default submit handler if Enter is pressed in a single input form, but we have multiple.
+                // DialogV2 handles buttons nicely.
+            }
+        });
+    }
+
+    /**
+     * Toggles a Weapon Mastery selection
+     * @param {Actor} actor 
+     * @param {string} masteryId 
+     */
+    async toggleMastery(actor, masteryId) {
+        if (!actor || !masteryId) return;
+
+        const currentMasteries = new Set(actor.system.traits?.weaponProf?.mastery?.value || []);
+        
+        if (currentMasteries.has(masteryId)) {
+            currentMasteries.delete(masteryId);
+        } else {
+            if (currentMasteries.size >= 2) {
+                ui.notifications.warn("You can only select up to 2 Weapon Masteries.");
+                return;
+            }
+            currentMasteries.add(masteryId);
+        }
+
+        return actor.update({ "system.traits.weaponProf.mastery.value": Array.from(currentMasteries) });
+    }
+
+    /**
+     * Locks Weapon Mastery selection
+     * @param {Actor} actor 
+     */
+    async lockMasteries(actor) {
+        if (!actor) return;
+        return actor.setFlag("action-pack-enhanced", "masterySelectionPending", false);
     }
 
     /**

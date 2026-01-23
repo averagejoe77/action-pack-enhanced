@@ -1,8 +1,30 @@
-var De = Object.defineProperty;
-var Ne = (i, e, t) => e in i ? De(i, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : i[e] = t;
-var C = (i, e, t) => Ne(i, typeof e != "symbol" ? e + "" : e, t);
-class ze {
+var Ve = Object.defineProperty;
+var Ke = (i, e, t) => e in i ? Ve(i, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : i[e] = t;
+var T = (i, e, t) => Ke(i, typeof e != "symbol" ? e + "" : e, t);
+class Ge {
   constructor() {
+    this.masteryTable = [
+      { level: 1, mastery: 3 },
+      { level: 2, mastery: 3 },
+      { level: 3, mastery: 3 },
+      { level: 4, mastery: 4 },
+      { level: 5, mastery: 4 },
+      { level: 6, mastery: 4 },
+      { level: 7, mastery: 4 },
+      { level: 8, mastery: 4 },
+      { level: 9, mastery: 4 },
+      { level: 10, mastery: 5 },
+      { level: 11, mastery: 5 },
+      { level: 12, mastery: 5 },
+      { level: 13, mastery: 5 },
+      { level: 14, mastery: 5 },
+      { level: 15, mastery: 5 },
+      { level: 16, mastery: 6 },
+      { level: 17, mastery: 6 },
+      { level: 18, mastery: 6 },
+      { level: 19, mastery: 6 },
+      { level: 20, mastery: 6 }
+    ];
   }
   /**
    * Updates an actor's HP
@@ -44,8 +66,121 @@ class ze {
    * @param {Actor} actor 
    */
   async longRest(e) {
+    var a;
+    if (!e) return;
+    const t = await e.longRest();
+    if (game.modules.get("wm5e") && ((a = game.modules.get("wm5e")) == null ? void 0 : a.active) && e.itemTypes.feat.find((n) => n.name === "Weapon Mastery" || n.name === "Weapon Master")) {
+      await e.setFlag("action-pack-enhanced", "masterySelectionPending", !0);
+      const n = e.itemTypes.weapon.filter((h) => h.system.equipped), o = /* @__PURE__ */ new Map(), r = e.system.traits.weaponProf.mastery.value;
+      n.forEach((h) => {
+        var v, f;
+        const m = h.system.mastery, g = (v = h.system.type) == null ? void 0 : v.baseItem;
+        m && g && !o.has(g) && o.set(g, {
+          id: g,
+          label: g.replace(/-/g, " ").replace(/\b\w/g, (y) => y.toUpperCase()),
+          masteryLabel: ((f = CONFIG.DND5E.weaponMasteries[m]) == null ? void 0 : f.label) || m,
+          selected: r.find((y) => y === g)
+        });
+      });
+      const l = e.itemTypes.class.find((h) => h.name === "Fighter"), c = l ? e.itemTypes.class.find((h) => h.name === "Fighter").system.levels : 0, p = e.itemTypes.class.find((h) => h.name === "Rogue");
+      if (l) {
+        const h = this.masteryTable.find((m) => m.level <= c);
+        h && await this.promptMasterySelection(e, o, h.mastery);
+      } else p ? await this.promptMasterySelection(e, o, 2) : await this.promptMasterySelection(e, o, 1);
+    } else
+      await e.setFlag("action-pack-enhanced", "masterySelectionPending", !1), await e.update({ "system.traits.weaponProf.mastery.value": [] });
+    return t;
+  }
+  async promptMasterySelection(e, t, s) {
+    const { DialogV2: a } = foundry.applications.api;
+    let n = `<p>Select up to ${s} Weapon ${s === 1 ? "Mastery" : "Masteries"} for the day:</p>`;
+    n += '<form class="ape-mastery-dialog">';
+    for (const [o, r] of t)
+      n += `
+            <div class="ape-mastery-switch form-group">
+                <input id="${o}" class="ape-mastery-checkbox" type="checkbox" name="mastery" value="${o}" data-dtype="String" ${r.selected ? "checked" : ""}>
+                <label for="${o}" class="ape-mastery-label">${r.label} (${r.masteryLabel})</label>
+            </div>`;
+    return n += "</form>", n += `
+        <script>
+            (function() {
+                const form = document.querySelector('.ape-mastery-dialog');
+                if (!form) return;
+                const inputs = form.querySelectorAll('input[name="mastery"]');
+                const max = ${s};
+                
+                function updateState() {
+                    const checked = Array.from(inputs).filter(i => i.checked);
+                    inputs.forEach(i => {
+                        if (!i.checked) {
+                            i.disabled = checked.length >= max;
+                        } else {
+                            i.disabled = false;
+                        }
+                    });
+                }
+                
+                inputs.forEach(i => i.addEventListener('change', updateState));
+                updateState(); // Initial check
+            })();
+        <\/script>
+        `, a.wait({
+      window: { title: "Weapon Mastery Selection" },
+      content: n,
+      buttons: [{
+        action: "update",
+        label: "Update",
+        default: !0,
+        callback: async (o, r, l) => {
+          const c = [];
+          return l.element.querySelectorAll('input[name="mastery"]:checked').forEach((p) => {
+            c.push(p.value);
+          }), c.length > s && (ui.notifications.warn(`You selected more than ${s} masteries. Only the first ${s} will be applied.`), c.splice(s)), await e.update({ "system.traits.weaponProf.mastery.value": c }), await e.setFlag("action-pack-enhanced", "masterySelectionPending", !1), !0;
+        }
+      }, {
+        action: "cancel",
+        label: "Cancel",
+        callback: async () => (await e.setFlag("action-pack-enhanced", "masterySelectionPending", !1), !1)
+      }],
+      submit: (o) => {
+      }
+    });
+  }
+  /**
+   * Toggles inspiration on an actor
+   * @param {Actor} actor 
+   */
+  async toggleInspiration(e) {
     if (e)
-      return e.longRest();
+      return e.update({ "system.attributes.inspiration": !e.system.attributes.inspiration });
+  }
+  /**
+   * Toggles a Weapon Mastery selection
+   * @param {Actor} actor 
+   * @param {string} masteryId 
+   */
+  async toggleMastery(e, t) {
+    var a, n, o;
+    if (!e || !t) return;
+    const s = new Set(((o = (n = (a = e.system.traits) == null ? void 0 : a.weaponProf) == null ? void 0 : n.mastery) == null ? void 0 : o.value) || []);
+    if (console.log("Current Masteries: ", s), console.log("Mastery ID: ", t), s.has(t))
+      console.log("Removing Mastery: ", t), s.delete(t);
+    else {
+      if (console.log("Adding Mastery: ", t), s.size >= 2) {
+        ui.notifications.warn("You can only select up to 2 Weapon Masteries.");
+        return;
+      }
+      s.add(t);
+    }
+    return console.log("Updated Masteries: ", s), e.update({ "system.traits.weaponProf.mastery.value": Array.from(s) });
+  }
+  /**
+   * Locks Weapon Mastery selection
+   * @param {Actor} actor 
+   */
+  async lockMasteries(e) {
+    if (e)
+      return e.setFlag("action-pack-enhanced", "masterySelectionPending", !1);
   }
   /**
    * Rolls Initiative for the actor in the current combat
@@ -166,30 +301,30 @@ class ze {
     return t && s ? `${t} ${s}` : s ? s === "inst" ? "Instantaneous" : s : "";
   }
 }
-function F(i) {
+function K(i) {
   return i == null ? "0" : `${i >= 0 ? "+" : ""}${i}`;
 }
-function Me(i) {
-  const e = je(i), t = Be(i), s = Le(i);
+function Ze(i) {
+  const e = Je(i), t = Ye(i), s = Qe(i);
   return { castingTime: e, range: t, duration: s };
 }
-function je(i) {
+function Je(i) {
   var s, a, n, o;
   const e = ((a = (s = i.system) == null ? void 0 : s.activation) == null ? void 0 : a.type) || "", t = ((o = (n = i.system) == null ? void 0 : n.activation) == null ? void 0 : o.value) || "";
   return t === "" && e !== "" ? game.i18n.localize(`action-pack-enhanced.action-type.${e}`) : t && e ? `${t} ${e.charAt(0).toUpperCase() + e.slice(1)}` : "";
 }
-function Be(i) {
-  var a, n, o, r, l, c, p, u;
+function Ye(i) {
+  var a, n, o, r, l, c, p, h;
   const e = ((n = (a = i.system) == null ? void 0 : a.range) == null ? void 0 : n.long) || null, t = (r = (o = i.system) == null ? void 0 : o.range) == null ? void 0 : r.units;
   let s;
-  return t !== "touch" && t !== "self" ? s = ((c = (l = i.system) == null ? void 0 : l.range) == null ? void 0 : c.value) || ((u = (p = i.system) == null ? void 0 : p.range) == null ? void 0 : u.reach) || 5 : s = null, s && e && t ? `${s} ${t} / ${e} ${t}` : s && t ? `${s} ${t}` : t ? game.i18n.localize(`action-pack-enhanced.range.${t}`) : "";
+  return t !== "touch" && t !== "self" ? s = ((c = (l = i.system) == null ? void 0 : l.range) == null ? void 0 : c.value) || ((h = (p = i.system) == null ? void 0 : p.range) == null ? void 0 : h.reach) || 5 : s = null, s && e && t ? `${s} ${t} / ${e} ${t}` : s && t ? `${s} ${t}` : t ? game.i18n.localize(`action-pack-enhanced.range.${t}`) : "";
 }
-function Le(i) {
+function Qe(i) {
   var s, a, n, o;
   const e = (a = (s = i.system) == null ? void 0 : s.duration) == null ? void 0 : a.value, t = (o = (n = i.system) == null ? void 0 : n.duration) == null ? void 0 : o.units;
   return e && t ? `${e} ${e > 1 ? t + "s" : t}` : t ? game.i18n.localize(`action-pack-enhanced.duration.${t}`) : "";
 }
-function qe(i) {
+function et(i) {
   var r, l;
   let e = {}, t = i.itemTypes.race, s = i.itemTypes.class, a = i.itemTypes.subclass;
   const n = i.system.details.level;
@@ -202,8 +337,8 @@ function qe(i) {
     let c = { race: `<span>${(l = t[0]) == null ? void 0 : l.name} - ${n}</span>` || "Unknown", classes: [] };
     for (let p = 0; p < s.length; p++) {
       c.classes[p] = { name: s[p].name, level: s[p].system.levels, subclass: { name: "" } };
-      for (let u = 0; u < a.length; u++)
-        c.classes[p].subclass.name = a[u].name;
+      for (let h = 0; h < a.length; h++)
+        c.classes[p].subclass.name = a[h].name;
     }
     e = c;
   }
@@ -212,19 +347,19 @@ function qe(i) {
     o += `<span class="ape-actor-class">${e.classes[c].name}(${e.classes[c].level})</span>`, e.classes[c].subclass.name !== "" && (o += `<span class="ape-actor-subclass"> - ${e.classes[c].subclass.name}</span>`), c < e.classes.length - 1 && (o += ", ");
   return o;
 }
-const Fe = (i) => {
+const tt = (i) => {
   const e = i.system, t = e.consume;
   if (t && t.target)
-    return Xe(i.actor, t);
+    return st(i.actor, t);
   const s = e.uses;
   if (s && (s.max > 0 || s.value > 0))
-    return Ae(e);
+    return Ie(e);
   const a = i.type;
-  return a === "feat" ? We() : a === "consumable" ? {
+  return a === "feat" ? at() : a === "consumable" ? {
     available: e.quantity
-  } : a === "weapon" ? Ke(e) : null;
+  } : a === "weapon" ? it(e) : null;
 };
-function Xe(i, e) {
+function st(i, e) {
   let t = null, s = null;
   if (e.type === "attribute") {
     const a = getProperty(i.system, e.target);
@@ -234,30 +369,30 @@ function Xe(i, e) {
     a ? t = a.system.quantity : t = 0;
   } else if (e.type === "charges") {
     const a = i.items.get(e.target);
-    a ? { available: t, maximum: s } = Ae(a.system) : t = 0;
+    a ? { available: t, maximum: s } = Ie(a.system) : t = 0;
   }
   return t !== null ? (e.amount > 1 && (t = Math.floor(t / e.amount), s !== null && (s = Math.floor(s / e.amount))), { available: t, maximum: s }) : null;
 }
-function Ae(i) {
+function Ie(i) {
   let e = i.uses.value, t = i.uses.max;
   const s = i.quantity;
   return s && (e = e + (s - 1) * t, t = t * s), { available: e, maximum: t };
 }
-function We(i) {
+function at(i) {
   return null;
 }
-function Ke(i) {
+function it(i) {
   return i.properties.thr && !i.properties.ret ? { available: i.quantity, maximum: null } : null;
 }
-class Ve {
+class nt {
   constructor() {
   }
   build(e, t) {
     return this.settingShowNoUses = game.settings.get("action-pack-enhanced", "show-no-uses"), this.settingShowUnpreparedCantrips = game.settings.get("action-pack-enhanced", "show-unprepared-cantrips"), this.settingShowUnpreparedSpells = game.settings.get("action-pack-enhanced", "show-unprepared-spells"), this.settingSkillMode = game.settings.get("action-pack-enhanced", "skill-mode"), this.settingSortAlphabetically = game.settings.get("action-pack-enhanced", "sort-alphabetic"), e.map((s) => this.prepareActor(s, t));
   }
   prepareActor(e, t) {
-    var m;
-    const s = e.system, a = !!e.itemTypes.feat.find((g) => g.name === "Ritual Adept");
+    var g, v;
+    const s = e.system, a = !!e.itemTypes.feat.find((f) => f.name === "Ritual Adept");
     let n = {
       equipped: { items: [], title: "action-pack-enhanced.category.equipped" },
       inventory: {
@@ -276,32 +411,37 @@ class Ve {
           innate: { items: [], title: "action-pack-enhanced.category.innate" },
           atwill: { items: [], title: "action-pack-enhanced.category.atwill" },
           pact: { items: [], title: "action-pack-enhanced.category.pact" },
-          ...[...Array(10).keys()].reduce((g, f) => (g[`spell${f}`] = { items: [], title: `action-pack-enhanced.category.spell${f}` }, g), {})
+          ...[...Array(10).keys()].reduce((f, y) => (f[`spell${y}`] = { items: [], title: `action-pack-enhanced.category.spell${y}` }, f), {})
         }
       },
       passive: { items: [], title: "action-pack-enhanced.category.passive" }
     };
     const o = ["consumable", "container", "equipment", "feat", "loot", "spell", "tool", "weapon"];
-    for (const [g, f] of Object.entries(e.itemTypes))
-      if (o.includes(g))
-        for (const M of f)
-          this._processItem(M, g, n, e, a);
-    const r = (m = game.combat) == null ? void 0 : m.combatants.find((g) => g.actor === e), l = r && !r.initiative;
-    let c = !1;
-    const { uuid: p, showSkills: u } = t || {};
-    return e.uuid === p && u && (c = !0), {
+    for (const [f, y] of Object.entries(e.itemTypes))
+      if (o.includes(f))
+        for (const X of y)
+          this._processItem(X, f, n, e, a);
+    const r = game.modules.find((f) => f.id === "wm5e") && ((g = game.modules.get("wm5e")) == null ? void 0 : g.active);
+    if (e.type === "character" && r && e.itemTypes.feat.find((y) => y.name === "Weapon Mastery" || y.name === "Weapon Master")) {
+      const y = e.getFlag("action-pack-enhanced", "masterySelectionPending");
+      n.equipped.forceOpen = y;
+    }
+    const l = (v = game.combat) == null ? void 0 : v.combatants.find((f) => f.actor === e), c = l && !l.initiative;
+    let p = !1;
+    const { uuid: h, showSkills: m } = t || {};
+    return e.uuid === h && m && (p = !0), {
       actor: e,
       name: e.name,
       sections: this.addSpellLevelUses(this.sortItems(this.removeEmptySections(n)), s),
-      needsInitiative: l,
+      needsInitiative: c,
       skills: CONFIG.DND5E.skills,
       skillMode: this.settingSkillMode,
-      showSkills: c
+      showSkills: p
     };
   }
   _processItem(e, t, s, a, n) {
-    var u;
-    const o = e.system, r = Fe(e), l = this.settingShowNoUses || !r || r.available, c = ((u = o == null ? void 0 : o.activities) == null ? void 0 : u.size) > 0, p = e.getFlag("action-pack-enhanced", "hidden");
+    var h;
+    const o = e.system, r = tt(e), l = this.settingShowNoUses || !r || r.available, c = ((h = o == null ? void 0 : o.activities) == null ? void 0 : h.size) > 0, p = e.getFlag("action-pack-enhanced", "hidden");
     if (l && c && !p)
       switch (t) {
         case "feat":
@@ -336,8 +476,8 @@ class Ve {
     var r;
     switch (t == null ? void 0 : t.method) {
       case "spell":
-        const l = (t == null ? void 0 : t.prepared) === 1, c = (t == null ? void 0 : t.prepared) === 2, p = n && ((r = t.properties) == null ? void 0 : r.has("ritual")), u = t.level == 0 && this.settingShowUnpreparedCantrips, m = t.level > 0 && this.settingShowUnpreparedSpells;
-        (c || l || p || u || m) && a.spell.groups[`spell${t.level}`].items.push({ item: e, uses: s });
+        const l = (t == null ? void 0 : t.prepared) === 1, c = (t == null ? void 0 : t.prepared) === 2, p = n && ((r = t.properties) == null ? void 0 : r.has("ritual")), h = t.level == 0 && this.settingShowUnpreparedCantrips, m = t.level > 0 && this.settingShowUnpreparedSpells;
+        (c || l || p || h || m) && a.spell.groups[`spell${t.level}`].items.push({ item: e, uses: s });
         break;
       case "atwill":
         a.spell.groups.atwill.items.push({ item: e, uses: s });
@@ -405,7 +545,7 @@ class Ve {
     }), e;
   }
 }
-function Ge(i) {
+function ot(i) {
   const { updateTray: e, updateTrayState: t, resetScroll: s } = i;
   function a() {
     return game.settings.get("action-pack-enhanced", "tray-display") === "always";
@@ -570,6 +710,18 @@ function Ge(i) {
     }
   ), game.settings.register(
     "action-pack-enhanced",
+    "show-weapon-mastery",
+    {
+      name: "action-pack-enhanced.settings.show-weapon-mastery",
+      hint: "action-pack-enhanced.settings.show-weapon-mastery-hint",
+      scope: "client",
+      config: !0,
+      default: !1,
+      type: Boolean,
+      onChange: () => e()
+    }
+  ), game.settings.register(
+    "action-pack-enhanced",
     "use-control-button",
     {
       name: "action-pack-enhanced.settings.use-control-button",
@@ -611,18 +763,18 @@ function Ge(i) {
  * Copyright 2019 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const j = globalThis, Q = j.ShadowRoot && (j.ShadyCSS === void 0 || j.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, Se = Symbol(), pe = /* @__PURE__ */ new WeakMap();
-let Je = class {
+const L = globalThis, se = L.ShadowRoot && (L.ShadyCSS === void 0 || L.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, Re = Symbol(), ke = /* @__PURE__ */ new WeakMap();
+let rt = class {
   constructor(e, t, s) {
-    if (this._$cssResult$ = !0, s !== Se) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
+    if (this._$cssResult$ = !0, s !== Re) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
     this.cssText = e, this.t = t;
   }
   get styleSheet() {
     let e = this.o;
     const t = this.t;
-    if (Q && e === void 0) {
+    if (se && e === void 0) {
       const s = t !== void 0 && t.length === 1;
-      s && (e = pe.get(t)), e === void 0 && ((this.o = e = new CSSStyleSheet()).replaceSync(this.cssText), s && pe.set(t, e));
+      s && (e = ke.get(t)), e === void 0 && ((this.o = e = new CSSStyleSheet()).replaceSync(this.cssText), s && ke.set(t, e));
     }
     return e;
   }
@@ -630,26 +782,26 @@ let Je = class {
     return this.cssText;
   }
 };
-const Ze = (i) => new Je(typeof i == "string" ? i : i + "", void 0, Se), Qe = (i, e) => {
-  if (Q) i.adoptedStyleSheets = e.map((t) => t instanceof CSSStyleSheet ? t : t.styleSheet);
+const lt = (i) => new rt(typeof i == "string" ? i : i + "", void 0, Re), ct = (i, e) => {
+  if (se) i.adoptedStyleSheets = e.map((t) => t instanceof CSSStyleSheet ? t : t.styleSheet);
   else for (const t of e) {
-    const s = document.createElement("style"), a = j.litNonce;
+    const s = document.createElement("style"), a = L.litNonce;
     a !== void 0 && s.setAttribute("nonce", a), s.textContent = t.cssText, i.appendChild(s);
   }
-}, he = Q ? (i) => i : (i) => i instanceof CSSStyleSheet ? ((e) => {
+}, _e = se ? (i) => i : (i) => i instanceof CSSStyleSheet ? ((e) => {
   let t = "";
   for (const s of e.cssRules) t += s.cssText;
-  return Ze(t);
+  return lt(t);
 })(i) : i;
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const { is: Ye, defineProperty: et, getOwnPropertyDescriptor: tt, getOwnPropertyNames: st, getOwnPropertySymbols: at, getPrototypeOf: it } = Object, b = globalThis, ue = b.trustedTypes, nt = ue ? ue.emptyScript : "", X = b.reactiveElementPolyfillSupport, P = (i, e) => i, J = { toAttribute(i, e) {
+const { is: pt, defineProperty: ht, getOwnPropertyDescriptor: dt, getOwnPropertyNames: ut, getOwnPropertySymbols: mt, getPrototypeOf: gt } = Object, w = globalThis, we = w.trustedTypes, ft = we ? we.emptyScript : "", G = w.reactiveElementPolyfillSupport, I = (i, e) => i, ee = { toAttribute(i, e) {
   switch (e) {
     case Boolean:
-      i = i ? nt : null;
+      i = i ? ft : null;
       break;
     case Object:
     case Array:
@@ -674,23 +826,23 @@ const { is: Ye, defineProperty: et, getOwnPropertyDescriptor: tt, getOwnProperty
       }
   }
   return t;
-} }, we = (i, e) => !Ye(i, e), de = { attribute: !0, type: String, converter: J, reflect: !1, useDefault: !1, hasChanged: we };
-Symbol.metadata ?? (Symbol.metadata = Symbol("metadata")), b.litPropertyMetadata ?? (b.litPropertyMetadata = /* @__PURE__ */ new WeakMap());
-let E = class extends HTMLElement {
+} }, De = (i, e) => !pt(i, e), Se = { attribute: !0, type: String, converter: ee, reflect: !1, useDefault: !1, hasChanged: De };
+Symbol.metadata ?? (Symbol.metadata = Symbol("metadata")), w.litPropertyMetadata ?? (w.litPropertyMetadata = /* @__PURE__ */ new WeakMap());
+let P = class extends HTMLElement {
   static addInitializer(e) {
     this._$Ei(), (this.l ?? (this.l = [])).push(e);
   }
   static get observedAttributes() {
     return this.finalize(), this._$Eh && [...this._$Eh.keys()];
   }
-  static createProperty(e, t = de) {
+  static createProperty(e, t = Se) {
     if (t.state && (t.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((t = Object.create(t)).wrapped = !0), this.elementProperties.set(e, t), !t.noAccessor) {
       const s = Symbol(), a = this.getPropertyDescriptor(e, s, t);
-      a !== void 0 && et(this.prototype, e, a);
+      a !== void 0 && ht(this.prototype, e, a);
     }
   }
   static getPropertyDescriptor(e, t, s) {
-    const { get: a, set: n } = tt(this.prototype, e) ?? { get() {
+    const { get: a, set: n } = dt(this.prototype, e) ?? { get() {
       return this[t];
     }, set(o) {
       this[t] = o;
@@ -701,17 +853,17 @@ let E = class extends HTMLElement {
     }, configurable: !0, enumerable: !0 };
   }
   static getPropertyOptions(e) {
-    return this.elementProperties.get(e) ?? de;
+    return this.elementProperties.get(e) ?? Se;
   }
   static _$Ei() {
-    if (this.hasOwnProperty(P("elementProperties"))) return;
-    const e = it(this);
+    if (this.hasOwnProperty(I("elementProperties"))) return;
+    const e = gt(this);
     e.finalize(), e.l !== void 0 && (this.l = [...e.l]), this.elementProperties = new Map(e.elementProperties);
   }
   static finalize() {
-    if (this.hasOwnProperty(P("finalized"))) return;
-    if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(P("properties"))) {
-      const t = this.properties, s = [...st(t), ...at(t)];
+    if (this.hasOwnProperty(I("finalized"))) return;
+    if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(I("properties"))) {
+      const t = this.properties, s = [...ut(t), ...mt(t)];
       for (const a of s) this.createProperty(a, t[a]);
     }
     const e = this[Symbol.metadata];
@@ -730,8 +882,8 @@ let E = class extends HTMLElement {
     const t = [];
     if (Array.isArray(e)) {
       const s = new Set(e.flat(1 / 0).reverse());
-      for (const a of s) t.unshift(he(a));
-    } else e !== void 0 && t.push(he(e));
+      for (const a of s) t.unshift(_e(a));
+    } else e !== void 0 && t.push(_e(e));
     return t;
   }
   static _$Eu(e, t) {
@@ -760,7 +912,7 @@ let E = class extends HTMLElement {
   }
   createRenderRoot() {
     const e = this.shadowRoot ?? this.attachShadow(this.constructor.shadowRootOptions);
-    return Qe(e, this.constructor.elementStyles), e;
+    return ct(e, this.constructor.elementStyles), e;
   }
   connectedCallback() {
     var e;
@@ -785,7 +937,7 @@ let E = class extends HTMLElement {
     var n;
     const s = this.constructor.elementProperties.get(e), a = this.constructor._$Eu(e, s);
     if (a !== void 0 && s.reflect === !0) {
-      const o = (((n = s.converter) == null ? void 0 : n.toAttribute) !== void 0 ? s.converter : J).toAttribute(t, s.type);
+      const o = (((n = s.converter) == null ? void 0 : n.toAttribute) !== void 0 ? s.converter : ee).toAttribute(t, s.type);
       this._$Em = e, o == null ? this.removeAttribute(a) : this.setAttribute(a, o), this._$Em = null;
     }
   }
@@ -793,7 +945,7 @@ let E = class extends HTMLElement {
     var n, o;
     const s = this.constructor, a = s._$Eh.get(e);
     if (a !== void 0 && this._$Em !== a) {
-      const r = s.getPropertyOptions(a), l = typeof r.converter == "function" ? { fromAttribute: r.converter } : ((n = r.converter) == null ? void 0 : n.fromAttribute) !== void 0 ? r.converter : J;
+      const r = s.getPropertyOptions(a), l = typeof r.converter == "function" ? { fromAttribute: r.converter } : ((n = r.converter) == null ? void 0 : n.fromAttribute) !== void 0 ? r.converter : ee;
       this._$Em = a;
       const c = l.fromAttribute(t, r.type);
       this[a] = c ?? ((o = this._$Ej) == null ? void 0 : o.get(a)) ?? c, this._$Em = null;
@@ -803,7 +955,7 @@ let E = class extends HTMLElement {
     var o;
     if (e !== void 0) {
       const r = this.constructor;
-      if (a === !1 && (n = this[e]), s ?? (s = r.getPropertyOptions(e)), !((s.hasChanged ?? we)(n, t) || s.useDefault && s.reflect && n === ((o = this._$Ej) == null ? void 0 : o.get(e)) && !this.hasAttribute(r._$Eu(e, s)))) return;
+      if (a === !1 && (n = this[e]), s ?? (s = r.getPropertyOptions(e)), !((s.hasChanged ?? De)(n, t) || s.useDefault && s.reflect && n === ((o = this._$Ej) == null ? void 0 : o.get(e)) && !this.hasAttribute(r._$Eu(e, s)))) return;
       this.C(e, t, s);
     }
     this.isUpdatePending === !1 && (this._$ES = this._$EP());
@@ -879,76 +1031,76 @@ let E = class extends HTMLElement {
   firstUpdated(e) {
   }
 };
-E.elementStyles = [], E.shadowRootOptions = { mode: "open" }, E[P("elementProperties")] = /* @__PURE__ */ new Map(), E[P("finalized")] = /* @__PURE__ */ new Map(), X == null || X({ ReactiveElement: E }), (b.reactiveElementVersions ?? (b.reactiveElementVersions = [])).push("2.1.2");
+P.elementStyles = [], P.shadowRootOptions = { mode: "open" }, P[I("elementProperties")] = /* @__PURE__ */ new Map(), P[I("finalized")] = /* @__PURE__ */ new Map(), G == null || G({ ReactiveElement: P }), (w.reactiveElementVersions ?? (w.reactiveElementVersions = [])).push("2.1.2");
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const U = globalThis, ge = (i) => i, B = U.trustedTypes, me = B ? B.createPolicy("lit-html", { createHTML: (i) => i }) : void 0, xe = "$lit$", v = `lit$${Math.random().toFixed(9).slice(2)}$`, Ce = "?" + v, ot = `<${Ce}>`, w = document, I = () => w.createComment(""), R = (i) => i === null || typeof i != "object" && typeof i != "function", Y = Array.isArray, rt = (i) => Y(i) || typeof (i == null ? void 0 : i[Symbol.iterator]) == "function", W = `[ 	
-\f\r]`, T = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, fe = /-->/g, ye = />/g, k = RegExp(`>|${W}(?:([^\\s"'>=/]+)(${W}*=${W}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), $e = /'/g, ve = /"/g, Ee = /^(?:script|style|textarea|title)$/i, lt = (i) => (e, ...t) => ({ _$litType$: i, strings: e, values: t }), d = lt(1), x = Symbol.for("lit-noChange"), h = Symbol.for("lit-nothing"), be = /* @__PURE__ */ new WeakMap(), A = w.createTreeWalker(w, 129);
-function Oe(i, e) {
-  if (!Y(i) || !i.hasOwnProperty("raw")) throw Error("invalid template strings array");
-  return me !== void 0 ? me.createHTML(e) : e;
+const R = globalThis, Ae = (i) => i, q = R.trustedTypes, xe = q ? q.createPolicy("lit-html", { createHTML: (i) => i }) : void 0, He = "$lit$", _ = `lit$${Math.random().toFixed(9).slice(2)}$`, Ne = "?" + _, yt = `<${Ne}>`, E = document, D = () => E.createComment(""), H = (i) => i === null || typeof i != "object" && typeof i != "function", ae = Array.isArray, $t = (i) => ae(i) || typeof (i == null ? void 0 : i[Symbol.iterator]) == "function", Z = `[ 	
+\f\r]`, M = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Ce = /-->/g, Ee = />/g, A = RegExp(`>|${Z}(?:([^\\s"'>=/]+)(${Z}*=${Z}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Oe = /'/g, Te = /"/g, ze = /^(?:script|style|textarea|title)$/i, vt = (i) => (e, ...t) => ({ _$litType$: i, strings: e, values: t }), u = vt(1), O = Symbol.for("lit-noChange"), d = Symbol.for("lit-nothing"), Pe = /* @__PURE__ */ new WeakMap(), x = E.createTreeWalker(E, 129);
+function je(i, e) {
+  if (!ae(i) || !i.hasOwnProperty("raw")) throw Error("invalid template strings array");
+  return xe !== void 0 ? xe.createHTML(e) : e;
 }
-const ct = (i, e) => {
+const bt = (i, e) => {
   const t = i.length - 1, s = [];
-  let a, n = e === 2 ? "<svg>" : e === 3 ? "<math>" : "", o = T;
+  let a, n = e === 2 ? "<svg>" : e === 3 ? "<math>" : "", o = M;
   for (let r = 0; r < t; r++) {
     const l = i[r];
-    let c, p, u = -1, m = 0;
-    for (; m < l.length && (o.lastIndex = m, p = o.exec(l), p !== null); ) m = o.lastIndex, o === T ? p[1] === "!--" ? o = fe : p[1] !== void 0 ? o = ye : p[2] !== void 0 ? (Ee.test(p[2]) && (a = RegExp("</" + p[2], "g")), o = k) : p[3] !== void 0 && (o = k) : o === k ? p[0] === ">" ? (o = a ?? T, u = -1) : p[1] === void 0 ? u = -2 : (u = o.lastIndex - p[2].length, c = p[1], o = p[3] === void 0 ? k : p[3] === '"' ? ve : $e) : o === ve || o === $e ? o = k : o === fe || o === ye ? o = T : (o = k, a = void 0);
-    const g = o === k && i[r + 1].startsWith("/>") ? " " : "";
-    n += o === T ? l + ot : u >= 0 ? (s.push(c), l.slice(0, u) + xe + l.slice(u) + v + g) : l + v + (u === -2 ? r : g);
+    let c, p, h = -1, m = 0;
+    for (; m < l.length && (o.lastIndex = m, p = o.exec(l), p !== null); ) m = o.lastIndex, o === M ? p[1] === "!--" ? o = Ce : p[1] !== void 0 ? o = Ee : p[2] !== void 0 ? (ze.test(p[2]) && (a = RegExp("</" + p[2], "g")), o = A) : p[3] !== void 0 && (o = A) : o === A ? p[0] === ">" ? (o = a ?? M, h = -1) : p[1] === void 0 ? h = -2 : (h = o.lastIndex - p[2].length, c = p[1], o = p[3] === void 0 ? A : p[3] === '"' ? Te : Oe) : o === Te || o === Oe ? o = A : o === Ce || o === Ee ? o = M : (o = A, a = void 0);
+    const g = o === A && i[r + 1].startsWith("/>") ? " " : "";
+    n += o === M ? l + yt : h >= 0 ? (s.push(c), l.slice(0, h) + He + l.slice(h) + _ + g) : l + _ + (h === -2 ? r : g);
   }
-  return [Oe(i, n + (i[t] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), s];
+  return [je(i, n + (i[t] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), s];
 };
-class H {
+class N {
   constructor({ strings: e, _$litType$: t }, s) {
     let a;
     this.parts = [];
     let n = 0, o = 0;
-    const r = e.length - 1, l = this.parts, [c, p] = ct(e, t);
-    if (this.el = H.createElement(c, s), A.currentNode = this.el.content, t === 2 || t === 3) {
-      const u = this.el.content.firstChild;
-      u.replaceWith(...u.childNodes);
+    const r = e.length - 1, l = this.parts, [c, p] = bt(e, t);
+    if (this.el = N.createElement(c, s), x.currentNode = this.el.content, t === 2 || t === 3) {
+      const h = this.el.content.firstChild;
+      h.replaceWith(...h.childNodes);
     }
-    for (; (a = A.nextNode()) !== null && l.length < r; ) {
+    for (; (a = x.nextNode()) !== null && l.length < r; ) {
       if (a.nodeType === 1) {
-        if (a.hasAttributes()) for (const u of a.getAttributeNames()) if (u.endsWith(xe)) {
-          const m = p[o++], g = a.getAttribute(u).split(v), f = /([.?@])?(.*)/.exec(m);
-          l.push({ type: 1, index: n, name: f[2], strings: g, ctor: f[1] === "." ? ht : f[1] === "?" ? ut : f[1] === "@" ? dt : q }), a.removeAttribute(u);
-        } else u.startsWith(v) && (l.push({ type: 6, index: n }), a.removeAttribute(u));
-        if (Ee.test(a.tagName)) {
-          const u = a.textContent.split(v), m = u.length - 1;
+        if (a.hasAttributes()) for (const h of a.getAttributeNames()) if (h.endsWith(He)) {
+          const m = p[o++], g = a.getAttribute(h).split(_), v = /([.?@])?(.*)/.exec(m);
+          l.push({ type: 1, index: n, name: v[2], strings: g, ctor: v[1] === "." ? _t : v[1] === "?" ? wt : v[1] === "@" ? St : W }), a.removeAttribute(h);
+        } else h.startsWith(_) && (l.push({ type: 6, index: n }), a.removeAttribute(h));
+        if (ze.test(a.tagName)) {
+          const h = a.textContent.split(_), m = h.length - 1;
           if (m > 0) {
-            a.textContent = B ? B.emptyScript : "";
-            for (let g = 0; g < m; g++) a.append(u[g], I()), A.nextNode(), l.push({ type: 2, index: ++n });
-            a.append(u[m], I());
+            a.textContent = q ? q.emptyScript : "";
+            for (let g = 0; g < m; g++) a.append(h[g], D()), x.nextNode(), l.push({ type: 2, index: ++n });
+            a.append(h[m], D());
           }
         }
-      } else if (a.nodeType === 8) if (a.data === Ce) l.push({ type: 2, index: n });
+      } else if (a.nodeType === 8) if (a.data === Ne) l.push({ type: 2, index: n });
       else {
-        let u = -1;
-        for (; (u = a.data.indexOf(v, u + 1)) !== -1; ) l.push({ type: 7, index: n }), u += v.length - 1;
+        let h = -1;
+        for (; (h = a.data.indexOf(_, h + 1)) !== -1; ) l.push({ type: 7, index: n }), h += _.length - 1;
       }
       n++;
     }
   }
   static createElement(e, t) {
-    const s = w.createElement("template");
+    const s = E.createElement("template");
     return s.innerHTML = e, s;
   }
 }
-function O(i, e, t = i, s) {
+function U(i, e, t = i, s) {
   var o, r;
-  if (e === x) return e;
+  if (e === O) return e;
   let a = s !== void 0 ? (o = t._$Co) == null ? void 0 : o[s] : t._$Cl;
-  const n = R(e) ? void 0 : e._$litDirective$;
-  return (a == null ? void 0 : a.constructor) !== n && ((r = a == null ? void 0 : a._$AO) == null || r.call(a, !1), n === void 0 ? a = void 0 : (a = new n(i), a._$AT(i, t, s)), s !== void 0 ? (t._$Co ?? (t._$Co = []))[s] = a : t._$Cl = a), a !== void 0 && (e = O(i, a._$AS(i, e.values), a, s)), e;
+  const n = H(e) ? void 0 : e._$litDirective$;
+  return (a == null ? void 0 : a.constructor) !== n && ((r = a == null ? void 0 : a._$AO) == null || r.call(a, !1), n === void 0 ? a = void 0 : (a = new n(i), a._$AT(i, t, s)), s !== void 0 ? (t._$Co ?? (t._$Co = []))[s] = a : t._$Cl = a), a !== void 0 && (e = U(i, a._$AS(i, e.values), a, s)), e;
 }
-class pt {
+class kt {
   constructor(e, t) {
     this._$AV = [], this._$AN = void 0, this._$AD = e, this._$AM = t;
   }
@@ -959,30 +1111,30 @@ class pt {
     return this._$AM._$AU;
   }
   u(e) {
-    const { el: { content: t }, parts: s } = this._$AD, a = ((e == null ? void 0 : e.creationScope) ?? w).importNode(t, !0);
-    A.currentNode = a;
-    let n = A.nextNode(), o = 0, r = 0, l = s[0];
+    const { el: { content: t }, parts: s } = this._$AD, a = ((e == null ? void 0 : e.creationScope) ?? E).importNode(t, !0);
+    x.currentNode = a;
+    let n = x.nextNode(), o = 0, r = 0, l = s[0];
     for (; l !== void 0; ) {
       if (o === l.index) {
         let c;
-        l.type === 2 ? c = new N(n, n.nextSibling, this, e) : l.type === 1 ? c = new l.ctor(n, l.name, l.strings, this, e) : l.type === 6 && (c = new gt(n, this, e)), this._$AV.push(c), l = s[++r];
+        l.type === 2 ? c = new j(n, n.nextSibling, this, e) : l.type === 1 ? c = new l.ctor(n, l.name, l.strings, this, e) : l.type === 6 && (c = new At(n, this, e)), this._$AV.push(c), l = s[++r];
       }
-      o !== (l == null ? void 0 : l.index) && (n = A.nextNode(), o++);
+      o !== (l == null ? void 0 : l.index) && (n = x.nextNode(), o++);
     }
-    return A.currentNode = w, a;
+    return x.currentNode = E, a;
   }
   p(e) {
     let t = 0;
     for (const s of this._$AV) s !== void 0 && (s.strings !== void 0 ? (s._$AI(e, s, t), t += s.strings.length - 2) : s._$AI(e[t])), t++;
   }
 }
-class N {
+class j {
   get _$AU() {
     var e;
     return ((e = this._$AM) == null ? void 0 : e._$AU) ?? this._$Cv;
   }
   constructor(e, t, s, a) {
-    this.type = 2, this._$AH = h, this._$AN = void 0, this._$AA = e, this._$AB = t, this._$AM = s, this.options = a, this._$Cv = (a == null ? void 0 : a.isConnected) ?? !0;
+    this.type = 2, this._$AH = d, this._$AN = void 0, this._$AA = e, this._$AB = t, this._$AM = s, this.options = a, this._$Cv = (a == null ? void 0 : a.isConnected) ?? !0;
   }
   get parentNode() {
     let e = this._$AA.parentNode;
@@ -996,7 +1148,7 @@ class N {
     return this._$AB;
   }
   _$AI(e, t = this) {
-    e = O(this, e, t), R(e) ? e === h || e == null || e === "" ? (this._$AH !== h && this._$AR(), this._$AH = h) : e !== this._$AH && e !== x && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : rt(e) ? this.k(e) : this._(e);
+    e = U(this, e, t), H(e) ? e === d || e == null || e === "" ? (this._$AH !== d && this._$AR(), this._$AH = d) : e !== this._$AH && e !== O && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : $t(e) ? this.k(e) : this._(e);
   }
   O(e) {
     return this._$AA.parentNode.insertBefore(e, this._$AB);
@@ -1005,33 +1157,33 @@ class N {
     this._$AH !== e && (this._$AR(), this._$AH = this.O(e));
   }
   _(e) {
-    this._$AH !== h && R(this._$AH) ? this._$AA.nextSibling.data = e : this.T(w.createTextNode(e)), this._$AH = e;
+    this._$AH !== d && H(this._$AH) ? this._$AA.nextSibling.data = e : this.T(E.createTextNode(e)), this._$AH = e;
   }
   $(e) {
     var n;
-    const { values: t, _$litType$: s } = e, a = typeof s == "number" ? this._$AC(e) : (s.el === void 0 && (s.el = H.createElement(Oe(s.h, s.h[0]), this.options)), s);
+    const { values: t, _$litType$: s } = e, a = typeof s == "number" ? this._$AC(e) : (s.el === void 0 && (s.el = N.createElement(je(s.h, s.h[0]), this.options)), s);
     if (((n = this._$AH) == null ? void 0 : n._$AD) === a) this._$AH.p(t);
     else {
-      const o = new pt(a, this), r = o.u(this.options);
+      const o = new kt(a, this), r = o.u(this.options);
       o.p(t), this.T(r), this._$AH = o;
     }
   }
   _$AC(e) {
-    let t = be.get(e.strings);
-    return t === void 0 && be.set(e.strings, t = new H(e)), t;
+    let t = Pe.get(e.strings);
+    return t === void 0 && Pe.set(e.strings, t = new N(e)), t;
   }
   k(e) {
-    Y(this._$AH) || (this._$AH = [], this._$AR());
+    ae(this._$AH) || (this._$AH = [], this._$AR());
     const t = this._$AH;
     let s, a = 0;
-    for (const n of e) a === t.length ? t.push(s = new N(this.O(I()), this.O(I()), this, this.options)) : s = t[a], s._$AI(n), a++;
+    for (const n of e) a === t.length ? t.push(s = new j(this.O(D()), this.O(D()), this, this.options)) : s = t[a], s._$AI(n), a++;
     a < t.length && (this._$AR(s && s._$AB.nextSibling, a), t.length = a);
   }
   _$AR(e = this._$AA.nextSibling, t) {
     var s;
     for ((s = this._$AP) == null ? void 0 : s.call(this, !1, !0, t); e !== this._$AB; ) {
-      const a = ge(e).nextSibling;
-      ge(e).remove(), e = a;
+      const a = Ae(e).nextSibling;
+      Ae(e).remove(), e = a;
     }
   }
   setConnected(e) {
@@ -1039,7 +1191,7 @@ class N {
     this._$AM === void 0 && (this._$Cv = e, (t = this._$AP) == null || t.call(this, e));
   }
 }
-class q {
+class W {
   get tagName() {
     return this.element.tagName;
   }
@@ -1047,46 +1199,46 @@ class q {
     return this._$AM._$AU;
   }
   constructor(e, t, s, a, n) {
-    this.type = 1, this._$AH = h, this._$AN = void 0, this.element = e, this.name = t, this._$AM = a, this.options = n, s.length > 2 || s[0] !== "" || s[1] !== "" ? (this._$AH = Array(s.length - 1).fill(new String()), this.strings = s) : this._$AH = h;
+    this.type = 1, this._$AH = d, this._$AN = void 0, this.element = e, this.name = t, this._$AM = a, this.options = n, s.length > 2 || s[0] !== "" || s[1] !== "" ? (this._$AH = Array(s.length - 1).fill(new String()), this.strings = s) : this._$AH = d;
   }
   _$AI(e, t = this, s, a) {
     const n = this.strings;
     let o = !1;
-    if (n === void 0) e = O(this, e, t, 0), o = !R(e) || e !== this._$AH && e !== x, o && (this._$AH = e);
+    if (n === void 0) e = U(this, e, t, 0), o = !H(e) || e !== this._$AH && e !== O, o && (this._$AH = e);
     else {
       const r = e;
       let l, c;
-      for (e = n[0], l = 0; l < n.length - 1; l++) c = O(this, r[s + l], t, l), c === x && (c = this._$AH[l]), o || (o = !R(c) || c !== this._$AH[l]), c === h ? e = h : e !== h && (e += (c ?? "") + n[l + 1]), this._$AH[l] = c;
+      for (e = n[0], l = 0; l < n.length - 1; l++) c = U(this, r[s + l], t, l), c === O && (c = this._$AH[l]), o || (o = !H(c) || c !== this._$AH[l]), c === d ? e = d : e !== d && (e += (c ?? "") + n[l + 1]), this._$AH[l] = c;
     }
     o && !a && this.j(e);
   }
   j(e) {
-    e === h ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
+    e === d ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
   }
 }
-class ht extends q {
+class _t extends W {
   constructor() {
     super(...arguments), this.type = 3;
   }
   j(e) {
-    this.element[this.name] = e === h ? void 0 : e;
+    this.element[this.name] = e === d ? void 0 : e;
   }
 }
-class ut extends q {
+class wt extends W {
   constructor() {
     super(...arguments), this.type = 4;
   }
   j(e) {
-    this.element.toggleAttribute(this.name, !!e && e !== h);
+    this.element.toggleAttribute(this.name, !!e && e !== d);
   }
 }
-class dt extends q {
+class St extends W {
   constructor(e, t, s, a, n) {
     super(e, t, s, a, n), this.type = 5;
   }
   _$AI(e, t = this) {
-    if ((e = O(this, e, t, 0) ?? h) === x) return;
-    const s = this._$AH, a = e === h && s !== h || e.capture !== s.capture || e.once !== s.once || e.passive !== s.passive, n = e !== h && (s === h || a);
+    if ((e = U(this, e, t, 0) ?? d) === O) return;
+    const s = this._$AH, a = e === d && s !== d || e.capture !== s.capture || e.once !== s.once || e.passive !== s.passive, n = e !== d && (s === d || a);
     a && this.element.removeEventListener(this.name, this, s), n && this.element.addEventListener(this.name, this, e), this._$AH = e;
   }
   handleEvent(e) {
@@ -1094,7 +1246,7 @@ class dt extends q {
     typeof this._$AH == "function" ? this._$AH.call(((t = this.options) == null ? void 0 : t.host) ?? this.element, e) : this._$AH.handleEvent(e);
   }
 }
-class gt {
+class At {
   constructor(e, t, s) {
     this.element = e, this.type = 6, this._$AN = void 0, this._$AM = t, this.options = s;
   }
@@ -1102,17 +1254,17 @@ class gt {
     return this._$AM._$AU;
   }
   _$AI(e) {
-    O(this, e);
+    U(this, e);
   }
 }
-const K = U.litHtmlPolyfillSupport;
-K == null || K(H, N), (U.litHtmlVersions ?? (U.litHtmlVersions = [])).push("3.3.2");
-const mt = (i, e, t) => {
+const J = R.litHtmlPolyfillSupport;
+J == null || J(N, j), (R.litHtmlVersions ?? (R.litHtmlVersions = [])).push("3.3.2");
+const xt = (i, e, t) => {
   const s = (t == null ? void 0 : t.renderBefore) ?? e;
   let a = s._$litPart$;
   if (a === void 0) {
     const n = (t == null ? void 0 : t.renderBefore) ?? null;
-    s._$litPart$ = a = new N(e.insertBefore(I(), n), n, void 0, t ?? {});
+    s._$litPart$ = a = new j(e.insertBefore(D(), n), n, void 0, t ?? {});
   }
   return a._$AI(i), a;
 };
@@ -1121,8 +1273,8 @@ const mt = (i, e, t) => {
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const S = globalThis;
-let y = class extends E {
+const C = globalThis;
+let b = class extends P {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
   }
@@ -1133,7 +1285,7 @@ let y = class extends E {
   }
   update(e) {
     const t = this.render();
-    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = mt(t, this.renderRoot, this.renderOptions);
+    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = xt(t, this.renderRoot, this.renderOptions);
   }
   connectedCallback() {
     var e;
@@ -1144,21 +1296,21 @@ let y = class extends E {
     super.disconnectedCallback(), (e = this._$Do) == null || e.setConnected(!1);
   }
   render() {
-    return x;
+    return O;
   }
 };
-var ke;
-y._$litElement$ = !0, y.finalized = !0, (ke = S.litElementHydrateSupport) == null || ke.call(S, { LitElement: y });
-const V = S.litElementPolyfillSupport;
-V == null || V({ LitElement: y });
-(S.litElementVersions ?? (S.litElementVersions = [])).push("4.2.2");
+var Me;
+b._$litElement$ = !0, b.finalized = !0, (Me = C.litElementHydrateSupport) == null || Me.call(C, { LitElement: b });
+const Y = C.litElementPolyfillSupport;
+Y == null || Y({ LitElement: b });
+(C.litElementVersions ?? (C.litElementVersions = [])).push("4.2.2");
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const ft = { CHILD: 2 }, yt = (i) => (...e) => ({ _$litDirective$: i, values: e });
-class $t {
+const Ct = { CHILD: 2 }, Et = (i) => (...e) => ({ _$litDirective$: i, values: e });
+class Ot {
   constructor(e) {
   }
   get _$AU() {
@@ -1179,13 +1331,13 @@ class $t {
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-class Z extends $t {
+class te extends Ot {
   constructor(e) {
-    if (super(e), this.it = h, e.type !== ft.CHILD) throw Error(this.constructor.directiveName + "() can only be used in child bindings");
+    if (super(e), this.it = d, e.type !== Ct.CHILD) throw Error(this.constructor.directiveName + "() can only be used in child bindings");
   }
   render(e) {
-    if (e === h || e == null) return this._t = void 0, this.it = e;
-    if (e === x) return e;
+    if (e === d || e == null) return this._t = void 0, this.it = e;
+    if (e === O) return e;
     if (typeof e != "string") throw Error(this.constructor.directiveName + "() called with a non-string value");
     if (e === this.it) return this._t;
     this.it = e;
@@ -1193,9 +1345,9 @@ class Z extends $t {
     return t.raw = t, this._t = { _$litType$: this.constructor.resultType, strings: t, values: [] };
   }
 }
-Z.directiveName = "unsafeHTML", Z.resultType = 1;
-const vt = yt(Z);
-class Te extends y {
+te.directiveName = "unsafeHTML", te.resultType = 1;
+const Tt = Et(te);
+class Be extends b {
   // Use Light DOM to inherit global styles
   createRenderRoot() {
     return this;
@@ -1221,31 +1373,41 @@ class Te extends y {
     this.expanded = !this.expanded, this.expanded && !this.description && (this.description = await this.api.getItemDescription(this.item));
   }
   render() {
-    var M, ie, ne, oe, re, le, ce;
-    if (!this.item) return h;
-    const e = this.item.system, t = e.rarity || "", s = this.item.type === "spell", a = e.method === "innate", n = this.uses && (!s || a), o = (M = e.properties) == null ? void 0 : M.has("ritual"), r = (ie = e.properties) == null ? void 0 : ie.has("concentration"), l = ((ne = e.activation) == null ? void 0 : ne.type) === "bonus", c = ((oe = e.activation) == null ? void 0 : oe.type) === "reaction", p = ((re = e.activation) == null ? void 0 : re.type) === "legendary", u = (le = e.recharge) == null ? void 0 : le.value, m = (ce = e.recharge) == null ? void 0 : ce.charged, g = !!this.item.parent.itemTypes.feat.find((He) => He.name === "Ritual Adept"), f = e.prepared === 0 && !(o && g);
-    return d`
-            <div class="item-name rollable flexrow ${f ? "unprepared" : ""}">
-                <div class="item-image ${t}${f ? " unprepared" : ""}" 
+    var le, ce, pe, he, de, ue, me, ge, fe, ye, $e, ve, be;
+    if (!this.item) return d;
+    const e = this.item.system, t = this.item.actor, s = e.rarity !== "" ? e.rarity : this.item.type === "weapon" ? "common" : "", a = this.item.type === "spell", n = e.method === "innate", o = this.uses && (!a || n), r = (le = e.properties) == null ? void 0 : le.has("ritual"), l = (ce = e.properties) == null ? void 0 : ce.has("concentration"), c = ((pe = e.activation) == null ? void 0 : pe.type) === "bonus", p = ((he = e.activation) == null ? void 0 : he.type) === "reaction", h = ((de = e.activation) == null ? void 0 : de.type) === "legendary", m = (ue = e.recharge) == null ? void 0 : ue.value, g = (me = e.recharge) == null ? void 0 : me.charged;
+    let v = !1, f = !1, y = "";
+    if (game.modules.find((k) => k.id === "wm5e") && ((ge = game.modules.get("wm5e")) != null && ge.active) && (v = e.mastery || !1, v && this.item.type === "weapon")) {
+      const k = (fe = e.type) == null ? void 0 : fe.baseItem, Xe = new Set(this.masteryIds || ((ve = ($e = (ye = t.system.traits) == null ? void 0 : ye.weaponProf) == null ? void 0 : $e.mastery) == null ? void 0 : ve.value) || []);
+      f = k && Xe.has(k), y = game.i18n.localize(`action-pack-enhanced.masteries.${v}`);
+    }
+    const X = !!t.itemTypes.feat.find((k) => k.name === "Ritual Adept"), V = e.prepared === 0 && !(r && X);
+    return u`
+            <div class="item-name rollable flexrow ${V ? "unprepared" : ""}">
+                <div class="item-image ${s}${V ? " unprepared" : ""}" 
                         style="background-image: url('${this.item.img}')"
                         @mousedown="${this._onRoll}">
                     <i class="fa fa-dice-d20"></i>
                 </div>
                 
-                <h4 @mousedown="${this._onClick}">
-                    <span class="item-text ${t}">${this.item.name}</span>
-                    ${n ? d` (${this.uses.available}${this.uses.maximum ? "/" + this.uses.maximum : ""})` : h}
-                </h4>
+                <div class="item-name-wrap flexrow">
+                    <h4 @mousedown="${this._onClick}">
+                        <span class="item-text ${s}">${this.item.name}</span>
+                        ${o ? u` (${this.uses.available}${this.uses.maximum ? "/" + this.uses.maximum : ""})` : d}
+                    </h4>
 
-                ${o ? d`<div class="ritual flag" title="${game.i18n.localize("action-pack-enhanced.flag.ritual-title")}"></div>` : h}
-                ${r ? d`<div class="concentration flag" title="${game.i18n.localize("action-pack-enhanced.flag.concentration-title")}"></div>` : h}
-                ${l ? d`<div class="bonus flag" title="${game.i18n.localize("action-pack-enhanced.flag.bonus-title")}">${game.i18n.localize("action-pack-enhanced.flag.bonus")}</div>` : h}
-                ${c ? d`<div class="reaction flag" title="${game.i18n.localize("action-pack-enhanced.flag.reaction-title")}">${game.i18n.localize("action-pack-enhanced.flag.reaction")}</div>` : h}
-                ${p ? d`<div class="legendary flag" title="${game.i18n.localize("action-pack-enhanced.flag.legendary-title")}">${game.i18n.localize("action-pack-enhanced.flag.legendary")}</div>` : h}
+                    ${game.modules.find((k) => k.id === "wm5e") && ((be = game.modules.get("wm5e")) != null && be.active) && v ? u`<div class="mastery ${f ? "active" : "inactive"} flag">${y}</div>` : d}
+                </div>
 
-                ${u ? m ? d`<div class="flag"><i class="fas fa-bolt"></i></div>` : d`<div class="flag"><a class="rollable item-recharge" @mousedown="${this._onRecharge}"><i class="fas fa-dice-six"></i> ${e.recharge.value}+</a></div>` : h}
+                ${r ? u`<div class="ritual flag" title="${game.i18n.localize("action-pack-enhanced.flag.ritual-title")}"></div>` : d}
+                ${l ? u`<div class="concentration flag" title="${game.i18n.localize("action-pack-enhanced.flag.concentration-title")}"></div>` : d}
+                ${c ? u`<div class="bonus flag" title="${game.i18n.localize("action-pack-enhanced.flag.bonus-title")}">${game.i18n.localize("action-pack-enhanced.flag.bonus")}</div>` : d}
+                ${p ? u`<div class="reaction flag" title="${game.i18n.localize("action-pack-enhanced.flag.reaction-title")}">${game.i18n.localize("action-pack-enhanced.flag.reaction")}</div>` : d}
+                ${h ? u`<div class="legendary flag" title="${game.i18n.localize("action-pack-enhanced.flag.legendary-title")}">${game.i18n.localize("action-pack-enhanced.flag.legendary")}</div>` : d}
 
-                ${f ? d`<div class="unprepared flag" title="${game.i18n.localize("action-pack-enhanced.flag.unprepared-title")}">${game.i18n.localize("action-pack-enhanced.flag.unprepared")}</div>` : h}
+                ${m ? g ? u`<div class="flag"><i class="fas fa-bolt"></i></div>` : u`<div class="flag"><a class="rollable item-recharge" @mousedown="${this._onRecharge}"><i class="fas fa-dice-six"></i> ${e.recharge.value}+</a></div>` : d}
+
+                ${V ? u`<div class="unprepared flag" title="${game.i18n.localize("action-pack-enhanced.flag.unprepared-title")}">${game.i18n.localize("action-pack-enhanced.flag.unprepared")}</div>` : d}
             </div>
             
             <div class="item-drag-handle" 
@@ -1255,32 +1417,39 @@ class Te extends y {
                 <i class="fas fa-grip-vertical"></i>
             </div>
 
-            ${this.expanded ? d`
+            ${this.expanded ? u`
                 <div class="item-summary" style="display:block">
                     ${this._renderItemDetails()}
-                    ${this.description ? d`<p>${vt(this.description.description)}</p>` : d`<i class="fas fa-spinner fa-spin"></i>`}
+                    ${this.description ? u`<p>${Tt(this.description.description)}</p>` : u`<i class="fas fa-spinner fa-spin"></i>`}
                 </div>
-            ` : h}
+            ` : d}
         `;
   }
   _renderItemDetails() {
-    const e = Me(this.item);
-    return d`
-            ${e.castingTime ? d`<p><strong>Casting Time:</strong> ${e.castingTime}</p>` : h}
-            ${e.range ? d`<p><strong>Range:</strong> ${e.range}</p>` : h}
-            ${e.duration ? d`<p><strong>Duration:</strong> ${e.duration}</p>` : h}
+    const e = Ze(this.item);
+    return u`
+            ${e.castingTime ? u`<p><strong>Casting Time:</strong> ${e.castingTime}</p>` : d}
+            ${e.range ? u`<p><strong>Range:</strong> ${e.range}</p>` : d}
+            ${e.duration ? u`<p><strong>Duration:</strong> ${e.duration}</p>` : d}
         `;
   }
 }
-C(Te, "properties", {
+T(Be, "properties", {
   item: { type: Object },
   uses: { type: Object },
   api: { type: Object },
+  masteryIds: { type: Array },
   expanded: { type: Boolean, state: !0 },
   description: { type: Object, state: !0 }
 });
-customElements.define("ape-item", Te);
-class Pe extends y {
+customElements.define("ape-item", Be);
+class Le extends b {
+  _openJournal(e) {
+    fromUuid(e).then((t) => {
+      var s;
+      return (s = t == null ? void 0 : t.sheet) == null ? void 0 : s.render(!0);
+    });
+  }
   constructor() {
     super(), this.isOpen = !0;
   }
@@ -1288,28 +1457,37 @@ class Pe extends y {
     return this;
   }
   updated(e) {
-    e.has("isOpen") && this.classList.toggle("is-open", this.isOpen);
+    this.classList.toggle("is-open", this.isOpen), e.has("forceOpen") && this.forceOpen && (this.isOpen || (this.isOpen = !0));
   }
   _toggleOpen(e) {
     e.stopPropagation(), this.isOpen = !this.isOpen;
   }
   render() {
-    return d`
-            ${this.title ? d`
+    return u`
+            ${this.title ? u`
                 <h2 @click="${this._toggleOpen}">
                     <i class="fas fa-caret-down"></i> ${game.i18n.localize(this.title)}
                 </h2>
-            ` : h}
+            ` : d}
 
-            ${this.items && this.items.length > 0 ? d`
+            ${this.items && this.items.length > 0 ? u`
                 <div class="ape-items">
-                    ${this.items.map((e) => d`
-                        <ape-item class="ape-item item" data-item-uuid="${e.item.uuid}" .item="${e.item}" .uses="${e.uses}" .api="${this.api}"></ape-item>
-                    `)}
+                    ${this.items.map((e) => {
+      var t, s, a, n, o;
+      return u`
+                        <ape-item class="ape-item item" 
+                            data-item-uuid="${e.item.uuid}" 
+                            .item="${e.item}" 
+                            .uses="${e.uses}" 
+                            .api="${this.api}"
+                            .masteryIds="${(o = (n = (a = (s = (t = this.actor) == null ? void 0 : t.system) == null ? void 0 : s.traits) == null ? void 0 : a.weaponProf) == null ? void 0 : n.mastery) == null ? void 0 : o.value}">
+                        </ape-item>
+                    `;
+    })}
                 </div>
-            ` : h}
+            ` : d}
 
-            ${this.groups ? Object.entries(this.groups).map(([e, t]) => d`
+            ${this.groups ? Object.entries(this.groups).map(([e, t]) => u`
                 <ape-group 
                     class="ape-group"
                     .group="${t}" 
@@ -1319,11 +1497,11 @@ class Pe extends y {
                     .showSpellDots="${this.showSpellDots}"
                     .showSpellUses="${this.showSpellUses}">
                 </ape-group>
-            `) : h}
+            `) : d}
         `;
   }
 }
-C(Pe, "properties", {
+T(Le, "properties", {
   title: { type: String },
   items: { type: Array },
   // Array of {item, uses} objects
@@ -1334,10 +1512,12 @@ C(Pe, "properties", {
   api: { type: Object },
   showSpellDots: { type: Boolean },
   showSpellUses: { type: Boolean },
-  actor: { type: Object }
+  actor: { type: Object },
+  masteries: { type: Object },
+  forceOpen: { type: Boolean }
 });
-customElements.define("ape-section", Pe);
-class Ue extends y {
+customElements.define("ape-section", Le);
+class qe extends b {
   constructor() {
     super(), this.isOpen = !0;
   }
@@ -1351,37 +1531,37 @@ class Ue extends y {
     e.target.closest(".group-dots") || (this.isOpen = !this.isOpen);
   }
   render() {
-    if (!this.group) return h;
+    if (!this.group) return d;
     const { items: e, uses: t, title: s } = this.group, a = e && e.length > 0, n = t && t.maximum;
-    if (!a && !n) return h;
+    if (!a && !n) return d;
     const o = n && this.showSpellDots, r = t && this.showSpellUses, l = [
       "flexrow",
       "ape-group-header",
       o ? "has-dots" : "",
       r ? "has-uses" : ""
     ].filter(Boolean).join(" ");
-    return d`
+    return u`
             <div class="${l}" @click="${this._toggleOpen}">
                 <h3>
                     <i class="fas fa-caret-down"></i> ${game.i18n.localize(s)}
                 </h3>
-                ${o ? this._renderDots(t) : h}
-                ${r ? d`<div class="group-uses">${t.available}/${t.maximum}</div>` : h}
+                ${o ? this._renderDots(t) : d}
+                ${r ? u`<div class="group-uses">${t.available}/${t.maximum}</div>` : d}
             </div>
 
-            ${a ? d`
+            ${a ? u`
                 <div class="ape-items">
-                    ${e.map((c) => d`
+                    ${e.map((c) => u`
                         <ape-item class="ape-item item" data-item-uuid="${c.item.uuid}" .item="${c.item}" .uses="${c.uses}" .api="${this.api}"></ape-item>
                     `)}
                 </div>
-            ` : h}
+            ` : d}
         `;
   }
   _renderDots(e) {
-    return d`
+    return u`
             <div class="group-dots" data-group-name="${this.groupName}">
-                ${Array.from({ length: e.maximum }).map((t, s) => d`
+                ${Array.from({ length: e.maximum }).map((t, s) => u`
                     <div class="dot ${s < e.available ? "" : "empty"}" 
                          data-slot="${s}"
                          @click="${(a) => {
@@ -1393,17 +1573,18 @@ class Ue extends y {
         `;
   }
 }
-C(Ue, "properties", {
+T(qe, "properties", {
   group: { type: Object },
   groupName: { type: String },
   api: { type: Object },
   actor: { type: Object },
   showSpellDots: { type: Boolean },
   showSpellUses: { type: Boolean },
-  isOpen: { type: Boolean, state: !0 }
+  isOpen: { type: Boolean, state: !0 },
+  forceOpen: { type: Boolean }
 });
-customElements.define("ape-group", Ue);
-class Ie extends y {
+customElements.define("ape-group", qe);
+class Fe extends b {
   createRenderRoot() {
     return this;
   }
@@ -1411,25 +1592,34 @@ class Ie extends y {
     e.has("actorData") && this.actorData && (this.dataset.actorUuid = this.actorData.actor.uuid);
   }
   render() {
-    if (!this.actorData) return h;
-    const { actor: e, name: t, sections: s, needsInitiative: a, skillMode: n, showSkills: o } = this.actorData, r = e.system.attributes.hp, l = e.system.attributes.ac.value, c = e.type, p = r.value <= 0 && c === "character";
-    return d`
+    if (!this.actorData) return d;
+    const { actor: e, name: t, sections: s, needsInitiative: a, skillMode: n, showSkills: o } = this.actorData, r = e.system.attributes.hp, l = e.system.attributes.ac.value, c = e.type, p = r.value <= 0 && c === "character", h = e.system.attributes.inspiration;
+    return u`
             <div class="ape-actor-header">
                 <h1>
-                    <a class="ape-actor-name" @click="${(u) => this.api.openSheet(e)}">${t.split(" ")[0]}</a>
+                    <a class="ape-actor-name" @click="${(m) => this.api.openSheet(e)}">${t.split(" ")[0]}</a>
+                    <a class="ape-actor-inspiration ${h ? "ape-actor-inspiration-active" : ""}" title="${t} is ${h ? "inspired" : "not inspired"}!" @mousedown="${(m) => this.api.toggleInspiration(e, m)}">
+                        <svg width="100%" height="100%" viewBox="0 0 163 191" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+                            <path d="M58.699,71.415l0,63.404"/>
+                            <path d="M78.624,71.415l0,63.404"/>
+                            <path d="M97.63,71.415l0,63.404"/>
+                            <path d="M35.88,149.717c-4.526,3.624 -16.665,18.643 -20.574,22.552c30.949,15.518 96.969,17.912 122.372,-1.233c-4.18,-4.18 -18.011,-21.744 -18.295,-22.22c-0.881,9.201 -82.394,9.898 -83.502,0.9Zm-0.489,-101.365l83.626,0.267c0,0 0.366,79.504 0.366,100.197c0,9.081 -83.502,9.982 -83.502,0.9c0,-14.9 -0.489,-101.365 -0.489,-101.365Zm83.714,16.03c0,0 29.622,-0.424 33.244,2.76c4.154,3.651 6.015,31.36 0.334,41.72c-5.681,10.36 -33.166,19.636 -33.166,19.636l-0.412,-64.116Z"/>
+                            <path id="foam" class="ape-actor-inspiration-foam ${h ? "ape-actor-inspiration-foam-active" : "ape-actor-inspiration-foam-hidden"}" d="M26.53,76.061c0,0 -24.573,-12.245 -19.621,-37.499c4.953,-25.254 36.384,-1.701 38.194,-0.34c1.81,1.361 -8.286,-33.928 21.049,-31.887c29.336,2.041 31.382,19.982 31.478,26.19c0.095,6.207 8.138,-23.223 34.718,-8.503c17.811,9.864 8.665,25.224 5.33,29.251c-3.364,4.062 -9.328,9.305 -14.471,11.091c-4.583,1.591 -20.853,3.096 -29.719,-11.516c-1.238,-2.041 -0.932,15.302 -9.097,16.357c-3.908,0.505 -14.578,3.667 -23.477,-13.095c-10.105,33.947 -34.384,19.951 -34.384,19.951Z"/>
+                        </svg>
+                    </a>
                     <span class="ape-actor-ac">
                         <img class="ape-actor-ac-icon" src="/modules/action-pack-enhanced/images/ac-icon.svg">
                         <span class="ape-actor-ac-display">${l}</span>
                     </span>
                 </h1>
 
-                ${c === "character" ? d`
+                ${c === "character" ? u`
                     <div class="ape-actor-race-class">
                         ${this._renderRaceClass(e)}
                     </div>
-                ` : h}
+                ` : d}
 
-                ${game.settings.get("action-pack-enhanced", "show-xp-info") && c === "character" ? this._renderExperience(e) : h}
+                ${game.settings.get("action-pack-enhanced", "show-xp-info") && c === "character" ? this._renderExperience(e) : d}
 
                 <div class="ape-actor-rest-buttons">
                     <button class="ape-actor-rest-button" @click="${() => this.api.shortRest(e)}"><span class="fas fa-fork-knife"></span></button>
@@ -1440,30 +1630,30 @@ class Ie extends y {
                 
             </div>
 
-            ${p ? this._renderDeathSaves(e) : h}
+            ${p ? this._renderDeathSaves(e) : d}
 
-            ${a ? d`
+            ${a ? u`
                 <div class="ape-initiative" @click="${() => this.api.rollInitiative(e)}">
                     <i class="fas fa-swords ape-initiative-icon"></i>
                     <span class="ape-initiative-text">${game.i18n.localize("action-pack-enhanced.roll-initiative")}</span>
                 </div>
-            ` : h}
+            ` : d}
 
             ${this._renderAbilities(e)}
 
-            ${n === "dropdown" ? this._renderSkills(e, o, !0) : h}
+            ${n === "dropdown" ? this._renderSkills(e, o, !0) : d}
 
             <!-- Sections -->
             ${this._renderSections(e, s)}
 
-            ${n === "append" ? this._renderSkills(e, o, !1) : h}
+            ${n === "append" ? this._renderSkills(e, o, !1) : d}
         `;
   }
   _renderExperience(e) {
     const t = e.system.details, s = t.xp.pct, a = t.xp.max;
     t.xp.min;
     const n = t.xp.value;
-    return d`
+    return u`
             <div class="ape-actor-xp">
                 <div class="ape-actor-xp-bar" style="--bar-percent: ${s}%"></div>
                 <div class="ape-actor-xp-info">
@@ -1497,12 +1687,12 @@ class Ie extends y {
     this._xpActionsOpen = !this._xpActionsOpen;
   }
   _renderRaceClass(e) {
-    const t = qe(e);
-    return d`<div style="display:contents" .innerHTML="${t.replace(/,/g, "<br />")}"></div>`;
+    const t = et(e);
+    return u`<div style="display:contents" .innerHTML="${t.replace(/,/g, "<br />")}"></div>`;
   }
   _renderHpBar(e, t) {
     const s = Math.min(100, Math.max(0, t.value / t.max * 100));
-    return d`
+    return u`
              <div class="ape-actor-hp-wrapper">
                 <div class="ape-actor-hp" style="--bar-percent: ${s}%">
                     <span class="ape-actor-hp-text">
@@ -1550,9 +1740,9 @@ class Ie extends y {
   }
   _renderAbilities(e) {
     const t = this.globalData.abilityColumns;
-    return d`
+    return u`
             <div class="ape-abilities">
-                ${t.map((s) => d`
+                ${t.map((s) => u`
                     <div class="flex-col">
                         <span class="ape-ability">
                              <span class="ape-ability-label">&nbsp;</span>
@@ -1561,18 +1751,18 @@ class Ie extends y {
                         </span>
                         ${s.map((a) => {
       const n = e.system.abilities[a.key];
-      return d`
+      return u`
                                 <span class="ape-ability">
                                     <span class="ape-ability-label">${a.key}</span>
                                     <a class="fas fa-dice-d20 ape-ability-check" 
                                        title="${a.label} check"
                                        @click="${(o) => this.api.rollAbilityCheck(e, a.key, o)}">
-                                        <span class="ape-ability-text">${F(n.mod)}</span>
+                                        <span class="ape-ability-text">${K(n.mod)}</span>
                                     </a>
                                     <a class="fas fa-dice-d20 ape-ability-save" 
                                        title="${a.label} saving throw"
                                        @click="${(o) => this.api.rollSavingThrow(e, a.key, o)}">
-                                        <span class="ape-ability-text">${F(n.save.value)}</span>
+                                        <span class="ape-ability-text">${K(n.save.value)}</span>
                                     </a>
                                 </span>
                             `;
@@ -1584,27 +1774,27 @@ class Ie extends y {
   }
   _renderSkills(e, t, s) {
     const a = this.actorData.skills, n = e.system.skills;
-    return d`
+    return u`
             <div class="ape-skill-container ${this.actorData.skillMode} ${t ? "is-open" : ""}">
-                ${s ? d`
+                ${s ? u`
                     <h2 class="ape-skill-header" @click="${this._toggleSkills}">
                         <i class="fas fa-caret-down"></i> Skills
                     </h2>
-                ` : h}
+                ` : d}
 
                 <div class="ape-skills">
                     ${Object.keys(n).map((o) => {
       const r = n[o], l = a[o];
-      if (!l) return h;
+      if (!l) return d;
       let c = "far fa-circle";
-      return r.proficient === 0.5 ? c = "fas fa-adjust" : r.proficient === 1 ? c = "fas fa-check" : r.proficient === 2 && (c = "fas fa-star"), d`
+      return r.proficient === 0.5 ? c = "fas fa-adjust" : r.proficient === 1 ? c = "fas fa-check" : r.proficient === 2 && (c = "fas fa-star"), u`
                             <div class="ape-skill-row flexrow ${r.proficient === 1 ? "proficient" : r.proficient === 2 ? "expert" : ""}"
                                @click="${(p) => this.api.rollSkill(e, o, p)}"
                                @contextmenu="${(p) => this.api.rollSkill(e, o, p, !0)}">
                                 <span class="ape-skill-icon ${c}"></span>
                                 <span class="ape-skill-ability">${r.ability}</span>
                                 <span class="ape-skill-label">${l.label}</span>
-                                <span class="ape-skill-bonus">${F(r.total)}</span>
+                                <span class="ape-skill-bonus">${K(r.total)}</span>
                                 <span class="ape-skill-passive">(${r.passive})</span>
                             </div>
                         `;
@@ -1617,12 +1807,12 @@ class Ie extends y {
     e.currentTarget.parentElement.classList.toggle("is-open");
   }
   _renderDeathSaves(e) {
-    const t = e.system.attributes.death.failure, s = e.system.attributes.death.success, a = (o, r, l) => Array.from({ length: 3 }).map((c, p) => d`
+    const t = e.system.attributes.death.failure, s = e.system.attributes.death.success, a = (o, r, l) => Array.from({ length: 3 }).map((c, p) => u`
                 <span class="ape-death-dot ${p < o ? "filled" : ""}">
-                    ${p < o ? d`<span class="fas ${l}"></span>` : h}
+                    ${p < o ? u`<span class="fas ${l}"></span>` : d}
                 </span>
              `), n = t < 3 && s < 3;
-    return d`
+    return u`
              <div class="ape-death-saving">
                 <span class="ape-death-throws failed">
                     ${a(t, "failed", "fa-skull-crossbones")}
@@ -1639,7 +1829,7 @@ class Ie extends y {
   _renderSections(e, t) {
     return ["equipped", "feature", "spell", "inventory", "passive"].map((a) => {
       const n = t[a];
-      return n ? d`
+      return n ? u`
                 <ape-section 
                     class="ape-category"
                     .title="${n.title}" 
@@ -1649,13 +1839,14 @@ class Ie extends y {
                     .api="${this.api}"
                     .actor="${e}"
                     .showSpellDots="${this.globalData.showSpellDots}"
-                    .showSpellUses="${this.globalData.showSpellUses}">
+                    .showSpellUses="${this.globalData.showSpellUses}"
+                    .forceOpen="${n.forceOpen}">
                 </ape-section>
-            ` : h;
+            ` : d;
     });
   }
 }
-C(Ie, "properties", {
+T(Fe, "properties", {
   actorData: { type: Object },
   // The object returned by data-builder
   globalData: { type: Object },
@@ -1663,8 +1854,8 @@ C(Ie, "properties", {
   api: { type: Object },
   _xpActionsOpen: { state: !1 }
 });
-customElements.define("ape-actor", Ie);
-class Re extends y {
+customElements.define("ape-actor", Fe);
+class We extends b {
   createRenderRoot() {
     return this;
   }
@@ -1684,20 +1875,20 @@ class Re extends y {
     }
   }
   render() {
-    if (!this.data) return h;
+    if (!this.data) return d;
     const { actors: e } = this.data, t = !e || e.length === 0;
-    return d`
+    return u`
             <div class="${[
       "ape-wrapper"
     ].join(" ")}" @scroll="${this._onScroll}">
                 ${this._renderHeader()}
 
                 <div class="ape-actors">
-                    ${t ? d`
+                    ${t ? u`
                         <div class="ape-empty-tray">
                             <i class="fas fa-dice-d20"></i>
                         </div>
-                    ` : e.map((a) => d`
+                    ` : e.map((a) => u`
                         <ape-actor 
                             class="ape-actor"
                             .actorData="${a}"
@@ -1708,25 +1899,25 @@ class Re extends y {
                 </div>
 
                 <div class="ape-end-turn" @click="${() => this.api.endTurn()}">
-                    ${game.i18n.localize("ape.end-turn")}
+                    ${game.i18n.localize("action-pack-enhanced.end-turn")}
                 </div>
             </div>
         `;
   }
   _renderHeader() {
-    return h;
+    return d;
   }
 }
-C(Re, "properties", {
+T(We, "properties", {
   data: { type: Object },
   // Contains actors
   globalData: { type: Object },
   // Contains abilityColumns, showSpellDots
   api: { type: Object }
 });
-customElements.define("ape-app", Re);
-let L, D, _e, G;
-function bt(i) {
+customElements.define("ape-app", We);
+let F, z, Ue, Q;
+function Pt(i) {
   var o;
   if (!i || i === "") return null;
   let e = i.split(".");
@@ -1743,15 +1934,15 @@ function bt(i) {
   }
   return n || null;
 }
-function xt(i) {
+function Ht(i) {
   if (i instanceof CONFIG.Actor.documentClass)
     return i;
   if (i instanceof CONFIG.Token.documentClass)
     return i.object.actor;
 }
-function ee() {
+function ie() {
   const i = canvas.tokens.controlled.map((t) => t.actor), e = document.querySelector("#ape-app");
-  e && (game.combat && i.includes(D) ? e.classList.add("is-current-combatant") : e.classList.remove("is-current-combatant"));
+  e && (game.combat && i.includes(z) ? e.classList.add("is-current-combatant") : e.classList.remove("is-current-combatant"));
 }
 Hooks.on("ready", () => {
   var i, e;
@@ -1759,21 +1950,21 @@ Hooks.on("ready", () => {
     const t = document.createElement("ape-app");
     t.id = "ape-app", t.classList.add("ape-container");
     const s = document.getElementById("interface");
-    s && document.body.insertBefore(t, s), _e = new ze(), t.api = _e;
+    s && document.body.insertBefore(t, s), Ue = new Ge(), t.api = Ue;
   }
-  L = (e = (i = game.combat) == null ? void 0 : i.turns.find((t) => {
+  F = (e = (i = game.combat) == null ? void 0 : i.turns.find((t) => {
     var s;
     return t.id == ((s = game.combat) == null ? void 0 : s.current.combatantId);
-  })) == null ? void 0 : e.actor, D = L, te() && $("#ape-app").addClass("is-open always-on"), ae();
+  })) == null ? void 0 : e.actor, z = F, ne() && $("#ape-app").addClass("is-open always-on"), re();
 });
-function _t() {
+function Ut() {
   const i = game.settings.get("action-pack-enhanced", "tray-display");
   return i === "selected" || i === "auto";
 }
-function te() {
+function ne() {
   return game.settings.get("action-pack-enhanced", "tray-display") === "always";
 }
-function z() {
+function B() {
   const i = canvas.tokens.controlled.filter((e) => {
     var t;
     return ["character", "npc"].includes((t = e.actor) == null ? void 0 : t.type);
@@ -1781,47 +1972,47 @@ function z() {
   return i.length ? i.map((e) => e.actor) : game.user.character && game.settings.get("action-pack-enhanced", "assume-default-character") ? [game.user.character] : [];
 }
 Hooks.on("controlToken", async () => {
-  ae();
+  re();
 });
 Hooks.on("updateActor", (i) => {
-  z().includes(i) && _();
+  B().includes(i) && S();
 });
-function se(i) {
-  z().includes(i.actor) && _();
+function oe(i) {
+  B().includes(i.actor) && S();
 }
 Hooks.on("updateItem", (i) => {
-  se(i);
+  oe(i);
 });
 Hooks.on("deleteItem", (i) => {
-  se(i);
+  oe(i);
 });
 Hooks.on("createItem", (i) => {
-  se(i);
+  oe(i);
 });
 Hooks.on("updateCombat", (i) => {
   var e;
-  D = (e = i.turns.find((t) => t.id == i.current.combatantId)) == null ? void 0 : e.actor, ee(), L = D;
+  z = (e = i.turns.find((t) => t.id == i.current.combatantId)) == null ? void 0 : e.actor, ie(), F = z;
 });
 Hooks.on("createCombatant", (i) => {
-  z().includes(i.actor) && _();
+  B().includes(i.actor) && S();
 });
 Hooks.on("updateCombatant", (i, e) => {
-  z().includes(i.actor) && _();
+  B().includes(i.actor) && S();
 });
 Hooks.on("deleteCombat", (i) => {
-  game.combat || (D = null, L = null, ee());
+  game.combat || (z = null, F = null, ie());
 });
 Hooks.on("init", () => {
-  Ge({
-    updateTray: _,
-    updateTrayState: ae,
+  ot({
+    updateTray: S,
+    updateTrayState: re,
     resetScroll: () => {
       document.querySelector("ape-app");
     }
   });
 });
 Hooks.on("getSceneControlButtons", (i) => {
-  if (game.settings.get("action-pack-enhanced", "use-control-button") && !te()) {
+  if (game.settings.get("action-pack-enhanced", "use-control-button") && !ne()) {
     const e = i.tokens.tools;
     e && (e.apeApp = {
       name: "apeApp",
@@ -1835,24 +2026,24 @@ Hooks.on("getSceneControlButtons", (i) => {
     });
   }
 });
-function ae() {
+function re() {
   const i = $("#ape-app");
-  _t() && (canvas.tokens.controlled.filter((t) => {
+  Ut() && (canvas.tokens.controlled.filter((t) => {
     var s;
     return ["character", "npc"].includes((s = t.actor) == null ? void 0 : s.type);
-  }).length ? i.addClass("is-open") : i.removeClass("is-open")), te() ? i.addClass("is-open always-on") : i.removeClass("always-on"), ee(), _();
+  }).length ? i.addClass("is-open") : i.removeClass("is-open")), ne() ? i.addClass("is-open always-on") : i.removeClass("always-on"), ie(), S();
 }
-async function _() {
-  G || (G = new Ve());
-  const i = z(), e = G.build(i, {
+async function S() {
+  Q || (Q = new nt());
+  const i = B(), e = Q.build(i, {
     /* scrollPosition stub */
   });
-  function t(p, u) {
-    return p && [u, p].join("-");
+  function t(p, h) {
+    return p && [h, p].join("-");
   }
   const s = t(game.settings.get("action-pack-enhanced", "icon-size"), "icon"), a = t(game.settings.get("action-pack-enhanced", "tray-size"), "tray"), n = game.settings.get("action-pack-enhanced", "show-spell-dots"), o = game.settings.get("action-pack-enhanced", "show-spell-uses"), r = Object.entries(CONFIG.DND5E.abilities), l = [
-    r.slice(0, 3).map(([p, u]) => ({ key: p, label: u.label })),
-    r.slice(3, 6).map(([p, u]) => ({ key: p, label: u.label }))
+    r.slice(0, 3).map(([p, h]) => ({ key: p, label: h.label })),
+    r.slice(3, 6).map(([p, h]) => ({ key: p, label: h.label }))
   ], c = document.querySelector("#ape-app");
   Array.from(c.classList).forEach((p) => {
     (p.startsWith("tray-") || p.startsWith("icon-")) && c.classList.remove(p);
@@ -1870,25 +2061,27 @@ Hooks.on("dnd5e.getItemContextOptions", (i, e) => {
     name: game.i18n.localize("action-pack-enhanced.item-context.show"),
     icon: "<i class='fas fa-eye'></i>",
     callback: async () => {
-      await i.setFlag("action-pack-enhanced", "hidden", !1), _();
+      await i.setFlag("action-pack-enhanced", "hidden", !1), S();
     }
   }) : e.push({
     name: game.i18n.localize("action-pack-enhanced.item-context.hide"),
     icon: "<i class='fas fa-eye-slash'></i>",
     callback: async () => {
-      await i.setFlag("ape", "hidden", !0), _();
+      await i.setFlag("ape", "hidden", !0), S();
     }
   }));
 });
 Hooks.on("dropCanvasData", (i, e) => {
   if (e.type === "ActionPackItem" && e.uuid) {
-    const t = bt(e.uuid);
+    const t = Pt(e.uuid);
     if (!t) return;
     const s = i.tokens.placeables.find((a) => e.x >= a.x && e.x <= a.x + a.w && e.y >= a.y && e.y <= a.y + a.h);
-    if (s)
-      return s.setTarget(!0, { user: game.user, releaseOthers: !0, groupSelection: !1 }), t.use(), !1;
+    if (s) {
+      const a = t.system.target, n = a && a.value > 1;
+      return s.setTarget(!0, { user: game.user, releaseOthers: !n, groupSelection: !0 }), t.use(), !1;
+    }
   }
 });
 export {
-  xt as fudgeToActor
+  Ht as fudgeToActor
 };

@@ -5,6 +5,9 @@
         "roll-initiative": "Roll initiative!",
         "roll-check": "ability check",
         "roll-save": "saving throw",
+        "drag-to-target": "Drag to target",
+        "show-weapon-mastery": "Show weapon masteries",
+        "show-weapon-mastery-hint": "Show weapon mastery labels on weapon items in the APE display.",
         "action-type": {
             "action": "Action",
             "bonus": "Bonus Action",
@@ -47,6 +50,16 @@
             "legendary-title": "Legendary action",
             "unprepared": "U",
             "unprepared-title": "Unprepared spell"
+        },
+        "masteries": {
+            "cleave": "Cleave",
+            "graze": "Graze",
+            "nick": "Nick",
+            "push": "Push",
+            "sap": "Sap",
+            "slow": "Slow",
+            "topple": "Topple",
+            "vex": "Vex"
         },
         "category": {
             "equipped": "Equipped",

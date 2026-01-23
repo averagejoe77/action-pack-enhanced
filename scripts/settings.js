@@ -191,6 +191,20 @@ export function registerSettings(callbacks) {
 
     game.settings.register(
         "action-pack-enhanced",
+        "show-weapon-mastery",
+        {
+            name: "action-pack-enhanced.settings.show-weapon-mastery",
+            hint: "action-pack-enhanced.settings.show-weapon-mastery-hint",
+            scope: "client",
+            config: true,
+            default: false,
+            type: Boolean,
+            onChange: () => updateTray()
+        }
+    );
+
+    game.settings.register(
+        "action-pack-enhanced",
         "use-control-button",
         {
             name: "action-pack-enhanced.settings.use-control-button",
