@@ -1,30 +1,63 @@
 var Xe = Object.defineProperty;
 var Ve = (i, e, t) => e in i ? Xe(i, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : i[e] = t;
-var T = (i, e, t) => Ve(i, typeof e != "symbol" ? e + "" : e, t);
+var P = (i, e, t) => Ve(i, typeof e != "symbol" ? e + "" : e, t);
 class Ge {
   constructor() {
-    this.masteryTable = [
-      { level: 1, mastery: 3 },
-      { level: 2, mastery: 3 },
-      { level: 3, mastery: 3 },
-      { level: 4, mastery: 4 },
-      { level: 5, mastery: 4 },
-      { level: 6, mastery: 4 },
-      { level: 7, mastery: 4 },
-      { level: 8, mastery: 4 },
-      { level: 9, mastery: 4 },
-      { level: 10, mastery: 5 },
-      { level: 11, mastery: 5 },
-      { level: 12, mastery: 5 },
-      { level: 13, mastery: 5 },
-      { level: 14, mastery: 5 },
-      { level: 15, mastery: 5 },
-      { level: 16, mastery: 6 },
-      { level: 17, mastery: 6 },
-      { level: 18, mastery: 6 },
-      { level: 19, mastery: 6 },
-      { level: 20, mastery: 6 }
-    ];
+    this.masteryRules = {
+      Fighter: {
+        type: "table",
+        values: [
+          { level: 1, mastery: 3 },
+          { level: 2, mastery: 3 },
+          { level: 3, mastery: 3 },
+          { level: 4, mastery: 4 },
+          { level: 5, mastery: 4 },
+          { level: 6, mastery: 4 },
+          { level: 7, mastery: 4 },
+          { level: 8, mastery: 4 },
+          { level: 9, mastery: 4 },
+          { level: 10, mastery: 5 },
+          { level: 11, mastery: 5 },
+          { level: 12, mastery: 5 },
+          { level: 13, mastery: 5 },
+          { level: 14, mastery: 5 },
+          { level: 15, mastery: 5 },
+          { level: 16, mastery: 6 },
+          { level: 17, mastery: 6 },
+          { level: 18, mastery: 6 },
+          { level: 19, mastery: 6 },
+          { level: 20, mastery: 6 }
+        ]
+      },
+      Barbarian: {
+        type: "table",
+        values: [
+          { level: 1, mastery: 2 },
+          { level: 2, mastery: 2 },
+          { level: 3, mastery: 2 },
+          { level: 4, mastery: 3 },
+          { level: 5, mastery: 3 },
+          { level: 6, mastery: 3 },
+          { level: 7, mastery: 3 },
+          { level: 8, mastery: 3 },
+          { level: 9, mastery: 3 },
+          { level: 10, mastery: 4 },
+          { level: 11, mastery: 4 },
+          { level: 12, mastery: 4 },
+          { level: 13, mastery: 4 },
+          { level: 14, mastery: 4 },
+          { level: 15, mastery: 4 },
+          { level: 16, mastery: 4 },
+          { level: 17, mastery: 4 },
+          { level: 18, mastery: 4 },
+          { level: 19, mastery: 4 },
+          { level: 20, mastery: 4 }
+        ]
+      },
+      Ranger: { type: "constant", value: 2 },
+      Rogue: { type: "constant", value: 2 },
+      Paladin: { type: "constant", value: 2 }
+    };
   }
   /**
    * Updates an actor's HP
@@ -61,6 +94,23 @@ class Ge {
     if (e)
       return e.shortRest();
   }
+  calculateMaxMasteries(e) {
+    let t = 1;
+    for (const s of e.itemTypes.class) {
+      const a = this.masteryRules[s.name];
+      if (a) {
+        let n = 0;
+        if (a.type === "constant")
+          n = a.value;
+        else if (a.type === "table") {
+          const o = s.system.levels, r = a.values.find((l) => l.level === o);
+          n = r ? r.mastery : 0;
+        }
+        n > t && (t = n);
+      }
+    }
+    return t;
+  }
   /**
    * Performs a Long Rest
    * @param {Actor} actor 
@@ -71,29 +121,26 @@ class Ge {
     const t = await e.longRest();
     if (game.modules.get("wm5e") && ((a = game.modules.get("wm5e")) == null ? void 0 : a.active) && e.itemTypes.feat.find((n) => n.name === "Weapon Mastery" || n.name === "Weapon Master")) {
       await e.setFlag("action-pack-enhanced", "masterySelectionPending", !0);
-      const n = e.itemTypes.weapon.filter((p) => p.system.equipped), o = /* @__PURE__ */ new Map(), r = e.system.traits.weaponProf.mastery.value;
-      n.forEach((p) => {
-        var v, f;
-        const m = p.system.mastery, g = (v = p.system.type) == null ? void 0 : v.baseItem;
-        m && g && !o.has(g) && o.set(g, {
-          id: g,
-          label: g.replace(/-/g, " ").replace(/\b\w/g, (y) => y.toUpperCase()),
-          masteryLabel: ((f = CONFIG.DND5E.weaponMasteries[m]) == null ? void 0 : f.label) || m,
-          selected: r.find((y) => y === g)
+      const n = e.itemTypes.weapon.filter((c) => c.system.equipped), o = /* @__PURE__ */ new Map(), r = e.system.traits.weaponProf.mastery.value;
+      n.forEach((c) => {
+        var m, g;
+        const p = c.system.mastery, h = (m = c.system.type) == null ? void 0 : m.baseItem;
+        p && h && !o.has(h) && o.set(h, {
+          id: h,
+          label: h.replace(/-/g, " ").replace(/\b\w/g, (f) => f.toUpperCase()),
+          masteryLabel: ((g = CONFIG.DND5E.weaponMasteries[p]) == null ? void 0 : g.label) || p,
+          selected: r.find((f) => f === h)
         });
       });
-      const l = e.itemTypes.class.find((p) => p.name === "Fighter"), c = l ? e.itemTypes.class.find((p) => p.name === "Fighter").system.levels : 0, h = e.itemTypes.class.find((p) => p.name === "Rogue");
-      if (l) {
-        const p = this.masteryTable.find((m) => m.level <= c);
-        p && await this.promptMasterySelection(e, o, p.mastery);
-      } else h ? await this.promptMasterySelection(e, o, 2) : await this.promptMasterySelection(e, o, 1);
+      const l = this.calculateMaxMasteries(e);
+      await this.promptMasterySelection(e, o, l);
     } else
       await e.setFlag("action-pack-enhanced", "masterySelectionPending", !1), await e.update({ "system.traits.weaponProf.mastery.value": [] });
     return t;
   }
   async promptMasterySelection(e, t, s) {
     const { DialogV2: a } = foundry.applications.api;
-    let n = `<p>Select up to ${s} Weapon ${s === 1 ? "Mastery" : "Masteries"} for the day:</p>`;
+    let n = `<p>Select up to ${s} ${s === 1 ? "weapon" : "weapons"} to use ${s === 1 ? "its" : "their"} weapon mastery for the day:</p>`;
     n += '<form class="ape-mastery-dialog">';
     for (const [o, r] of t)
       n += `
@@ -133,8 +180,8 @@ class Ge {
         default: !0,
         callback: async (o, r, l) => {
           const c = [];
-          return l.element.querySelectorAll('input[name="mastery"]:checked').forEach((h) => {
-            c.push(h.value);
+          return l.element.querySelectorAll('input[name="mastery"]:checked').forEach((p) => {
+            c.push(p.value);
           }), c.length > s && (ui.notifications.warn(`You selected more than ${s} masteries. Only the first ${s} will be applied.`), c.splice(s)), await e.update({ "system.traits.weaponProf.mastery.value": c }), await e.setFlag("action-pack-enhanced", "masterySelectionPending", !1), !0;
         }
       }, {
@@ -1383,11 +1430,11 @@ class je extends b {
   render() {
     var le, ce, pe, he, de, ue, me, ge, fe, ye, $e, ve;
     if (!this.item) return d;
-    const e = this.item.system, t = this.item.actor, s = e.rarity !== "" ? e.rarity : this.item.type === "weapon" ? "common" : "", a = this.item.type === "spell", n = e.method === "innate", o = this.uses && (!a || n), r = (le = e.properties) == null ? void 0 : le.has("ritual"), l = (ce = e.properties) == null ? void 0 : ce.has("concentration"), c = ((pe = e.activation) == null ? void 0 : pe.type) === "bonus", h = ((he = e.activation) == null ? void 0 : he.type) === "reaction", p = ((de = e.activation) == null ? void 0 : de.type) === "legendary", m = (ue = e.recharge) == null ? void 0 : ue.value, g = (me = e.recharge) == null ? void 0 : me.charged;
-    let v = !1, f = !1, y = "";
-    if (game.modules.find((O) => O.id === "wm5e") && ((ge = game.modules.get("wm5e")) != null && ge.active) && (v = e.mastery || !1, v && this.item.type === "weapon")) {
+    const e = this.item.system, t = this.item.actor, s = e.rarity !== "" ? e.rarity : this.item.type === "weapon" ? "common" : "", a = this.item.type === "spell", n = e.method === "innate", o = this.uses && (!a || n), r = (le = e.properties) == null ? void 0 : le.has("ritual"), l = (ce = e.properties) == null ? void 0 : ce.has("concentration"), c = ((pe = e.activation) == null ? void 0 : pe.type) === "bonus", p = ((he = e.activation) == null ? void 0 : he.type) === "reaction", h = ((de = e.activation) == null ? void 0 : de.type) === "legendary", m = (ue = e.recharge) == null ? void 0 : ue.value, g = (me = e.recharge) == null ? void 0 : me.charged;
+    let f = !1, y = !1, v = "";
+    if (game.modules.find((O) => O.id === "wm5e") && ((ge = game.modules.get("wm5e")) != null && ge.active) && (f = e.mastery || !1, f && this.item.type === "weapon")) {
       const O = (fe = e.type) == null ? void 0 : fe.baseItem, Fe = new Set(this.masteryIds || ((ve = ($e = (ye = t.system.traits) == null ? void 0 : ye.weaponProf) == null ? void 0 : $e.mastery) == null ? void 0 : ve.value) || []);
-      f = O && Fe.has(O), y = game.i18n.localize(`action-pack-enhanced.masteries.${v}`);
+      y = O && Fe.has(O), v = game.i18n.localize(`action-pack-enhanced.masteries.${f}`);
     }
     const X = !!t.itemTypes.feat.find((O) => O.name === "Ritual Adept"), V = e.prepared === 0 && !(r && X);
     return u`
@@ -1403,14 +1450,14 @@ class je extends b {
                         <span class="item-text ${s}">${this.item.name}</span>
                         ${o ? u` (${this.uses.available}${this.uses.maximum ? "/" + this.uses.maximum : ""})` : d}
                     </h4>
-                    ${this.showWeaponMastery ? this._renderWeaponMastery(v, f, y) : d}
+                    ${this.showWeaponMastery ? this._renderWeaponMastery(f, y, v) : d}
                 </div>
 
                 ${r ? u`<div class="ritual flag" title="${game.i18n.localize("action-pack-enhanced.flag.ritual-title")}"></div>` : d}
                 ${l ? u`<div class="concentration flag" title="${game.i18n.localize("action-pack-enhanced.flag.concentration-title")}"></div>` : d}
                 ${c ? u`<div class="bonus flag" title="${game.i18n.localize("action-pack-enhanced.flag.bonus-title")}">${game.i18n.localize("action-pack-enhanced.flag.bonus")}</div>` : d}
-                ${h ? u`<div class="reaction flag" title="${game.i18n.localize("action-pack-enhanced.flag.reaction-title")}">${game.i18n.localize("action-pack-enhanced.flag.reaction")}</div>` : d}
-                ${p ? u`<div class="legendary flag" title="${game.i18n.localize("action-pack-enhanced.flag.legendary-title")}">${game.i18n.localize("action-pack-enhanced.flag.legendary")}</div>` : d}
+                ${p ? u`<div class="reaction flag" title="${game.i18n.localize("action-pack-enhanced.flag.reaction-title")}">${game.i18n.localize("action-pack-enhanced.flag.reaction")}</div>` : d}
+                ${h ? u`<div class="legendary flag" title="${game.i18n.localize("action-pack-enhanced.flag.legendary-title")}">${game.i18n.localize("action-pack-enhanced.flag.legendary")}</div>` : d}
 
                 ${m ? g ? u`<div class="flag"><i class="fas fa-bolt"></i></div>` : u`<div class="flag"><a class="rollable item-recharge" @mousedown="${this._onRecharge}"><i class="fas fa-dice-six"></i> ${e.recharge.value}+</a></div>` : d}
 

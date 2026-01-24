@@ -2,28 +2,61 @@ import { formatNumber } from "./utils.js";
 
 export class ActionPackAPI {
     constructor() {
-        this.masteryTable = [
-            {"level": 1, "mastery": 3},
-            {"level": 2, "mastery": 3},
-            {"level": 3, "mastery": 3},
-            {"level": 4, "mastery": 4},
-            {"level": 5, "mastery": 4},
-            {"level": 6, "mastery": 4},
-            {"level": 7, "mastery": 4},
-            {"level": 8, "mastery": 4},
-            {"level": 9, "mastery": 4},
-            {"level": 10, "mastery": 5},
-            {"level": 11, "mastery": 5},
-            {"level": 12, "mastery": 5},
-            {"level": 13, "mastery": 5},
-            {"level": 14, "mastery": 5},
-            {"level": 15, "mastery": 5},
-            {"level": 16, "mastery": 6},
-            {"level": 17, "mastery": 6},
-            {"level": 18, "mastery": 6},
-            {"level": 19, "mastery": 6},
-            {"level": 20, "mastery": 6}
-        ]
+        this.masteryRules = {
+            "Fighter": { 
+                type: "table", 
+                values: [
+                    {"level": 1, "mastery": 3},
+                    {"level": 2, "mastery": 3},
+                    {"level": 3, "mastery": 3},
+                    {"level": 4, "mastery": 4},
+                    {"level": 5, "mastery": 4},
+                    {"level": 6, "mastery": 4},
+                    {"level": 7, "mastery": 4},
+                    {"level": 8, "mastery": 4},
+                    {"level": 9, "mastery": 4},
+                    {"level": 10, "mastery": 5},
+                    {"level": 11, "mastery": 5},
+                    {"level": 12, "mastery": 5},
+                    {"level": 13, "mastery": 5},
+                    {"level": 14, "mastery": 5},
+                    {"level": 15, "mastery": 5},
+                    {"level": 16, "mastery": 6},
+                    {"level": 17, "mastery": 6},
+                    {"level": 18, "mastery": 6},
+                    {"level": 19, "mastery": 6},
+                    {"level": 20, "mastery": 6}
+                ]
+            },
+            "Barbarian": {
+                type: "table",
+                values: [
+                    {"level": 1, "mastery": 2},
+                    {"level": 2, "mastery": 2},
+                    {"level": 3, "mastery": 2},
+                    {"level": 4, "mastery": 3},
+                    {"level": 5, "mastery": 3},
+                    {"level": 6, "mastery": 3},
+                    {"level": 7, "mastery": 3},
+                    {"level": 8, "mastery": 3},
+                    {"level": 9, "mastery": 3},
+                    {"level": 10, "mastery": 4},
+                    {"level": 11, "mastery": 4},
+                    {"level": 12, "mastery": 4},
+                    {"level": 13, "mastery": 4},
+                    {"level": 14, "mastery": 4},
+                    {"level": 15, "mastery": 4},
+                    {"level": 16, "mastery": 4},
+                    {"level": 17, "mastery": 4},
+                    {"level": 18, "mastery": 4},
+                    {"level": 19, "mastery": 4},
+                    {"level": 20, "mastery": 4}
+                ]
+            },
+            "Ranger": { type: "constant", value: 2 },
+            "Rogue": { type: "constant", value: 2 },
+            "Paladin": { type: "constant", value: 2 }
+        };
     }
 
     /**
@@ -65,6 +98,29 @@ export class ActionPackAPI {
         return actor.shortRest();
     }
 
+    calculateMaxMasteries(actor) {
+        let maxMasteries = 1; // Default for "Weapon Master" feat if no class has it
+
+        for (const cls of actor.itemTypes.class) {
+            const rule = this.masteryRules[cls.name];
+            if (rule) {
+                let count = 0;
+                if (rule.type === "constant") {
+                    count = rule.value;
+                } else if (rule.type === "table") {
+                    const level = cls.system.levels;
+                    const entry = rule.values.find(v => v.level === level);
+                    count = entry ? entry.mastery : 0;
+                }
+
+                if (count > maxMasteries) {
+                    maxMasteries = count;
+                }
+            }
+        }
+        return maxMasteries;
+    }
+
     /**
      * Performs a Long Rest
      * @param {Actor} actor 
@@ -103,21 +159,9 @@ export class ActionPackAPI {
             });
 
             // 4. Logic Branch
-            const isFighter = actor.itemTypes.class.find(c => c.name === "Fighter");
-            const fighterLvl = isFighter ? actor.itemTypes.class.find(c => c.name === "Fighter").system.levels : 0; 
-
-            const isRogue = actor.itemTypes.class.find(c => c.name === "Rogue");
-
-            if(isFighter){
-                const masteryLevel = this.masteryTable.find(m => m.level <= fighterLvl);
-                if (masteryLevel) {
-                    await this.promptMasterySelection(actor, choices, masteryLevel.mastery);
-                }
-            } else if (isRogue){    
-                await this.promptMasterySelection(actor, choices, 2);
-            } else {
-                await this.promptMasterySelection(actor, choices, 1);
-            }
+            // 4. Calculate Max Masteries
+            const maxMasteries = this.calculateMaxMasteries(actor);
+            await this.promptMasterySelection(actor, choices, maxMasteries);
         } else {
             // If module not active, just ensure we are locked (not pending)
             await actor.setFlag("action-pack-enhanced", "masterySelectionPending", false);
@@ -131,7 +175,7 @@ export class ActionPackAPI {
     async promptMasterySelection(actor, choices, maxMasteries) {
         const { DialogV2 } = foundry.applications.api;
         
-        let content = `<p>Select up to ${maxMasteries} Weapon ${maxMasteries === 1 ? "Mastery" : "Masteries"} for the day:</p>`;
+        let content = `<p>Select up to ${maxMasteries} ${maxMasteries === 1 ? "weapon" : "weapons"} to use ${maxMasteries === 1 ? "its" : "their"} weapon mastery for the day:</p>`;
         content += `<form class="ape-mastery-dialog">`;
         
         for (const [id, data] of choices) {
