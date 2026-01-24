@@ -101,19 +101,19 @@ export class ApeActor extends LitElement {
                     <button class="ape-actor-xp-close" @click="${this._toggleXpActions}">close</button>
                     <p>Choose an amount to add to or subtract from ${actor.name}'s XP</p>
                     <div class="ape-actor-xp-increment">
-                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, currentXP + 1)}">+1</button>
-                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, currentXP + 10)}">+10</button>
-                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, currentXP + 100)}">+100</button>
-                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, currentXP + 1000)}">+1000</button>
+                        <button class="ape-actor-xp-button" ?disabled="${currentXP >= maxXP}" @click="${() => this.api.updateXP(actor, currentXP + 1)}">+1</button>
+                        <button class="ape-actor-xp-button" ?disabled="${currentXP >= maxXP}" @click="${() => this.api.updateXP(actor, currentXP + 10)}">+10</button>
+                        <button class="ape-actor-xp-button" ?disabled="${currentXP >= maxXP}" @click="${() => this.api.updateXP(actor, currentXP + 100)}">+100</button>
+                        <button class="ape-actor-xp-button" ?disabled="${currentXP >= maxXP}" @click="${() => this.api.updateXP(actor, currentXP + 1000)}">+1000</button>
                     </div>
                     <div class="ape-actor-xp-decrement">
-                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, currentXP - 1)}">-1</button>
-                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, currentXP - 10)}">-10</button>
-                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, currentXP - 100)}">-100</button>
-                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, currentXP - 1000)}">-1000</button>
+                        <button class="ape-actor-xp-button" ?disabled="${currentXP <= minXP}" @click="${() => this.api.updateXP(actor, currentXP - 1)}">-1</button>
+                        <button class="ape-actor-xp-button" ?disabled="${currentXP <= minXP}" @click="${() => this.api.updateXP(actor, currentXP - 10)}">-10</button>
+                        <button class="ape-actor-xp-button" ?disabled="${currentXP <= minXP}" @click="${() => this.api.updateXP(actor, currentXP - 100)}">-100</button>
+                        <button class="ape-actor-xp-button" ?disabled="${currentXP <= minXP}" @click="${() => this.api.updateXP(actor, currentXP - 1000)}">-1000</button>
                     </div>
                     <div class="ape-actor-xp-max">
-                        <button class="ape-actor-xp-button" @click="${() => this.api.updateXP(actor, maxXP)}">Max</button>
+                        <button class="ape-actor-xp-button" ?disabled="${currentXP >= maxXP}" @click="${() => this.api.updateXP(actor, maxXP)}">Max</button>
                     </div>
                 </div>
             </div>
