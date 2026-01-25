@@ -59,7 +59,7 @@ jobs:
 
       - name: Package Module
         run: |
-          zip -r module.zip dist/ images/ lang/ styles/ module.json README.md LICENSE
+          zip -r module.zip dist/ images/ lang/ styles/ module.json README.md LICENSE -x "*.mjs.map"
 
       - name: Upload Release Asset
         id: upload-release-asset
