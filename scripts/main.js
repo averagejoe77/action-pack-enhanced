@@ -288,15 +288,20 @@ Hooks.on("dropCanvasData", (canvas, data) => {
         });
 
         if (dropTarget) {
-            // Check if item supports multiple targets
-            const target = item.system.target;
-            const isMultiTarget = target && target.value > 1;
-            
-            // releaseOthers: true if single target (replace), false if multi-target (add)
-            dropTarget.setTarget(true, { user: game.user, releaseOthers: !isMultiTarget, groupSelection: true });
-            item.use();
-            return false;
+
+            // get the activities for the item
+            const activities = item.system?.activities;
+            if (!activities) return;
+            // just get the first activity from the Collection
+            const activity = activities.contents[0];
+            const count = activity.target.affects.count || 1;
+            if(count === 1) {
+                dropTarget.setTarget(true, { user: game.user, releaseOthers: true, groupSelection: true });
+            }
         }
+
+        item.use();
+        return false;
     }
 });
 

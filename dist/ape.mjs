@@ -2133,16 +2133,25 @@ Hooks.on("dnd5e.getItemContextOptions", (i, e) => {
   }));
 });
 Hooks.on("dropCanvasData", (i, e) => {
+  var t;
   if (e.type === "ActionPackItem" && e.uuid) {
-    const t = Pt(e.uuid);
-    if (!t) return;
-    const s = i.tokens.placeables.find((a) => e.x >= a.x && e.x <= a.x + a.w && e.y >= a.y && e.y <= a.y + a.h);
-    if (s) {
-      const a = t.system.target, n = a && a.value > 1;
-      return s.setTarget(!0, { user: game.user, releaseOthers: !n, groupSelection: !0 }), t.use(), !1;
+    const s = Pt(e.uuid);
+    if (!s) return;
+    const a = i.tokens.placeables.find((n) => e.x >= n.x && e.x <= n.x + n.w && e.y >= n.y && e.y <= n.y + n.h);
+    if (a) {
+      const n = (t = s.system) == null ? void 0 : t.activities;
+      if (!n) return;
+      if ((n.contents[0].target.affects.count || 1) === 1)
+        a.setTarget(!0, { user: game.user, releaseOthers: !0, groupSelection: !0 });
+      else {
+        const c = !(game.user.targets.size > 1);
+        a.setTarget(!0, { user: game.user, releaseOthers: c, groupSelection: !0 });
+      }
     }
+    return s.use(), !1;
   }
 });
 export {
   Dt as fudgeToActor
 };
+//# sourceMappingURL=ape.mjs.map
