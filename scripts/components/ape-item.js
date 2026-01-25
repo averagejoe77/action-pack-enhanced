@@ -125,6 +125,9 @@ export class ApeItem extends LitElement {
                 <div class="item-summary" style="display:block">
                     ${this._renderItemDetails()}
                     ${this.description ? html`<p>${unsafeHTML(this.description.description)}</p>` : html`<i class="fas fa-spinner fa-spin"></i>`}
+                    <div class="item-properties">
+                        ${this._renderItemProperties(this.item)}
+                    </div>
                 </div>
             ` : nothing}
         `;
@@ -136,6 +139,33 @@ export class ApeItem extends LitElement {
             ${details.castingTime ? html`<p><strong>Casting Time:</strong> ${details.castingTime}</p>` : nothing}
             ${details.range ? html`<p><strong>Range:</strong> ${details.range}</p>` : nothing}
             ${details.duration ? html`<p><strong>Duration:</strong> ${details.duration}</p>` : nothing}
+            ${details.materials ? html`<p><strong>Materials:</strong> ${details.materials}</p>` : nothing}
+        `;
+    }
+
+    _renderItemProperties(item) {
+        // loop over the set of properties and return them as a list
+        const properties = item?.labels?.properties || [];
+        const dmgType = item.labels.hasOwnProperty('damageTypes') ? (item?.labels?.damageTypes?.includes(',') ? item?.labels?.damageTypes.split(',') : [item?.labels?.damageTypes] || []) : [];
+
+        const allProperties = [];
+
+        if (dmgType.length > 0) {
+            const types = dmgType.map(t => {return {label: t}});
+            const labels = types.map(t => t.label);
+            allProperties.push(...labels);
+        }
+
+        if (properties.length > 0) {
+            const labels = properties.map(p => p.label);
+            labels.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+            allProperties.push(...labels);
+        }
+
+        if(allProperties.length === 0) return nothing;
+
+        return html`
+            ${allProperties ? html`${allProperties.map(p => html`<span class="tag">${p}</span>`)} ` : nothing}
         `;
     }
 

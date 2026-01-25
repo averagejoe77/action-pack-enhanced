@@ -10,7 +10,8 @@ export function getItemDetails(item) {
     const castingTime = _formatCastingTime(item);
     const range = _formatRange(item);
     const duration = _formatDuration(item);
-    return { castingTime, range, duration };
+    const materials = item.type === 'spell' ? _formatMaterials(item) : '';
+    return { castingTime, range, duration, materials };
 }
 
 function _formatCastingTime(item) {
@@ -45,6 +46,12 @@ function _formatDuration(item) {
     const units = item.system?.duration?.units;
     if (value && units) return `${value} ${value > 1 ? units + 's' : units}`;
     if (units) return game.i18n.localize(`action-pack-enhanced.duration.${units}`);
+    return "";
+}
+
+function _formatMaterials(item) {
+    const materials = item.system?.materials?.value;
+    if (materials) return materials;
     return "";
 }
 

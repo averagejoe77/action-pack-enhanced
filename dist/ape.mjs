@@ -352,8 +352,8 @@ function G(i) {
   return i == null ? "0" : `${i >= 0 ? "+" : ""}${i}`;
 }
 function Ke(i) {
-  const e = Ze(i), t = Je(i), s = Ye(i);
-  return { castingTime: e, range: t, duration: s };
+  const e = Ze(i), t = Je(i), s = Ye(i), a = i.type === "spell" ? Qe(i) : "";
+  return { castingTime: e, range: t, duration: s, materials: a };
 }
 function Ze(i) {
   var s, a, n, o;
@@ -372,6 +372,11 @@ function Ye(i) {
   return e && t ? `${e} ${e > 1 ? t + "s" : t}` : t ? game.i18n.localize(`action-pack-enhanced.duration.${t}`) : "";
 }
 function Qe(i) {
+  var t, s;
+  const e = (s = (t = i.system) == null ? void 0 : t.materials) == null ? void 0 : s.value;
+  return e || "";
+}
+function et(i) {
   var r, l;
   let e = {}, t = i.itemTypes.race, s = i.itemTypes.class, a = i.itemTypes.subclass;
   const n = i.system.details.level;
@@ -1474,7 +1479,10 @@ class je extends b {
             ${this.expanded ? u`
                 <div class="item-summary" style="display:block">
                     ${this._renderItemDetails()}
-                    ${this.description ? u`<p>${Ot(this.description.description)}</p>` : u`<i class="fas fa-spinner fa-spin"></i>`}
+                    ${this.description ? u`<p>${Pt(this.description.description)}</p>` : u`<i class="fas fa-spinner fa-spin"></i>`}
+                    <div class="item-properties">
+                        ${this._renderItemProperties(this.item)}
+                    </div>
                 </div>
             ` : d}
         `;
@@ -1485,6 +1493,22 @@ class je extends b {
             ${e.castingTime ? u`<p><strong>Casting Time:</strong> ${e.castingTime}</p>` : d}
             ${e.range ? u`<p><strong>Range:</strong> ${e.range}</p>` : d}
             ${e.duration ? u`<p><strong>Duration:</strong> ${e.duration}</p>` : d}
+            ${e.materials ? u`<p><strong>Materials:</strong> ${e.materials}</p>` : d}
+        `;
+  }
+  _renderItemProperties(e) {
+    var n, o, r, l, c;
+    const t = ((n = e == null ? void 0 : e.labels) == null ? void 0 : n.properties) || [], s = e.labels.hasOwnProperty("damageTypes") ? (r = (o = e == null ? void 0 : e.labels) == null ? void 0 : o.damageTypes) != null && r.includes(",") ? (l = e == null ? void 0 : e.labels) == null ? void 0 : l.damageTypes.split(",") : [(c = e == null ? void 0 : e.labels) == null ? void 0 : c.damageTypes] : [], a = [];
+    if (s.length > 0) {
+      const h = s.map((m) => ({ label: m })).map((m) => m.label);
+      a.push(...h);
+    }
+    if (t.length > 0) {
+      const p = t.map((h) => h.label);
+      p.sort((h, m) => h.toLowerCase().localeCompare(m.toLowerCase())), a.push(...p);
+    }
+    return a.length === 0 ? d : u`
+            ${a ? u`${a.map((p) => u`<span class="tag">${p}</span>`)} ` : d}
         `;
   }
   _renderWeaponMastery(e, t, s) {
