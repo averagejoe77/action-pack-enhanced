@@ -399,19 +399,19 @@ function et(i) {
     o += `<span class="ape-actor-class">${e.classes[c].name}(${e.classes[c].level})</span>`, e.classes[c].subclass.name !== "" && (o += `<span class="ape-actor-subclass"> - ${e.classes[c].subclass.name}</span>`), c < e.classes.length - 1 && (o += ", ");
   return o;
 }
-const et = (i) => {
+const tt = (i) => {
   const e = i.system, t = e.consume;
   if (t && t.target)
-    return tt(i.actor, t);
+    return st(i.actor, t);
   const s = e.uses;
   if (s && (s.max > 0 || s.value > 0))
     return Ue(e);
   const a = i.type;
-  return a === "feat" ? st() : a === "consumable" ? {
+  return a === "feat" ? at() : a === "consumable" ? {
     available: e.quantity
-  } : a === "weapon" ? at(e) : null;
+  } : a === "weapon" ? it(e) : null;
 };
-function tt(i, e) {
+function st(i, e) {
   let t = null, s = null;
   if (e.type === "attribute") {
     const a = getProperty(i.system, e.target);
@@ -430,13 +430,13 @@ function Ue(i) {
   const s = i.quantity;
   return s && (e = e + (s - 1) * t, t = t * s), { available: e, maximum: t };
 }
-function st(i) {
+function at(i) {
   return null;
 }
-function at(i) {
+function it(i) {
   return i.properties.thr && !i.properties.ret ? { available: i.quantity, maximum: null } : null;
 }
-class it {
+class nt {
   constructor() {
   }
   build(e, t) {
@@ -493,7 +493,7 @@ class it {
   }
   _processItem(e, t, s, a, n) {
     var h;
-    const o = e.system, r = et(e), l = this.settingShowNoUses || !r || r.available, c = ((h = o == null ? void 0 : o.activities) == null ? void 0 : h.size) > 0, p = e.getFlag("action-pack-enhanced", "hidden");
+    const o = e.system, r = tt(e), l = this.settingShowNoUses || !r || r.available, c = ((h = o == null ? void 0 : o.activities) == null ? void 0 : h.size) > 0, p = e.getFlag("action-pack-enhanced", "hidden");
     if (l && c && !p)
       switch (t) {
         case "feat":
@@ -597,7 +597,7 @@ class it {
     }), e;
   }
 }
-function nt(i) {
+function ot(i) {
   const { updateTray: e, updateTrayState: t, resetScroll: s } = i;
   function a() {
     return game.settings.get("action-pack-enhanced", "tray-display") === "always";
@@ -1770,7 +1770,7 @@ class qe extends b {
     this._xpActionsOpen = !this._xpActionsOpen;
   }
   _renderRaceClass(e) {
-    const t = Qe(e);
+    const t = et(e);
     return u`<div style="display:contents" .innerHTML="${t.replace(/,/g, "<br />")}"></div>`;
   }
   _renderHpBar(e, t) {
@@ -2001,7 +2001,7 @@ P(We, "properties", {
 });
 customElements.define("ape-app", We);
 let W, z, Te, Q;
-function Pt(i) {
+function Tt(i) {
   var o;
   if (!i || i === "") return null;
   let e = i.split(".");
@@ -2018,7 +2018,7 @@ function Pt(i) {
   }
   return n || null;
 }
-function Dt(i) {
+function Ht(i) {
   if (i instanceof CONFIG.Actor.documentClass)
     return i;
   if (i instanceof CONFIG.Token.documentClass)
@@ -2041,7 +2041,7 @@ Hooks.on("ready", () => {
     return t.id == ((s = game.combat) == null ? void 0 : s.current.combatantId);
   })) == null ? void 0 : e.actor, z = W, ne() && $("#ape-app").addClass("is-open always-on"), re();
 });
-function Tt() {
+function Mt() {
   const i = game.settings.get("action-pack-enhanced", "tray-display");
   return i === "selected" || i === "auto";
 }
@@ -2087,7 +2087,7 @@ Hooks.on("deleteCombat", (i) => {
   game.combat || (z = null, W = null, ie());
 });
 Hooks.on("init", () => {
-  nt({
+  ot({
     updateTray: w,
     updateTrayState: re,
     resetScroll: () => {
@@ -2112,13 +2112,13 @@ Hooks.on("getSceneControlButtons", (i) => {
 });
 function re() {
   const i = $("#ape-app");
-  Tt() && (canvas.tokens.controlled.filter((t) => {
+  Mt() && (canvas.tokens.controlled.filter((t) => {
     var s;
     return ["character", "npc"].includes((s = t.actor) == null ? void 0 : s.type);
   }).length ? i.addClass("is-open") : i.removeClass("is-open")), ne() ? i.addClass("is-open always-on") : i.removeClass("always-on"), ie(), w();
 }
 async function w() {
-  Q || (Q = new it());
+  Q || (Q = new nt());
   const i = B(), e = Q.build(i, {
     /* scrollPosition stub */
   });
@@ -2159,23 +2159,18 @@ Hooks.on("dnd5e.getItemContextOptions", (i, e) => {
 Hooks.on("dropCanvasData", (i, e) => {
   var t;
   if (e.type === "ActionPackItem" && e.uuid) {
-    const s = Pt(e.uuid);
+    const s = Tt(e.uuid);
     if (!s) return;
     const a = i.tokens.placeables.find((n) => e.x >= n.x && e.x <= n.x + n.w && e.y >= n.y && e.y <= n.y + n.h);
     if (a) {
       const n = (t = s.system) == null ? void 0 : t.activities;
       if (!n) return;
-      if ((n.contents[0].target.affects.count || 1) === 1)
-        a.setTarget(!0, { user: game.user, releaseOthers: !0, groupSelection: !0 });
-      else {
-        const c = !(game.user.targets.size > 1);
-        a.setTarget(!0, { user: game.user, releaseOthers: c, groupSelection: !0 });
-      }
+      (n.contents[0].target.affects.count || 1) === 1 && a.setTarget(!0, { user: game.user, releaseOthers: !0, groupSelection: !0 });
     }
     return s.use(), !1;
   }
 });
 export {
-  Dt as fudgeToActor
+  Ht as fudgeToActor
 };
 //# sourceMappingURL=ape.mjs.map
