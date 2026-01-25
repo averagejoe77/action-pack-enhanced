@@ -14,6 +14,7 @@ export default defineConfig({
     rollupOptions: {
         // Externalize Foundry globals so they aren't bundled
         external: [/^foundry\/.*/], 
-    }
+    },
+    sourcemap: true
   }
 });
