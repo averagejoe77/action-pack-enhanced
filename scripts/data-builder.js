@@ -277,7 +277,7 @@ export class ActionPackDataBuilder {
                         return a.item.sort - b.item.sort;
                     }
                 });
-            } else if (typeof value === "object") {
+            } else if (value && typeof value === "object") {
                 this.sortItems(value);
             }
         });
