@@ -124,6 +124,10 @@
             "skill-mode-dropdown": "Collapsible at the top",
             "skill-mode-append": "At the bottom of the APE display"
         },
+        "warning": {
+            "quantity-limit": "Not enough quantity to equip in both slots.",
+            "two-handed": "You cannot have two two-handed weapons in the same set."
+        },
         "item-context": {
             "show": "Show in APE display",
             "hide": "Hide in APE display"

@@ -1099,3 +1099,90 @@
         transform: scale(0.85);
     }
 }
+
+/* Weapon Sets */
+.ape-weapon-sets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+    justify-content: space-between;
+}
+
+.ape-weapon-set {
+    display: flex;
+    gap: 5px;
+    padding: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    flex: 0 0 30%;
+    box-sizing: border-box;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.2);
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.ape-weapon-set:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.ape-weapon-set.active {
+    border-color: #ff6400;
+    background: rgba(255, 102, 0, 0.5);
+    box-shadow: 0 0 5px rgba(255, 100, 0, 0.3);
+}
+
+.ape-weapon-slot {
+    width: 32px;
+    height: 32px;
+    border: 1px dashed rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.4);
+    background: rgba(0, 0, 0, 0.2);
+    transition: border-color 0.2s;
+}
+
+.ape-weapon-slot:hover {
+    border-color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.ape-weapon-slot.filled {
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: black;
+
+    &.common {
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    &.uncommon {
+        border-color: #155127;
+    }
+
+    &.rare {
+        border-color: #7851a9;
+    }
+
+    &.veryRare {
+        border-color: #c39a3a;
+    }
+
+    &.legendary {
+        border-color: #f5b92b;
+    }
+}
+
+.ape-weapon-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 3px;
+    border: none;
+    display: block;
+}

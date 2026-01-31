@@ -5,6 +5,7 @@ export class ApeSection extends LitElement {
     static properties = {
         title: { type: String },
         items: { type: Array }, // Array of {item, uses} objects
+        weaponSets: { type: Array }, // Array of Weapon Sets
         groups: { type: Object }, // Object of groups
         sectionId: { type: String },
         isOpen: { type: Boolean, state: true },
@@ -47,6 +48,38 @@ export class ApeSection extends LitElement {
         this.isOpen = !this.isOpen;
     }
 
+    _onDrop(e, setIndex, slot) {
+        e.preventDefault();
+        const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+        if (data.uuid) {
+            this.api.setWeaponSetItem(this.actor, setIndex, slot, data.uuid, data.rarity);
+        }
+    }
+
+    _renderWeaponSets() {
+        if (!this.weaponSets) return nothing;
+        return html`
+            <div class="ape-weapon-sets">
+                ${this.weaponSets.map(set => html`
+                    <div class="ape-weapon-set ${set.active ? 'active' : ''}" @click="${() => this.api.equipWeaponSet(this.actor, set.index)}">
+                        <div class="ape-weapon-slot ${set.main ? 'filled ' + set.main.rarity : 'empty'}" 
+                                @drop="${(e) => this._onDrop(e, set.index, 'main')}" 
+                                @dragover="${(e) => e.preventDefault()}"
+                                @contextmenu="${(e) => this.api.clearWeaponSetItem(this.actor, set.index, 'main')}">
+                            ${set.main ? html`<img src="${set.main.img}" title="${set.main.name}">` : html`<i class="fas fa-sword"></i>`}
+                        </div>
+                        <div class="ape-weapon-slot ${set.off ? 'filled ' + set.off.rarity : 'empty'}" 
+                                @drop="${(e) => this._onDrop(e, set.index, 'off')}" 
+                                @dragover="${(e) => e.preventDefault()}"
+                                @contextmenu="${(e) => this.api.clearWeaponSetItem(this.actor, set.index, 'off')}">
+                            ${set.off ? html`<img src="${set.off.img}" title="${set.off.name}" style="height: 100%; width: auto;">` : html`<i class="fas fa-shield"></i>`}
+                        </div>
+                    </div>
+                `)}
+            </div>
+        `;
+    }
+
     render() {
         return html`
             ${this.title ? html`
@@ -54,6 +87,8 @@ export class ApeSection extends LitElement {
                     <i class="fas fa-caret-down"></i> ${game.i18n.localize(this.title)}
                 </h2>
             ` : nothing}
+
+            ${this._renderWeaponSets()}
 
             ${this.items && this.items.length > 0 ? html`
                 <div class="ape-items">

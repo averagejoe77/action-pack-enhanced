@@ -321,6 +321,7 @@ export class ApeActor extends LitElement {
                     class="ape-category"
                     .title="${data.title}" 
                     .items="${data.items}"
+                    .weaponSets="${data.weaponSets}"
                     .groups="${data.groups}"
                     .sectionId="${id}"
                     .api="${this.api}"

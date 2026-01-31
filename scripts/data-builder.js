@@ -19,12 +19,37 @@ export class ActionPackDataBuilder {
         const actorData = actor.system;
         const canCastUnpreparedRituals = !!actor.itemTypes.feat.find(i => i.name === "Ritual Adept");
 
+        // Prepare Weapon Sets
+        const savedSets = actor.getFlag("action-pack-enhanced", "weaponSets") || [];
+        const weaponSets = [];
+        // Ensure 3 sets
+        for (let i = 0; i < 3; i++) {
+            const set = savedSets[i] || { main: null, off: null, active: false };
+            const resolvedSet = { index: i, main: null, off: null, active: set.active };
+            
+            if (set.main) {
+                const item = fromUuidSync(set.main);
+                if (item) resolvedSet.main = { uuid: set.main, img: item.img, rarity: item.system.rarity, name: item.name };
+            }
+            if (set.off) {
+                const item = fromUuidSync(set.off);
+                if (item) resolvedSet.off = { uuid: set.off, img: item.img, rarity: item.system.rarity, name: item.name };
+            }
+            weaponSets.push(resolvedSet);
+        }
+
         let sections = {
-            equipped: { items: [], title: "action-pack-enhanced.category.equipped" },
+            equipped: { 
+                items: [], 
+                title: "action-pack-enhanced.category.weapon", 
+                weaponSets: weaponSets,
+                groups: {
+                    unequipped: { items: [], title: "action-pack-enhanced.flag.unequipped-title" }
+                }
+            },
             inventory: {
                 title: "action-pack-enhanced.category.inventory",
                 groups: {
-                    weapon: { items: [], title: "action-pack-enhanced.category.weapon" },
                     equipment: { items: [], title: "action-pack-enhanced.category.equipment" },
                     consumable: { items: [], title: "action-pack-enhanced.category.consumable" },
                     other: { items: [], title: "action-pack-enhanced.category.other" }

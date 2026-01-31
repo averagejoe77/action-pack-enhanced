@@ -445,4 +445,116 @@ export class ActionPackAPI {
         if (units) return units === "inst" ? "Instantaneous" : units;
         return "";
     }
+
+    /**
+     * Sets a weapon set item
+     * @param {Actor} actor 
+     * @param {number} setIndex 
+     * @param {string} slot 'main' or 'off'
+     * @param {string} itemUuid 
+     */
+    async setWeaponSetItem(actor, setIndex, slot, itemUuid, rarity) {
+        if (!actor) return;
+        const sets = actor.getFlag("action-pack-enhanced", "weaponSets") || [];
+        // Ensure sets structure exists up to this index
+        for (let i = 0; i <= setIndex; i++) {
+            if (!sets[i]) sets[i] = { main: null, off: null, active: false };
+        }
+
+        // Validate Item Constraints
+        const newItem = fromUuidSync(itemUuid);
+        if (newItem) {
+            const otherSlot = slot === 'main' ? 'off' : 'main';
+            const otherItemUuid = sets[setIndex][otherSlot];
+            const errors = [];
+
+            // Quantity Check: Cannot equip same item twice if quantity is 1
+            if (otherItemUuid === itemUuid && newItem.system?.quantity === 1) {
+                errors.push(game.i18n.localize("action-pack-enhanced.warning.quantity-limit") || "Not enough quantity to equip in both slots.");
+            }
+
+            // Two-Handed Restriction
+            if (newItem.system.properties?.has("two")) {
+                if (otherItemUuid) {
+                    const otherItem = fromUuidSync(otherItemUuid);
+                    if (otherItem && otherItem.system.properties?.has("two")) {
+                        errors.push(game.i18n.localize("action-pack-enhanced.warning.two-handed") || "You cannot have two two-handed weapons in the same set.");
+                    }
+                }
+            }
+
+            if (errors.length > 0) {
+                errors.forEach(err => ui.notifications.warn(err));
+                return;
+            }
+        }
+
+        sets[setIndex][slot] = itemUuid;
+        await actor.setFlag("action-pack-enhanced", "weaponSets", sets);
+
+        // If this set is active, re-equip to ensure the new item is equipped
+        if (sets[setIndex].active) {
+            return this.equipWeaponSet(actor, setIndex);
+        }
+    }
+
+    /**
+     * Clears a weapon set item
+     * @param {Actor} actor 
+     * @param {number} setIndex 
+     * @param {string} slot 'main' or 'off'
+     */
+    async clearWeaponSetItem(actor, setIndex, slot) {
+        if (!actor) return;
+        const sets = actor.getFlag("action-pack-enhanced", "weaponSets") || [];
+        if (sets[setIndex]) {
+            sets[setIndex][slot] = null;
+            // If set is now empty, mark inactive
+            if (!sets[setIndex].main && !sets[setIndex].off) {
+                sets[setIndex].active = false;
+            }
+            return actor.setFlag("action-pack-enhanced", "weaponSets", sets);
+        }
+    }
+
+    /**
+     * Equips a weapon set
+     * @param {Actor} actor 
+     * @param {number} setIndex 
+     */
+    async equipWeaponSet(actor, setIndex) {
+        if (!actor) return;
+        const sets = actor.getFlag("action-pack-enhanced", "weaponSets");
+        if (!sets || !sets[setIndex]) return;
+
+        const targetSet = sets[setIndex];
+        
+        // Prevent equipping empty sets
+        if (!targetSet.main && !targetSet.off) return;
+
+        // Update active state in flags
+        const newSets = sets.map((s, i) => ({ ...s, active: i === setIndex }));
+        await actor.setFlag("action-pack-enhanced", "weaponSets", newSets);
+
+        const updates = [];
+
+        // Get all weapons
+        const weapons = actor.itemTypes.weapon.filter(w => w.name !== "Unarmed Strike");
+        
+        // Determine items to equip
+        const itemsToEquip = new Set();
+        if (targetSet.main) itemsToEquip.add(targetSet.main);
+        if (targetSet.off) itemsToEquip.add(targetSet.off);
+
+        for (const weapon of weapons) {
+            const shouldBeEquipped = itemsToEquip.has(weapon.uuid);
+            if (weapon.system.equipped !== shouldBeEquipped) {
+                updates.push({ _id: weapon.id, "system.equipped": shouldBeEquipped });
+            }
+        }
+
+        if (updates.length > 0) {
+            await actor.updateEmbeddedDocuments("Item", updates);
+        }
+    }
 }
