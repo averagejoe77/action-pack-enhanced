@@ -139,12 +139,12 @@ export class ActionPackAPI {
             // 3. Gather Unique Mastery Choices
             await actor.setFlag("action-pack-enhanced", "masterySelectionPending", true);
 
-            const equippedWeapons = actor.itemTypes.weapon.filter(w => w.system.equipped);
+            const availableWeapons = actor.itemTypes.weapon.filter(w => w.name !== "Unarmed Strike");
             const choices = new Map();
 
             const currentMasteries = actor.system.traits.weaponProf.mastery.value;
 
-            equippedWeapons.forEach(w => {
+            availableWeapons.forEach(w => {
                 const mastery = w.system.mastery;
                 const baseItem = w.system.type?.baseItem;
                 
