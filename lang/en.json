@@ -47,7 +47,9 @@
             "legendary": "L",
             "legendary-title": "Legendary action",
             "unprepared": "U",
-            "unprepared-title": "Unprepared spell"
+            "unprepared-title": "Unprepared spell",
+            "unequipped": "Equip",
+            "unequipped-title": "Unequipped"
         },
         "masteries": {
             "cleave": "Cleave",

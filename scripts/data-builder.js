@@ -189,10 +189,13 @@ export class ActionPackDataBuilder {
     }
 
     _prepareWeapon(item, itemData, uses, sections) {
-        if (itemData.equipped) {
+        // "Unarmed Strike" is always considered equipped
+        const isUnarmed = item.name === "Unarmed Strike";
+
+        if (itemData.equipped || isUnarmed) {
             sections.equipped.items.push({ item, uses });
         } else {
-            sections.inventory.groups.weapon.items.push({ item, uses });
+            sections.equipped.groups.unequipped.items.push({ item, uses });
         }
     }
 

@@ -63,6 +63,7 @@ export class ApeItem extends LitElement {
         const isLegendary = sys.activation?.type === 'legendary';
         const isRecharge = sys.recharge?.value;
         const isCharged = sys.recharge?.charged;
+        const isEquipped = sys.equipped;
 
         let itemMastery = false;
         let isMastered = false;
@@ -112,6 +113,7 @@ export class ApeItem extends LitElement {
                 ) : nothing}
 
                 ${isUnprepared ? html`<div class="unprepared flag" title="${game.i18n.localize("action-pack-enhanced.flag.unprepared-title")}">${game.i18n.localize("action-pack-enhanced.flag.unprepared")}</div>` : nothing}
+                ${this.item.type === "weapon" && !isEquipped ? html`<div class="unequipped flag" title="${game.i18n.localize("action-pack-enhanced.flag.unequipped-title")}" @mousedown="${this._onEquip}">${game.i18n.localize("action-pack-enhanced.flag.unequipped")}</div>` : nothing}
             </div>
             
             <div class="item-drag-handle" 
@@ -131,6 +133,12 @@ export class ApeItem extends LitElement {
                 </div>
             ` : nothing}
         `;
+    }
+
+    _onEquip(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.item.update({ "system.equipped": true });
     }
 
     _renderItemDetails() {
