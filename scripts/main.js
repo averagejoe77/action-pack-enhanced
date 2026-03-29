@@ -226,6 +226,7 @@ async function updateTray() {
     const showSpellDots = game.settings.get("action-pack-enhanced", "show-spell-dots");
     const showSpellUses = game.settings.get("action-pack-enhanced", "show-spell-uses");
     const showWeaponMastery = game.settings.get("action-pack-enhanced", "show-weapon-mastery");
+    const staticInfo = game.settings.get("action-pack-enhanced", "static-info");
     const allAbilities = Object.entries(CONFIG.DND5E.abilities);
     const abilityColumns = [
         allAbilities.slice(0, 3).map(([key, config]) => ({ key, label: config.label })),
@@ -247,7 +248,8 @@ async function updateTray() {
             abilityColumns,
             showSpellDots,
             showSpellUses,
-            showWeaponMastery
+            showWeaponMastery,
+            staticInfo
         };
         // API is already set on init
     }

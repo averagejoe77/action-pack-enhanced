@@ -81,24 +81,6 @@ export function registerSettings(callbacks) {
 
     game.settings.register(
         "action-pack-enhanced",
-        "skill-mode",
-        {
-            name: "action-pack-enhanced.settings.skill-mode",
-            hint: "action-pack-enhanced.settings.skill-mode-hint",
-            scope: "client",
-            config: true,
-            default: "dropdown",
-            choices: {
-                dropdown: "action-pack-enhanced.settings.skill-mode-dropdown",
-                append: "action-pack-enhanced.settings.skill-mode-append"
-            },
-            type: String,
-            onChange: () => updateTray()
-        }
-    );
-
-    game.settings.register(
-        "action-pack-enhanced",
         "show-inspiration-animation",
         {
             name: "action-pack-enhanced.settings.show-inspiration-animation",
@@ -110,6 +92,20 @@ export function registerSettings(callbacks) {
             onChange: () => updateTray()
         }
     );
+
+    // game.settings.register(
+    //     "action-pack-enhanced",
+    //     "use-custom-icons",
+    //     {
+    //         name: "action-pack-enhanced.settings.use-custom-icons",
+    //         hint: "action-pack-enhanced.settings.use-custom-icons-hint",
+    //         scope: "client",
+    //         config: true,
+    //         default: false,
+    //         type: Boolean,
+    //         onChange: () => updateTray()
+    //     }
+    // );
 
     game.settings.register(
         "action-pack-enhanced",
@@ -127,9 +123,24 @@ export function registerSettings(callbacks) {
 
     game.settings.register(
         "action-pack-enhanced",
+        "static-info",
+        {
+            name: "action-pack-enhanced.settings.static-info",
+            hint: "action-pack-enhanced.settings.static-info-hint",
+            scope: "client",
+            config: true,
+            default: false,
+            type: Boolean,
+            onChange: () => updateTray()
+        }
+    );
+
+    game.settings.register(
+        "action-pack-enhanced",
         "show-spell-dots",
         {
             name: "action-pack-enhanced.settings.show-spell-dots",
+            hint: "action-pack-enhanced.settings.show-spell-dots-hint",
             scope: "client",
             config: true,
             default: true,
@@ -143,6 +154,7 @@ export function registerSettings(callbacks) {
         "show-spell-uses",
         {
             name: "action-pack-enhanced.settings.show-spell-uses",
+            hint: "action-pack-enhanced.settings.show-spell-uses-hint",
             scope: "client",
             config: true,
             default: true,
@@ -156,6 +168,7 @@ export function registerSettings(callbacks) {
         "show-no-uses",
         {
             name: "action-pack-enhanced.settings.show-no-uses",
+            hint: "action-pack-enhanced.settings.show-no-uses-hint",
             scope: "client",
             config: true,
             default: false,
@@ -169,6 +182,7 @@ export function registerSettings(callbacks) {
         "sort-alphabetic",
         {
             name: "action-pack-enhanced.settings.sort-alphabetic",
+            hint: "action-pack-enhanced.settings.sort-alphabetic-hint",
             scope: "client",
             config: true,
             default: false,
@@ -182,6 +196,7 @@ export function registerSettings(callbacks) {
         "show-unprepared-cantrips",
         {
             name: "action-pack-enhanced.settings.show-unprepared-cantrips",
+            hint: "action-pack-enhanced.settings.show-unprepared-cantrips-hint",
             scope: "client",
             config: true,
             default: false,
@@ -195,6 +210,7 @@ export function registerSettings(callbacks) {
         "show-unprepared-spells",
         {
             name: "action-pack-enhanced.settings.show-unprepared-spells",
+            hint: "action-pack-enhanced.settings.show-unprepared-spells-hint",
             scope: "client",
             config: true,
             default: false,
@@ -222,6 +238,7 @@ export function registerSettings(callbacks) {
         "use-control-button",
         {
             name: "action-pack-enhanced.settings.use-control-button",
+            hint: "action-pack-enhanced.settings.use-control-button-hint",
             scope: "client",
             config: true,
             default: true,
@@ -243,35 +260,4 @@ export function registerSettings(callbacks) {
         }
     });
 
-    game.keybindings.register("action-pack-enhanced", "toggle-skills", {
-        name: "action-pack-enhanced.keybindings.toggle-skills",
-        hint: "action-pack-enhanced.keybindings.toggle-skills-hint",
-        editable: [
-            { key: "KeyK", modifiers: [] }
-        ],
-        onDown: (ctx) => {
-            if (game.settings.get("action-pack-enhanced", "skill-mode") === "dropdown") {
-                const wasSkillsOpen = $('#ape-app .ape-skill-container').hasClass("is-open");
-                if ($('#ape-app').hasClass("is-open")) {
-                    $('#ape-app .ape-skill-container').toggleClass("is-open");
-                } else {
-                    $('#ape-app').toggleClass("is-open");
-                    $('#ape-app .ape-skill-container').addClass("is-open");
-                }
-
-                if (!wasSkillsOpen) {
-                    if (resetScroll) resetScroll();
-                    const container = $('.ape-container');
-                    if (container.length) {
-                        container[0].scrollTop = 0;
-                    }
-                }
-            } else {
-                if (!$('#ape-app').hasClass("is-open")) {
-                    $('#ape-app').toggleClass("is-open");
-                }
-                $('.ape-container')[0].scrollTop = $('#ape-app .ape-skill-container').offset().top;
-            }
-        }
-    });
 }

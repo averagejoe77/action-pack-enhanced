@@ -144,6 +144,7 @@ export class ApeItem extends LitElement {
     _renderItemDetails() {
         const details = getItemDetails(this.item);
         return html`
+            ${details.school ? html`<p><strong>School:</strong> ${details.school}</p>` : nothing}
             ${details.castingTime ? html`<p><strong>Casting Time:</strong> ${details.castingTime}</p>` : nothing}
             ${details.range ? html`<p><strong>Range:</strong> ${details.range}</p>` : nothing}
             ${details.duration ? html`<p><strong>Duration:</strong> ${details.duration}</p>` : nothing}

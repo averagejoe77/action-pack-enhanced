@@ -7,11 +7,12 @@ export function formatNumber(val) {
 }
 
 export function getItemDetails(item) {
+    const school = item.type === 'spell' ? _formatSchool(item) : '';
     const castingTime = _formatCastingTime(item);
     const range = _formatRange(item);
     const duration = _formatDuration(item);
     const materials = item.type === 'spell' ? _formatMaterials(item) : '';
-    return { castingTime, range, duration, materials };
+    return { school, castingTime, range, duration, materials };
 }
 
 function _formatCastingTime(item) {
@@ -55,6 +56,18 @@ function _formatMaterials(item) {
     return "";
 }
 
+function _formatSchool(item) {
+    if (item.labels?.school) {
+        return item.labels.school;
+    }
+    const school = item.system?.school;
+    if (school) {
+        const config = CONFIG.DND5E.spellSchools[school];
+        return config ? (config.label || config) : school;
+    }
+    return "";
+}
+
 export function generateRaceClassDisplay(actor) {
     // in the format (Human - Wizard [Abjurer], Fighter [Defense])
     let raceClass = {};
@@ -62,6 +75,7 @@ export function generateRaceClassDisplay(actor) {
     let classes = actor.itemTypes.class;
     let subClasses = actor.itemTypes.subclass;
     const level = actor.system.details.level;
+    // const useCustomIcons = game.settings.get("action-pack-enhanced", "use-custom-icons") || false;
     
     if (classes.length === subClasses.length) {
         let obj = {race: `<span>${races[0]?.name} - ${level}</span>` || "Unknown", classes: []};
@@ -73,25 +87,68 @@ export function generateRaceClassDisplay(actor) {
         let obj = {race: `<span>${races[0]?.name} - ${level}</span>` || "Unknown", classes: []};
         for (let i = 0; i < classes.length; i++) {
             obj.classes[i] = {name: classes[i].name, level: classes[i].system.levels, subclass: {name: ''}};
+            //  find the matching subclass for the class
             for(let j = 0; j < subClasses.length; j++) {
-                obj.classes[i].subclass.name = subClasses[j].name;
+                if (subClasses[j].system.class === classes[i].name) {
+                    obj.classes[i].subclass.name = subClasses[j].name;
+                }
             }
         }
         raceClass = obj;
     }
 
-    // create the race, class(lvl) - subclass, class(lvl) - subclass format from the data
-    let raceClassText = `${raceClass.race}, `;
+    // if(useCustomIcons) {
+    //     if(classes.length === subClasses.length) {
+    //         raceClass.classes.forEach((element, i) => {
+    //             element.icon = `/modules/action-pack-enhanced/images/classes/${element.name.toLowerCase()}.png`;
+    //             if(element.subclass.name !== '') {
+    //                 element.subclass.icon = `/modules/action-pack-enhanced/images/classes/${element.name.toLowerCase()}/${element.subclass.name.replace(/ /g, '-').toLowerCase()}.png`;
+    //             }
+    //         });
+    //     } else {
+    //         raceClass.classes.forEach((element, i) => {
+    //             element.icon = `/modules/action-pack-enhanced/images/classes/${element.name.toLowerCase()}.png`;
+    //             if(element.subclass.name !== '') {
+    //                 element.subclass.icon = `/modules/action-pack-enhanced/images/classes/${element.name.toLowerCase()}/${element.subclass.name.replace(/ /g, '-').toLowerCase()}.png`;
+    //             }
+    //         });
+    //     }
+    // } else {
+        // use the img key on the class and subclass objects
+        if(classes.length === subClasses.length) {
+            classes.forEach((element, i) => {
+                raceClass.classes[i].icon = element.img;
+                raceClass.classes[i].subclass.icon = element.subclass.img;
+            });
+        } else {
+            classes.forEach((element, i) => {
+                raceClass.classes[i].icon = element.img;
+                if(raceClass.classes[i].subclass.name !== '') {
+                    subClasses.forEach((subClass) => {
+                        if (subClass.system.class === element.name) {
+                            raceClass.classes[i].subclass.icon = subClass.img;
+                        }
+                    });
+                }
+            });
+        }
+    // }
+
+    let raceClassText = `${raceClass.race}`;
+    let classIcons = [];
     for (let i = 0; i < raceClass.classes.length; i++) {
-        raceClassText += `<span class="ape-actor-class">${raceClass.classes[i].name}(${raceClass.classes[i].level})</span>`;
+        let iconSrc = '';
+        let iconAlt = '';
         if (raceClass.classes[i].subclass.name !== '' ) {
-            raceClassText += `<span class="ape-actor-subclass"> - ${raceClass.classes[i].subclass.name}</span>`;
+            iconSrc = raceClass.classes[i].subclass.icon;
+            iconAlt = `${raceClass.classes[i].subclass.name} ${raceClass.classes[i].name} (${raceClass.classes[i].level})`;
+        } else {
+            iconSrc = raceClass.classes[i].icon;
+            iconAlt = `${raceClass.classes[i].name} (${raceClass.classes[i].level})`;
         }
-        if(i < raceClass.classes.length - 1) {
-            raceClassText += `, `;
-        }
+        classIcons.push(`<img class="ape-actor-class-icon" src="${iconSrc}" title="${iconAlt}">`);
     }
-    return raceClassText;
+    return raceClassText + `<span class="ape-actor-class-icons">${classIcons.join('')}</span>`;
 }
 
 // From Illandril's NPC Quick Actions by Joe Spandrusyszyn

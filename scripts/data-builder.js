@@ -8,7 +8,6 @@ export class ActionPackDataBuilder {
         this.settingShowNoUses = game.settings.get("action-pack-enhanced", "show-no-uses");
         this.settingShowUnpreparedCantrips = game.settings.get("action-pack-enhanced", "show-unprepared-cantrips");
         this.settingShowUnpreparedSpells = game.settings.get("action-pack-enhanced", "show-unprepared-spells");
-        this.settingSkillMode = game.settings.get("action-pack-enhanced", "skill-mode");
         this.settingSortAlphabetically = game.settings.get("action-pack-enhanced", "sort-alphabetic");
         this.settingShowWeaponMastery = game.settings.get("action-pack-enhanced", "show-weapon-mastery");
 
@@ -95,20 +94,12 @@ export class ActionPackDataBuilder {
         const combatant = game.combat?.combatants.find(c => c.actor === actor);
         const needsInitiative = combatant && !combatant.initiative;
 
-        let doShowSkills = false;
-        const { uuid, showSkills } = scrollPosition || {};
-        if (actor.uuid === uuid && showSkills) {
-            doShowSkills = true;
-        }
-
         return {
             actor: actor,
             name: actor.name,
             sections: this.addSpellLevelUses(this.sortItems(this.removeEmptySections(sections)), actorData),
             needsInitiative,
-            skills: CONFIG.DND5E.skills,
-            skillMode: this.settingSkillMode,
-            showSkills: doShowSkills
+            skills: CONFIG.DND5E.skills
         };
     }
 
@@ -157,7 +148,7 @@ export class ActionPackDataBuilder {
         } else if (type && sections.feature.groups[type]) {
             sections.feature.groups[type].items.push({ item, uses });
         } else {
-            sections.feature.items.push({ item, uses });
+            sections.feature.groups['general'].items.push({ item, uses });
         }
     }
 
@@ -214,6 +205,13 @@ export class ActionPackDataBuilder {
     }
 
     systemFeatureGroups() {
+        const groups = {
+            general: {
+                items: [],
+                title: "General Features"
+            }
+        };
+        
         return Object.entries(CONFIG.DND5E.featureTypes).reduce((prev, cur) => {
             prev[cur[0]] = {
                 items: [],
@@ -228,7 +226,7 @@ export class ActionPackDataBuilder {
                 }
             }
             return prev;
-        }, {});
+        }, groups);
     }
 
     removeEmptySections(sections) {

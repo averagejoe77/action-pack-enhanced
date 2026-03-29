@@ -87,9 +87,7 @@
             "passive": "Passive"
         },
         "keybindings": {
-            "toggle-tray": "Toggle APE display open or closed",
-            "toggle-skills": "Toggle skills open or closed",
-            "toggle-skills-hint": "The skill list placement can be selected in the module settings. When using a collapsible list, if the panel is already open, this will toggle skills open and closed and if the tray is not open, it will be opened with skills visible. When the skill list is placed at the bottom, this key will scroll to reveal the skill list."
+            "toggle-tray": "Toggle APE display open or closed"
         },
         "settings": {
             "tray-display": "APE display mode",
@@ -109,22 +107,29 @@
             "tray-size-medium": "Medium",
             "tray-size-large": "Large",
             "use-control-button": "Include a toggle button in token controls",
+            "use-control-button-hint": "Adds a toggle button to the token controls to open and close the APE display. This can be helpful if you have the APE display set to always show.",
             "show-inspiration-animation": "Show Inspiration Animation",
             "show-inspiration-animation-hint": "Enables the inspiration animation when an actor has inspiration toggled on. **If you uncheck this box, do not blame me when you forget that you have inspiration. Just saying.**",
+            "use-custom-icons": "Use custom icons",
+            "use-custom-icons-hint": "Use custom icons for race and class; If unchecked, use the system icons. **APE includes some AI generated icons for each class and subclass. To be fair they are not very good, but they provide a consistent look and feel. I don't really like them, but also don't really like the default icons. I will work on making better ones, or if anyone wants to help, please let me know.**",
             "show-weapon-mastery": "Show weapon masteries",
             "show-weapon-mastery-hint": "Show weapon mastery labels on weapon items in the Equipped section of the APE display.",
             "show-xp-info": "Show experience point progress",
             "show-xp-info-hint": "Uncheck if you are using milestone leveling. Check to show current and next level XP with XP progress bar and increment/decrement buttons when clicking on the current XP value.",
+            "static-info": "Static info section (No Accordion)",
+            "static-info-hint": "Toggle the XP/HP/Rest section between an accordion and a static display.",
             "show-no-uses": "Show items with no uses left",
+            "show-no-uses-hint": "If an item has no remaining uses, it will be removed from the APE display. To keep the item in the display, check this box.",
             "sort-alphabetic": "Sort items alphabetically",
+            "sort-alphabetic-hint": "Items are sorted in the order in which they are added to the actor. Use this to sort items alphabetically instead.",
             "show-unprepared-cantrips": "Show cantrips even if they are not prepared",
+            "show-unprepared-cantrips-hint": "(this is an older setting from the original action pack, afaik all cantrips are prepared by default in D&D 5e & 5.5e)",
             "show-unprepared-spells": "Show spells even if they are not prepared",
+            "show-unprepared-spells-hint": "Only prepared spells are shown by default. Check to show all spells, even those that are not prepared which, depending on DM rules, could still be useable.",
             "show-spell-dots": "Show spell slot dots",
+            "show-spell-dots-hint": "Check to show spell slots as a series of filled/unfilled dots.",
             "show-spell-uses": "Show spell slot uses",
-            "skill-mode": "Skill list placement",
-            "skill-mode-hint": "If \"Collapsible at the top\" is selected, the skill toggle hot key (in control settings) can be used to toggle the skill list open and closed, opening the APE display if needed. If skills are at the bottom of the APE display, the hotkey automatically scrolls to reveal them.",
-            "skill-mode-dropdown": "Collapsible at the top",
-            "skill-mode-append": "At the bottom of the APE display"
+            "show-spell-uses-hint": "Check to display the spells slots as a numeric value of uses remaining/total uses."
         },
         "warning": {
             "quantity-limit": "Not enough quantity to equip in both slots.",

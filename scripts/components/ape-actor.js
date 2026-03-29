@@ -7,7 +7,10 @@ export class ApeActor extends LitElement {
         actorData: { type: Object }, // The object returned by data-builder
         globalData: { type: Object }, // Global settings/options
         api: { type: Object },
-        _xpActionsOpen: { state: false }
+        _xpActionsOpen: { state: false },
+        _infoOpen: { state: false },
+        _skillsOpen: { state: false },
+        _abilitiesOpen: { state: false }
     };
 
     createRenderRoot() { return this; }
@@ -20,7 +23,7 @@ export class ApeActor extends LitElement {
 
     render() {
         if (!this.actorData) return nothing;
-        const { actor, name, sections, needsInitiative, skillMode, showSkills } = this.actorData;
+        const { actor, name, sections, needsInitiative } = this.actorData;
         const hp = actor.system.attributes.hp;
         const ac = actor.system.attributes.ac.value;
         const type = actor.type;
@@ -29,7 +32,7 @@ export class ApeActor extends LitElement {
 
         return html`
             <div class="ape-actor-header">
-                <h1>
+                <div class="ape-actor-header-wrap">
                     <a class="ape-actor-name" @click="${(e) => this.api.openSheet(actor)}">${name.split(' ')[0]}</a>
                     <a class="ape-actor-inspiration ${isInspired ? 'ape-actor-inspiration-active' : ''}" title="${name} is ${isInspired ? 'inspired' : 'not inspired'}!" @mousedown="${(e) => this.api.toggleInspiration(actor, e)}">
                         <svg width="100%" height="100%" viewBox="0 0 163 191" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
@@ -44,24 +47,49 @@ export class ApeActor extends LitElement {
                         <img class="ape-actor-ac-icon" src="/modules/action-pack-enhanced/images/ac-icon.svg">
                         <span class="ape-actor-ac-display">${ac}</span>
                     </span>
-                </h1>
-
-                ${type === "character" ? html`
-                    <div class="ape-actor-race-class">
-                        ${this._renderRaceClass(actor)}
-                    </div>
-                ` : nothing}
-
-                ${game.settings.get("action-pack-enhanced", "show-xp-info") && type === "character" ? this._renderExperience(actor) : nothing}
-
-                <div class="ape-actor-rest-buttons">
-                    <button class="ape-actor-rest-button" @click="${() => this.api.shortRest(actor)}"><span class="fas fa-fork-knife"></span></button>
-                    <button class="ape-actor-rest-button" @click="${() => this.api.longRest(actor)}"><span class="fas fa-tent"></span></button>
-                </div>
-
-                ${this._renderHpBar(actor, hp)}
-                
+                 </div>
             </div>
+
+            ${this.globalData.staticInfo ? html`
+                <div class="ape-static-info">
+                    ${type === "character" ? html`
+                        <div class="ape-actor-race-class">
+                            ${this._renderRaceClass(actor)}
+                        </div>
+                    ` : nothing}
+
+                    ${game.settings.get("action-pack-enhanced", "show-xp-info") && type === "character" ? this._renderExperience(actor) : nothing}
+
+                    ${this._renderHpBar(actor, hp)}
+
+                    <div class="ape-actor-rest-buttons rest-row">
+                        <button class="btn ape-actor-rest-button" @click="${() => this.api.shortRest(actor)}"><i class="fa-solid fa-utensils"></i> Short Rest</button>
+                        <button class="btn ape-actor-rest-button" @click="${() => this.api.longRest(actor)}"><i class="fa-solid fa-campground"></i> Long Rest</button>
+                    </div>
+                </div>
+            ` : html`
+                <div class="ape-accordion ${this._infoOpen ? 'is-open' : ''}">
+                    <h2 class="ape-accordion-header" @click="${() => this._toggleAccordion('info')}">
+                        <i class="fas fa-caret-down"></i> XP/HP/Rest
+                    </h2>
+                    <div class="ape-accordion-body">
+                        ${type === "character" ? html`
+                            <div class="ape-actor-race-class">
+                                ${this._renderRaceClass(actor)}
+                            </div>
+                        ` : nothing}
+
+                        ${game.settings.get("action-pack-enhanced", "show-xp-info") && type === "character" ? this._renderExperience(actor) : nothing}
+
+                        ${this._renderHpBar(actor, hp)}
+
+                        <div class="ape-actor-rest-buttons rest-row">
+                            <button class="btn ape-actor-rest-button" @click="${() => this.api.shortRest(actor)}"><i class="fa-solid fa-utensils"></i> Short Rest</button>
+                            <button class="btn ape-actor-rest-button" @click="${() => this.api.longRest(actor)}"><i class="fa-solid fa-campground"></i> Long Rest</button>
+                        </div>
+                    </div>
+                </div>
+            `}
 
             ${isDead ? this._renderDeathSaves(actor) : nothing}
 
@@ -72,14 +100,20 @@ export class ApeActor extends LitElement {
                 </div>
             ` : nothing}
 
-            ${this._renderAbilities(actor)}
+            <div class="ape-accordion ${this._abilitiesOpen ? 'is-open' : ''}">
+                <h2 class="ape-accordion-header" @click="${() => this._toggleAccordion('abilities')}">
+                    <i class="fas fa-caret-down"></i> Ability Checks/Saves
+                </h2>
+                <div class="ape-accordion-body">
+                    ${this._renderAbilities(actor)}
+                </div>
+            </div>
 
-            ${skillMode === "dropdown" ? this._renderSkills(actor, showSkills, true) : nothing}
+
+            ${this._renderSkills(actor)}
 
             <!-- Sections -->
             ${this._renderSections(actor, sections)}
-
-            ${skillMode === "append" ? this._renderSkills(actor, showSkills, false) : nothing}
         `;
     }
 
@@ -90,13 +124,16 @@ export class ApeActor extends LitElement {
         const minXP = details.xp.min;
         const currentXP = details.xp.value;
         return html`
-            <div class="ape-actor-xp">
-                <div class="ape-actor-xp-bar" style="--bar-percent: ${percent}%"></div>
-                <div class="ape-actor-xp-info">
-                    <span class="ape-actor-xp-current" @click="${this._toggleXpActions}">${currentXP}</span>
-                    <span class="ape-actor-xp-separator">/</span>
-                    <span class="ape-actor-xp-max">${maxXP}</span>
+            <div class="ape-actor-xp bar-group">
+                <div class="bar-label">
+                    <span>XP</span>
+                    <span class="ape-actor-xp-info">
+                        <span class="ape-actor-xp-current" @click="${this._toggleXpActions}">${currentXP}</span>
+                        <span class="ape-actor-xp-separator"> / </span>
+                        <span class="ape-actor-xp-max">${maxXP}</span>
+                    </span>
                 </div>
+                <div class="bar-track ape-actor-xp-bar"><div class="bar-fill xp-fill" style="width: ${percent}%"></div></div>
                 <div class="ape-actor-xp-actions ${this._xpActionsOpen ? 'active' : 'inactive'}">
                     <button class="ape-actor-xp-close" @click="${this._toggleXpActions}">close</button>
                     <p>Choose an amount to add to or subtract from ${actor.name}'s XP</p>
@@ -120,42 +157,51 @@ export class ApeActor extends LitElement {
         `;
     }
 
-
-
     _toggleXpActions() {
         this._xpActionsOpen = !this._xpActionsOpen;
+        this.requestUpdate();
+    }
+
+    _toggleAccordion(section) {
+        this[`_${section}Open`] = !this[`_${section}Open`];
+        this.requestUpdate();
     }
 
     _renderRaceClass(actor) {
         const htmlString = generateRaceClassDisplay(actor);
-        return html`<div style="display:contents" .innerHTML="${htmlString.replace(/,/g, '<br />')}"></div>`;
+        return html`<div style="display:contents" .innerHTML="${htmlString}"></div>`;
     }
 
     _renderHpBar(actor, hp) {
         const percent = Math.min(100, Math.max(0, (hp.value / hp.max) * 100));
         return html`
-             <div class="ape-actor-hp-wrapper">
-                <div class="ape-actor-hp" style="--bar-percent: ${percent}%">
-                    <span class="ape-actor-hp-text">
-                        <span class="ape-actor-hp-display" @click="${this._toggleHpInput}">
-                            <span class="ape-actor-hp-value">${hp.value}</span>
-                            <span class="ape-actor-hp-separator">/</span>
-                            <span class="ape-actor-hp-max">${hp.max}</span>
+            <div class="ape-actor-hp-wrapper hp-container">
+                <div class="hp-main">
+                    <div class="bar-label">
+                        <span style="color:#34d399;">HP</span>
+                        <span class="ape-actor-hp-text" style="color:#f8fafc;">
+                            <span class="ape-actor-hp-display" @click="${this._toggleHpInput}">
+                                <span class="ape-actor-hp-value">${hp.value}</span>
+                                <span class="ape-actor-hp-separator"> / </span>
+                                <span class="ape-actor-hp-max">${hp.max}</span>
+                            </span>
+                            <input type="text" class="ape-actor-hp-input" value="${hp.value}" 
+                                   style="display:none"
+                                   @blur="${this._finishHpEdit}"
+                                   @keydown="${this._hpInputKey}"
+                                   @change="${(e) => this.api.updateHP(actor, parseInt(e.target.value))}">
                         </span>
-                        <input type="text" class="ape-actor-hp-input" value="${hp.value}" 
-                               style="display:none"
-                               @blur="${this._finishHpEdit}"
-                               @keydown="${this._hpInputKey}"
-                               @change="${(e) => this.api.updateHP(actor, parseInt(e.target.value))}">
-                    </span>
+                    </div>
+                    <div class="bar-track ape-actor-hp"><div class="bar-fill hp-fill" style="width: ${percent}%"></div></div>
                 </div>
-                <div class="ape-actor-temp">
-                     <span class="ape-actor-temp-display" @click="${this._toggleTempInput}">${hp.temp || 0}</span>
-                     <input type="text" class="ape-actor-temp-input" value="${hp.temp || 0}" 
-                            style="display:none"
+                <div class="ape-actor-temp hp-temp">
+                     <span class="ape-actor-temp-display hp-temp-val" @click="${this._toggleTempInput}">${hp.temp || 0}</span>
+                     <input type="text" class="ape-actor-temp-input hp-temp-val" value="${hp.temp || 0}" 
+                            style="display:none; width: 100%; text-align: center; background: transparent; border: none; color: inherit; font-family: inherit;padding:0;line-height:1;height:fit-content"
                             @blur="${this._finishTempEdit}"
                             @keydown="${this._hpInputKey}"
                             @change="${(e) => this.api.updateTempHP(actor, parseInt(e.target.value))}">
+                     <span class="hp-temp-lbl">Temp</span>
                 </div>
              </div>
         `;
@@ -233,19 +279,16 @@ export class ApeActor extends LitElement {
         `;
     }
 
-    _renderSkills(actor, showSkills, isDropdown) {
+    _renderSkills(actor) {
         const skillsObj = this.actorData.skills;
         const actorSkills = actor.system.skills;
 
         return html`
-            <div class="ape-skill-container ${this.actorData.skillMode} ${showSkills ? 'is-open' : ''}">
-                ${isDropdown ? html`
-                    <h2 class="ape-skill-header" @click="${this._toggleSkills}">
-                        <i class="fas fa-caret-down"></i> Skills
-                    </h2>
-                ` : nothing}
-
-                <div class="ape-skills">
+            <div class="ape-accordion ape-skill-container ${this._skillsOpen ? 'is-open' : ''}">
+                <h2 class="ape-accordion-header ape-skill-header" @click="${() => this._toggleAccordion('skills')}">
+                    <i class="fas fa-caret-down"></i> Skills
+                </h2>
+                <div class="ape-accordion-body ape-skills">
                     ${Object.keys(actorSkills).map(key => {
                         const skill = actorSkills[key];
                         const config = skillsObj[key];
@@ -255,9 +298,6 @@ export class ApeActor extends LitElement {
                         if (skill.proficient === 0.5) iconClass = 'fas fa-adjust';
                         else if (skill.proficient === 1) iconClass = 'fas fa-check';
                         else if (skill.proficient === 2) iconClass = 'fas fa-star';
-
-
-
 
                         return html`
                             <div class="ape-skill-row flexrow ${skill.proficient === 1 ? 'proficient' : skill.proficient === 2 ? 'expert' : ''}"
@@ -274,10 +314,6 @@ export class ApeActor extends LitElement {
                 </div>
             </div>
         `;
-    }
-
-    _toggleSkills(e) {
-        e.currentTarget.parentElement.classList.toggle('is-open');
     }
 
     _renderDeathSaves(actor) {
