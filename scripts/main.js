@@ -63,6 +63,10 @@ Hooks.on("ready", () => {
         const app = document.createElement('ape-app');
         app.id = 'ape-app'; // Keep ID for CSS
         app.classList.add("ape-container");
+        // if the taskbar module is installed, add a class to indicate that
+        if (game.modules.get("foundry-taskbar")) {
+            app.classList.add("has-taskbar");
+        }
         // insert the app into the DOM before the element with id 'interface'
         const interfaceElement = document.getElementById('interface');
         if(interfaceElement) {

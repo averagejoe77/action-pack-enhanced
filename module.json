@@ -37,6 +37,11 @@
       "lang": "en",
       "name": "English",
       "path": "lang/en.json"
+    },
+    {
+      "lang": "it",
+      "name": "Italian",
+      "path": "lang/it.json"
     }
   ],
   "url": "https://github.com/averagejoe77/action-pack-enhanced",

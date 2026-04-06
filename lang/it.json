@@ -122,7 +122,11 @@
             "skill-mode": "Posizione elenco abilità",
             "skill-mode-hint": "Se è selezionato \"Comprimibile in alto\", il tasto rapido per le abilità può essere usato per mostrarle o nasconderle, aprendo il pannello APE se necessario. Se le abilità sono in fondo al pannello APE, il tasto rapido scorrerà automaticamente la vista per mostrarle.",
             "skill-mode-dropdown": "Comprimibile in alto",
-            "skill-mode-append": "In fondo al pannello APE"
+            "skill-mode-append": "In fondo al pannello APE",
+            "show-passive-abilities": "Mostra abilità passive",
+            "show-passive-abilities-hint": "Mostra le abilità passive (come le capacità di classe) nel pannello APE.",
+            "show-death-saves": "Nascondi l'interfaccia dei tiri salvezza in APE",
+            "show-death-saves-hint": "Spunta per nascondere l'interfaccia dei tiri salvezza in APE. Questa interfaccia è visibile solo quando l'attore ha 0 PF."
         },
         "item-context": {
             "show": "Mostra nel pannello APE",

@@ -137,6 +137,20 @@ export function registerSettings(callbacks) {
 
     game.settings.register(
         "action-pack-enhanced",
+        "show-death-saves",
+        {
+            name: "action-pack-enhanced.settings.show-death-saves",
+            hint: "action-pack-enhanced.settings.show-death-saves-hint",
+            scope: "client",
+            config: true,
+            default: true,
+            type: Boolean,
+            onChange: () => updateTray()
+        }
+    );
+
+    game.settings.register(
+        "action-pack-enhanced",
         "show-spell-dots",
         {
             name: "action-pack-enhanced.settings.show-spell-dots",

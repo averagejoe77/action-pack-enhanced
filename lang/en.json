@@ -129,7 +129,9 @@
             "show-spell-dots": "Show spell slot dots",
             "show-spell-dots-hint": "Check to show spell slots as a series of filled/unfilled dots.",
             "show-spell-uses": "Show spell slot uses",
-            "show-spell-uses-hint": "Check to display the spells slots as a numeric value of uses remaining/total uses."
+            "show-spell-uses-hint": "Check to display the spells slots as a numeric value of uses remaining/total uses.",
+            "show-death-saves": "Hide the death saves UI in APE",
+            "show-death-saves-hint": "Check to hide the death saves UI in APE. This UI is only visible when the actor is at 0 HP."
         },
         "warning": {
             "quantity-limit": "Not enough quantity to equip in both slots.",

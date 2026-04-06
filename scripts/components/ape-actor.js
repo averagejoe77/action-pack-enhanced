@@ -91,7 +91,7 @@ export class ApeActor extends LitElement {
                 </div>
             `}
 
-            ${isDead ? this._renderDeathSaves(actor) : nothing}
+            ${isDead && !game.settings.get("action-pack-enhanced", "show-death-saves") ? this._renderDeathSaves(actor) : nothing}
 
             ${needsInitiative ? html`
                 <div class="ape-initiative" @click="${() => this.api.rollInitiative(actor)}">
