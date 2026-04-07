@@ -61,9 +61,17 @@ export class ApeItem extends LitElement {
         const isBonus = sys.activation?.type === 'bonus';
         const isReaction = sys.activation?.type === 'reaction';
         const isLegendary = sys.activation?.type === 'legendary';
-        const isRecharge = sys.recharge?.value;
-        const isCharged = sys.recharge?.charged;
+        const isRecharge = this.item?.hasRecharge;
+        const isCharged = !this.item.isOnCooldown;
         const isEquipped = sys.equipped;
+
+        let rechargeValue = null;
+        if (isRecharge && sys.uses?.recovery) {
+            const recoveryOption = sys.uses.recovery.find(r => r.period === "recharge");
+            if (recoveryOption) {
+                rechargeValue = recoveryOption.formula;
+            }
+        }
 
         let itemMastery = false;
         let isMastered = false;
@@ -109,7 +117,7 @@ export class ApeItem extends LitElement {
 
                 ${isRecharge ? (isCharged ? 
                     html`<div class="flag"><i class="fas fa-bolt"></i></div>` : 
-                    html`<div class="flag"><a class="rollable item-recharge" @mousedown="${this._onRecharge}"><i class="fas fa-dice-six"></i> ${sys.recharge.value}+</a></div>`
+                    html`<div class="flag"><a class="rollable item-recharge" @mousedown="${this._onRecharge}"><i class="fas fa-dice-six"></i> ${rechargeValue}+</a></div>`
                 ) : nothing}
 
                 ${isUnprepared ? html`<div class="unprepared flag" title="${game.i18n.localize("action-pack-enhanced.flag.unprepared-title")}">${game.i18n.localize("action-pack-enhanced.flag.unprepared")}</div>` : nothing}

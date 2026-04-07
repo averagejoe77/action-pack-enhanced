@@ -390,7 +390,7 @@ export class ActionPackAPI {
      * @param {Item} item 
      */
     async rollRecharge(item) {
-        return item.rollRecharge();
+        return item.system.uses.rollRecharge();
     }
 
     /**
