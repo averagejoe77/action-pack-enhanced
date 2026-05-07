@@ -64,6 +64,7 @@ export class ApeItem extends LitElement {
         const isRecharge = this.item?.hasRecharge;
         const isCharged = !this.item.isOnCooldown;
         const isEquipped = sys.equipped;
+        const isShield = this.item.type === "equipment" && ((sys.identified && sys.identifier === "shield") || this.item.name.includes("Shield"));
 
         let rechargeValue = null;
         if (isRecharge && sys.uses?.recovery) {
@@ -121,7 +122,7 @@ export class ApeItem extends LitElement {
                 ) : nothing}
 
                 ${isUnprepared ? html`<div class="unprepared flag" title="${game.i18n.localize("action-pack-enhanced.flag.unprepared-title")}">${game.i18n.localize("action-pack-enhanced.flag.unprepared")}</div>` : nothing}
-                ${this.item.type === "weapon" && !isEquipped ? html`<div class="unequipped flag" title="${game.i18n.localize("action-pack-enhanced.flag.unequipped-title")}" @mousedown="${this._onEquip}">${game.i18n.localize("action-pack-enhanced.flag.unequipped")}</div>` : nothing}
+                ${(this.item.type === "weapon" || isShield) && !isEquipped ? html`<div class="unequipped flag" title="${game.i18n.localize("action-pack-enhanced.flag.unequipped-title")}" @mousedown="${this._onEquip}">${game.i18n.localize("action-pack-enhanced.flag.unequipped")}</div>` : nothing}
             </div>
             
             <div class="item-drag-handle" 

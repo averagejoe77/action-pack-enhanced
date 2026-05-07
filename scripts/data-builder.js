@@ -43,7 +43,8 @@ export class ActionPackDataBuilder {
                 title: "action-pack-enhanced.category.weapon", 
                 weaponSets: weaponSets,
                 groups: {
-                    unequipped: { items: [], title: "action-pack-enhanced.flag.unequipped-title" }
+                    unequipped: { items: [], title: "action-pack-enhanced.flag.unequipped-title" },
+                    shield: { items: [], title: "action-pack-enhanced.flag.shield-title" }
                 }
             },
             inventory: {
@@ -110,6 +111,14 @@ export class ActionPackDataBuilder {
         const hasUses = this.settingShowNoUses || !uses || uses.available;
         const hasActivities = itemData?.activities?.size > 0 ? true : false;
         const isHidden = item.getFlag("action-pack-enhanced", "hidden");
+        // if an item is a shield, we need a way to track it in the equipped section
+        if (item.type === "equipment" && ((itemData.identified && itemData.identifier === "shield") || item.name.includes("Shield")) ) {
+            if (itemData.equipped) {
+                sections.equipped.groups.shield.items.push({ item, uses });
+            } else {
+                sections.equipped.groups.unequipped.items.push({ item, uses });
+            }
+        }
 
         if (hasUses && hasActivities && !isHidden) {
             switch (type) {

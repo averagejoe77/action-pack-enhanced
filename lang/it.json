@@ -36,6 +36,7 @@
             "year": "Anno"
         },
         "flag": {
+            "shield-title": "Scudo",
             "bonus": "B",
             "bonus-title": "Azione bonus",
             "reaction": "R",

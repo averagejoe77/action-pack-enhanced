@@ -36,6 +36,7 @@
             "year": "Year"
         },
         "flag": {
+            "shield-title": "Shield",
             "bonus": "B",
             "bonus-title": "Bonus action",
             "reaction": "R",

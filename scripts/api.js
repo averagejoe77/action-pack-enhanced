@@ -540,6 +540,11 @@ export class ActionPackAPI {
 
         // Get all weapons
         const weapons = actor.itemTypes.weapon.filter(w => w.name !== "Unarmed Strike");
+        // get shield if actor has one
+        const shield = actor.itemTypes.equipment.find(e => e.name.includes("Shield"));
+        if (shield) {
+            weapons.push(shield);
+        }
         
         // Determine items to equip
         const itemsToEquip = new Set();
