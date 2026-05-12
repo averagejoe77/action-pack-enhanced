@@ -1,5 +1,13 @@
 # Action Pack Enhanced
 
+![Latest Downloads](https://img.shields.io/github/downloads/averagejoe77/action-pack-enhanced/latest/total?color=brightgreen&label=Latest%20Downloads)
+![Contributors](https://img.shields.io/github/contributors/averagejoe77/action-pack-enhanced?color=brightgreen)
+![Last Commit](https://img.shields.io/github/last-commit/averagejoe77/action-pack-enhanced?color=yellowgreen)
+![Forks](https://img.shields.io/github/forks/averagejoe77/action-pack-enhanced?color=blue)
+![Stars](https://img.shields.io/github/stars/averagejoe77/action-pack-enhanced?color=blue)
+
+![Foundry Version](https://img.shields.io/endpoint?label=Foundry%20VTT%20versions:&url=https://foundryshields.com/version?url=https://raw.githubusercontent.com/averagejoe77/action-pack-enhanced/main/module.json)
+
 Enhances the Action Pack module by adding additional features and functionality as well as updating the module to support FoundryVTT v13+.
 
 ## New Features
