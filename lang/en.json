@@ -132,7 +132,13 @@
             "show-spell-uses": "Show spell slot uses",
             "show-spell-uses-hint": "Check to display the spells slots as a numeric value of uses remaining/total uses.",
             "show-death-saves": "Hide the death saves UI in APE",
-            "show-death-saves-hint": "Check to hide the death saves UI in APE. This UI is only visible when the actor is at 0 HP."
+            "show-death-saves-hint": "Check to hide the death saves UI in APE. This UI is only visible when the actor is at 0 HP.",
+            "spell-points-text-color": "Spell Points Text Color",
+            "spell-points-text-color-hint": "The color of the text that displays the spell points (remaining/total).",
+            "spell-points-bar-color-start": "Spell Points Bar Color Start",
+            "spell-points-bar-color-start-hint": "The starting color of the spell points bar (when points are near maximum).",
+            "spell-points-bar-color-end": "Spell Points Bar Color End",
+            "spell-points-bar-color-end-hint": "The ending color of the spell points bar (when points are near zero)."
         },
         "warning": {
             "quantity-limit": "Not enough quantity to equip in both slots.",

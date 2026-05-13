@@ -127,7 +127,13 @@
             "show-passive-abilities": "Mostra abilità passive",
             "show-passive-abilities-hint": "Mostra le abilità passive (come le capacità di classe) nel pannello APE.",
             "show-death-saves": "Nascondi l'interfaccia dei tiri salvezza in APE",
-            "show-death-saves-hint": "Spunta per nascondere l'interfaccia dei tiri salvezza in APE. Questa interfaccia è visibile solo quando l'attore ha 0 PF."
+            "show-death-saves-hint": "Spunta per nascondere l'interfaccia dei tiri salvezza in APE. Questa interfaccia è visibile solo quando l'attore ha 0 PF.",
+            "spell-points-text-color": "Colore testo Punti Incantesimo",
+            "spell-points-text-color-hint": "Il colore del testo che mostra i punti incantesimo (rimanenti/totali).",
+            "spell-points-bar-color-start": "Colore inizio Barra Punti Incantesimo",
+            "spell-points-bar-color-start-hint": "Il colore iniziale della barra dei punti incantesimo (quando i punti sono vicini al massimo).",
+            "spell-points-bar-color-end": "Colore fine Barra Punti Incantesimo",
+            "spell-points-bar-color-end-hint": "Il colore finale della barra dei punti incantesimo (quando i punti sono vicini allo zero)."
         },
         "item-context": {
             "show": "Mostra nel pannello APE",

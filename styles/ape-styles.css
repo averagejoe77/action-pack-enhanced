@@ -689,6 +689,15 @@
             margin-left: auto;
             flex-direction: row-reverse;
         }
+
+        &.has-cost {
+            justify-content: space-between;
+
+            .group-cost {
+                text-align: right;
+                color: var(--spellPointsTextColor, #fff);
+            }
+        }
     }
 
     .ape-category {
@@ -1200,4 +1209,49 @@
     border-radius: 3px;
     border: none;
     display: block;
+}
+
+/* spell point uses styling */
+.section-uses {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    height: 2rem;
+    margin: 15px 0 10px;
+    width: 100%;
+}
+
+.section-uses-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    color: var(--spellPointsTextColor);
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+.section-uses-bar {
+    height: 100%;
+    background: linear-gradient(to right, var(--spellPointsBarColorStart) 0%, var(--spellPointsBarColorEnd) 50%, var(--spellPointsBarColorStart) 100%);
+    border-radius: 10px;
+    position: relative;
+
+    &:after {
+        background: rgb(55, 55, 55);
+        border-radius: 10px;
+        content: "";
+        display: block;
+        height: 100%;
+        position: absolute;
+        right: 0;
+        top: 0;
+        transform-origin: right;
+        transition: width 0.3s ease;
+        width: var(--percent);
+        z-index: 1;
+    }
 }

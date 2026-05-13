@@ -63,7 +63,7 @@ export class ActionPackDataBuilder {
                     atwill: { items: [], title: "action-pack-enhanced.category.atwill" },
                     pact: { items: [], title: "action-pack-enhanced.category.pact" },
                     ...[...Array(10).keys()].reduce((prev, cur) => {
-                        prev[`spell${cur}`] = { items: [], title: `action-pack-enhanced.category.spell${cur}` }
+                        prev[`spell${cur}`] = { items: [], title: `action-pack-enhanced.category.spell${cur}`, cost: 0 }
                         return prev;
                     }, {})
                 }
@@ -95,10 +95,18 @@ export class ActionPackDataBuilder {
         const combatant = game.combat?.combatants.find(c => c.actor === actor);
         const needsInitiative = combatant && !combatant.initiative;
 
+        const spModule = game.modules.get("dnd5e-spellpoints");
+        const spItem = spModule && spModule?.active ? getSpellPointsItem(actor) : null;
+
+        const preparedSections = this.sortItems(this.removeEmptySections(sections));
+        const finalSections = spItem 
+            ? this.addSpellPointUses(preparedSections, spItem, actorData)
+            : this.addSpellLevelUses(preparedSections, actorData);
+
         return {
             actor: actor,
             name: actor.name,
-            sections: this.addSpellLevelUses(this.sortItems(this.removeEmptySections(sections)), actorData),
+            sections: finalSections,
             needsInitiative,
             skills: CONFIG.DND5E.skills
         };
@@ -255,6 +263,46 @@ export class ActionPackDataBuilder {
         }, {});
     }
 
+    addSpellPointUses(sections, spItem, actorData) {
+
+        const spPointCost = {
+            0: 0,
+            1: 2,
+            2: 3,
+            3: 5,
+            4: 6,
+            5: 7,
+            6: 9,
+            7: 10,
+            8: 11,
+            9: 13
+        };
+
+        const spUses = {
+            available: spItem.system?.uses?.value || 0,
+            maximum: spItem.system?.uses?.max || 0
+        };
+
+        if (sections.spell) {
+            sections.spell.uses = spUses;
+            for (let l = 1; l <= 9; l++) {
+                const group = sections.spell?.groups[`spell${l}`];
+                if (group) {
+                    group.cost = spPointCost[l];
+                }
+            }
+        }
+
+        if (actorData.spells?.pact?.max && sections.spell?.groups?.pact) {
+            sections.spell.groups.pact.uses = {
+                available: actorData.spells.pact.value,
+                maximum: actorData.spells.pact.max
+            }
+        }
+
+        return sections;
+    }
+
     addSpellLevelUses(sections, actorData) {
         for (let l = 1; l <= 9; l++) {
             const group = sections.spell?.groups[`spell${l}`];
@@ -264,7 +312,7 @@ export class ActionPackDataBuilder {
             }
         }
 
-        if (actorData.spells.pact.max) {
+        if (actorData.spells?.pact?.max && sections.spell?.groups?.pact) {
             sections.spell.groups.pact.uses = {
                 available: actorData.spells.pact.value,
                 maximum: actorData.spells.pact.max

@@ -4,6 +4,7 @@ import './ape-item.js';
 export class ApeSection extends LitElement {
     static properties = {
         title: { type: String },
+        uses: { type: Object },
         items: { type: Array }, // Array of {item, uses} objects
         weaponSets: { type: Array }, // Array of Weapon Sets
         groups: { type: Object }, // Object of groups
@@ -80,13 +81,22 @@ export class ApeSection extends LitElement {
         `;
     }
 
+    _getReversedPercent(available, maximum) {
+        return Math.floor(((maximum - available) / maximum) * 100);
+    }
+
     render() {
         return html`
             ${this.title ? html`
                 <h2 @click="${this._toggleOpen}">
-                    <i class="fas fa-caret-down"></i> ${game.i18n.localize(this.title)}
+                    <span><i class="fas fa-caret-down"></i> ${game.i18n.localize(this.title)}</span>
                 </h2>
             ` : nothing}
+
+            ${this.uses ? html`<div class="section-uses" style="--percent: ${this._getReversedPercent(this.uses.available, this.uses.maximum)}%; --spellPointsTextColor: ${game.settings.get("action-pack-enhanced", "spellPointsTextColor")}; --spellPointsBarColorStart: ${game.settings.get("action-pack-enhanced", "spellPointsBarColorStart")}; --spellPointsBarColorEnd: ${game.settings.get("action-pack-enhanced", "spellPointsBarColorEnd")}">
+                <div class="section-uses-text">${this.uses.available} / ${this.uses.maximum}</div>
+                <div class="section-uses-bar"></div>
+            </div>` : nothing}
 
             ${this._renderWeaponSets()}
 
@@ -129,6 +139,7 @@ export class ApeGroup extends LitElement {
         actor: { type: Object },
         showSpellDots: { type: Boolean },
         showSpellUses: { type: Boolean },
+        showCost: { type: Boolean },
         isOpen: { type: Boolean, state: true },
         forceOpen: { type: Boolean }
     };
@@ -136,6 +147,7 @@ export class ApeGroup extends LitElement {
     constructor() {
         super();
         this.isOpen = true;
+        this.showCost = game.modules.get("dnd5e-spellpoints")?.active ? true : false;
     }
 
     createRenderRoot() { return this; }
@@ -156,20 +168,23 @@ export class ApeGroup extends LitElement {
 
     render() {
         if (!this.group) return nothing;
-        const { items, uses, title } = this.group;
+        const { items, uses, title, cost } = this.group;
         const hasItems = items && items.length > 0;
         const hasSlots = uses && uses.maximum;
+        const hasCost = cost ? cost : null;
 
         if (!hasItems && !hasSlots) return nothing;
 
         const displayDots = hasSlots && this.showSpellDots;
         const displayUses = uses && this.showSpellUses;
+        const displayCost = hasCost && this.showCost;
 
         const headerClasses = [
             'flexrow',
             'ape-group-header',
             displayDots ? 'has-dots' : '',
-            displayUses ? 'has-uses' : ''
+            displayUses ? 'has-uses' : '',
+            displayCost ? 'has-cost' : ''
         ].filter(Boolean).join(' ');
 
         return html`
@@ -179,6 +194,7 @@ export class ApeGroup extends LitElement {
                 </h3>
                 ${displayDots ? this._renderDots(uses) : nothing}
                 ${displayUses ? html`<div class="group-uses">${uses.available}/${uses.maximum}</div>` : nothing}
+                ${displayCost ? html`<div class="group-cost">Cost: ${cost} SP</div>` : nothing}
             </div>
 
             ${hasItems ? html`
