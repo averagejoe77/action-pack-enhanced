@@ -103,7 +103,7 @@ class Je {
         if (s.type === "constant")
           i = s.value;
         else if (s.type === "table") {
-          const r = a.system.levels, o = s.values.find((l) => l.level === r);
+          const r = a.system.levels, o = s.values.find((c) => c.level === r);
           i = o ? o.mastery : 0;
         }
         i > t && (t = i);
@@ -123,17 +123,17 @@ class Je {
       await e.setFlag("action-pack-enhanced", "masterySelectionPending", !0);
       const i = e.itemTypes.weapon.filter((d) => d.name !== "Unarmed Strike"), r = /* @__PURE__ */ new Map(), o = e.system.traits.weaponProf.mastery.value;
       i.forEach((d) => {
-        var g, m;
-        const p = d.system.mastery, c = (g = d.system.type) == null ? void 0 : g.baseItem;
-        p && c && !r.has(c) && r.set(c, {
-          id: c,
-          label: c.replace(/-/g, " ").replace(/\b\w/g, (y) => y.toUpperCase()),
+        var u, m;
+        const p = d.system.mastery, l = (u = d.system.type) == null ? void 0 : u.baseItem;
+        p && l && !r.has(l) && r.set(l, {
+          id: l,
+          label: l.replace(/-/g, " ").replace(/\b\w/g, (y) => y.toUpperCase()),
           masteryLabel: ((m = CONFIG.DND5E.weaponMasteries[p]) == null ? void 0 : m.label) || p,
-          selected: o.find((y) => y === c)
+          selected: o.find((y) => y === l)
         });
       });
-      const l = this.calculateMaxMasteries(e);
-      await this.promptMasterySelection(e, r, l);
+      const c = this.calculateMaxMasteries(e);
+      await this.promptMasterySelection(e, r, c);
     } else
       await e.setFlag("action-pack-enhanced", "masterySelectionPending", !1), await e.update({ "system.traits.weaponProf.mastery.value": [] });
     return t;
@@ -178,9 +178,9 @@ class Je {
         action: "update",
         label: "Update",
         default: !0,
-        callback: async (r, o, l) => {
+        callback: async (r, o, c) => {
           const d = [];
-          return l.element.querySelectorAll('input[name="mastery"]:checked').forEach((p) => {
+          return c.element.querySelectorAll('input[name="mastery"]:checked').forEach((p) => {
             d.push(p.value);
           }), d.length > a && (ui.notifications.warn(`You selected more than ${a} masteries. Only the first ${a} will be applied.`), d.splice(a)), await e.update({ "system.traits.weaponProf.mastery.value": d }), await e.setFlag("action-pack-enhanced", "masterySelectionPending", !1), !0;
         }
@@ -287,8 +287,8 @@ class Je {
     var r, o;
     const s = a + 1, i = (o = (r = e.system.spells) == null ? void 0 : r[t]) == null ? void 0 : o.value;
     if (i !== void 0) {
-      const l = `system.spells.${t}.value`, d = i !== s ? s : s - 1;
-      return e.update({ [l]: d });
+      const c = `system.spells.${t}.value`, d = i !== s ? s : s - 1;
+      return e.update({ [c]: d });
     }
   }
   /**
@@ -317,8 +317,8 @@ class Je {
    * @param {Item} item 
    */
   async getItemDescription(e) {
-    var r, o, l, d;
-    const t = await e.getChatData({ secrets: e.actor.isOwner }), a = ((o = (r = e.system) == null ? void 0 : r.activation) == null ? void 0 : o.type) || "", s = ((d = (l = e.system) == null ? void 0 : l.activation) == null ? void 0 : d.value) || "";
+    var r, o, c, d;
+    const t = await e.getChatData({ secrets: e.actor.isOwner }), a = ((o = (r = e.system) == null ? void 0 : r.activation) == null ? void 0 : o.type) || "", s = ((d = (c = e.system) == null ? void 0 : c.activation) == null ? void 0 : d.value) || "";
     let i = "";
     return s === "" ? i = a.charAt(0).toUpperCase() + a.slice(1) : s && a && (i = `${s} ${a.charAt(0).toUpperCase() + a.slice(1)}`), {
       description: t.description,
@@ -355,16 +355,16 @@ class Je {
    * @param {string} itemUuid 
    */
   async setWeaponSetItem(e, t, a, s, i) {
-    var l, d, p;
+    var c, d, p;
     if (!e) return;
     const r = e.getFlag("action-pack-enhanced", "weaponSets") || [];
-    for (let c = 0; c <= t; c++)
-      r[c] || (r[c] = { main: null, off: null, active: !1 });
+    for (let l = 0; l <= t; l++)
+      r[l] || (r[l] = { main: null, off: null, active: !1 });
     const o = fromUuidSync(s);
     if (o) {
-      const c = a === "main" ? "off" : "main", g = r[t][c], m = [];
-      if (g === s && ((l = o.system) == null ? void 0 : l.quantity) === 1 && m.push(game.i18n.localize("action-pack-enhanced.warning.quantity-limit") || "Not enough quantity to equip in both slots."), (d = o.system.properties) != null && d.has("two") && g) {
-        const y = fromUuidSync(g);
+      const l = a === "main" ? "off" : "main", u = r[t][l], m = [];
+      if (u === s && ((c = o.system) == null ? void 0 : c.quantity) === 1 && m.push(game.i18n.localize("action-pack-enhanced.warning.quantity-limit") || "Not enough quantity to equip in both slots."), (d = o.system.properties) != null && d.has("two") && u) {
+        const y = fromUuidSync(u);
         y && ((p = y.system.properties) != null && p.has("two")) && m.push(game.i18n.localize("action-pack-enhanced.warning.two-handed") || "You cannot have two two-handed weapons in the same set.");
       }
       if (m.length > 0) {
@@ -398,15 +398,15 @@ class Je {
     if (!a || !a[t]) return;
     const s = a[t];
     if (!s.main && !s.off) return;
-    const i = a.map((p, c) => ({ ...p, active: c === t }));
+    const i = a.map((p, l) => ({ ...p, active: l === t }));
     await e.setFlag("action-pack-enhanced", "weaponSets", i);
-    const r = [], o = e.itemTypes.weapon.filter((p) => p.name !== "Unarmed Strike"), l = e.itemTypes.equipment.find((p) => p.name.includes("Shield"));
-    l && o.push(l);
+    const r = [], o = e.itemTypes.weapon.filter((p) => p.name !== "Unarmed Strike"), c = e.itemTypes.equipment.find((p) => p.name.includes("Shield"));
+    c && o.push(c);
     const d = /* @__PURE__ */ new Set();
     s.main && d.add(s.main), s.off && d.add(s.off);
     for (const p of o) {
-      const c = d.has(p.uuid);
-      p.system.equipped !== c && r.push({ _id: p.id, "system.equipped": c });
+      const l = d.has(p.uuid);
+      p.system.equipped !== l && r.push({ _id: p.id, "system.equipped": l });
     }
     r.length > 0 && await e.updateEmbeddedDocuments("Item", r);
   }
@@ -424,10 +424,10 @@ function Qe(n) {
   return t === "" && e !== "" ? game.i18n.localize(`action-pack-enhanced.action-type.${e}`) : t && e ? `${t} ${e.charAt(0).toUpperCase() + e.slice(1)}` : "";
 }
 function et(n) {
-  var s, i, r, o, l, d, p, c;
+  var s, i, r, o, c, d, p, l;
   const e = ((i = (s = n.system) == null ? void 0 : s.range) == null ? void 0 : i.long) || null, t = (o = (r = n.system) == null ? void 0 : r.range) == null ? void 0 : o.units;
   let a;
-  return t !== "touch" && t !== "self" ? a = ((d = (l = n.system) == null ? void 0 : l.range) == null ? void 0 : d.value) || ((c = (p = n.system) == null ? void 0 : p.range) == null ? void 0 : c.reach) || 5 : a = null, a && e && t ? `${a} ${t} / ${e} ${t}` : a && t ? `${a} ${t}` : t ? game.i18n.localize(`action-pack-enhanced.range.${t}`) : "";
+  return t !== "touch" && t !== "self" ? a = ((d = (c = n.system) == null ? void 0 : c.range) == null ? void 0 : d.value) || ((l = (p = n.system) == null ? void 0 : p.range) == null ? void 0 : l.reach) || 5 : a = null, a && e && t ? `${a} ${t} / ${e} ${t}` : a && t ? `${a} ${t}` : t ? game.i18n.localize(`action-pack-enhanced.range.${t}`) : "";
 }
 function tt(n) {
   var a, s, i, r;
@@ -451,34 +451,34 @@ function st(n) {
   return "";
 }
 function it(n) {
-  var l, d;
+  var c, d;
   let e = {}, t = n.itemTypes.race, a = n.itemTypes.class, s = n.itemTypes.subclass;
   const i = n.system.details.level;
   if (a.length === s.length) {
-    let p = { race: `<span>${(l = t[0]) == null ? void 0 : l.name} - ${i}</span>` || "Unknown", classes: [] };
-    for (let c = 0; c < a.length; c++)
-      p.classes[c] = { name: a[c].name, level: a[c].system.levels, subclass: { name: s[c].name } };
+    let p = { race: `<span>${(c = t[0]) == null ? void 0 : c.name} - ${i}</span>` || "Unknown", classes: [] };
+    for (let l = 0; l < a.length; l++)
+      p.classes[l] = { name: a[l].name, level: a[l].system.levels, subclass: { name: s[l].name } };
     e = p;
   } else {
     let p = { race: `<span>${(d = t[0]) == null ? void 0 : d.name} - ${i}</span>` || "Unknown", classes: [] };
-    for (let c = 0; c < a.length; c++) {
-      p.classes[c] = { name: a[c].name, level: a[c].system.levels, subclass: { name: "" } };
-      for (let g = 0; g < s.length; g++)
-        s[g].system.class === a[c].name && (p.classes[c].subclass.name = s[g].name);
+    for (let l = 0; l < a.length; l++) {
+      p.classes[l] = { name: a[l].name, level: a[l].system.levels, subclass: { name: "" } };
+      for (let u = 0; u < s.length; u++)
+        s[u].system.class === a[l].name && (p.classes[l].subclass.name = s[u].name);
     }
     e = p;
   }
-  a.length === s.length ? a.forEach((p, c) => {
-    e.classes[c].icon = p.img, e.classes[c].subclass.icon = p.subclass.img;
-  }) : a.forEach((p, c) => {
-    e.classes[c].icon = p.img, e.classes[c].subclass.name !== "" && s.forEach((g) => {
-      g.system.class === p.name && (e.classes[c].subclass.icon = g.img);
+  a.length === s.length ? a.forEach((p, l) => {
+    e.classes[l].icon = p.img, e.classes[l].subclass.icon = p.subclass.img;
+  }) : a.forEach((p, l) => {
+    e.classes[l].icon = p.img, e.classes[l].subclass.name !== "" && s.forEach((u) => {
+      u.system.class === p.name && (e.classes[l].subclass.icon = u.img);
     });
   });
   let r = `${e.race}`, o = [];
   for (let p = 0; p < e.classes.length; p++) {
-    let c = "", g = "";
-    e.classes[p].subclass.name !== "" ? (c = e.classes[p].subclass.icon, g = `${e.classes[p].subclass.name} ${e.classes[p].name} (${e.classes[p].level})`) : (c = e.classes[p].icon, g = `${e.classes[p].name} (${e.classes[p].level})`), o.push(`<img class="ape-actor-class-icon" src="${c}" title="${g}">`);
+    let l = "", u = "";
+    e.classes[p].subclass.name !== "" ? (l = e.classes[p].subclass.icon, u = `${e.classes[p].subclass.name} ${e.classes[p].name} (${e.classes[p].level})`) : (l = e.classes[p].icon, u = `${e.classes[p].name} (${e.classes[p].level})`), o.push(`<img class="ape-actor-class-icon" src="${l}" title="${u}">`);
   }
   return r + `<span class="ape-actor-class-icons">${o.join("")}</span>`;
 }
@@ -570,9 +570,9 @@ class ct {
       },
       passive: { items: [], title: "action-pack-enhanced.category.passive" }
     };
-    const l = ["consumable", "container", "equipment", "feat", "loot", "spell", "tool", "weapon"];
+    const c = ["consumable", "container", "equipment", "feat", "loot", "spell", "tool", "weapon"];
     for (const [f, b] of Object.entries(e.itemTypes))
-      if (l.includes(f))
+      if (c.includes(f))
         for (const P of b)
           this._processItem(P, f, o, e, s);
     const d = game.modules.find((f) => f.id === "wm5e") && ((S = game.modules.get("wm5e")) == null ? void 0 : S.active);
@@ -580,19 +580,19 @@ class ct {
       const b = e.getFlag("action-pack-enhanced", "masterySelectionPending");
       o.equipped.forceOpen = b;
     }
-    const p = (E = game.combat) == null ? void 0 : E.combatants.find((f) => f.actor === e), c = p && !p.initiative, g = game.modules.get("dnd5e-spellpoints"), m = g && (g != null && g.active) ? getSpellPointsItem(e) : null, y = this.sortItems(this.removeEmptySections(o)), _ = m ? this.addSpellPointUses(y, m, a) : this.addSpellLevelUses(y, a);
+    const p = (E = game.combat) == null ? void 0 : E.combatants.find((f) => f.actor === e), l = p && !p.initiative, u = game.modules.get("dnd5e-spellpoints"), m = u && (u != null && u.active) ? getSpellPointsItem(e) : null, y = this.sortItems(this.removeEmptySections(o)), k = m ? this.addSpellPointUses(y, m, a) : this.addSpellLevelUses(y, a);
     return {
       actor: e,
       name: e.name,
-      sections: _,
-      needsInitiative: c,
+      sections: k,
+      needsInitiative: l,
       skills: CONFIG.DND5E.skills
     };
   }
   _processItem(e, t, a, s, i) {
-    var c;
-    const r = e.system, o = nt(e), l = this.settingShowNoUses || !o || o.available, d = ((c = r == null ? void 0 : r.activities) == null ? void 0 : c.size) > 0, p = e.getFlag("action-pack-enhanced", "hidden");
-    if (e.type === "equipment" && (r.identified && r.identifier === "shield" || e.name.includes("Shield")) && (r.equipped ? a.equipped.groups.shield.items.push({ item: e, uses: o }) : a.equipped.groups.unequipped.items.push({ item: e, uses: o })), l && d && !p)
+    var l;
+    const r = e.system, o = nt(e), c = this.settingShowNoUses || !o || o.available, d = ((l = r == null ? void 0 : r.activities) == null ? void 0 : l.size) > 0, p = e.getFlag("action-pack-enhanced", "hidden");
+    if (e.type === "equipment" && (r.identified && r.identifier === "shield" || e.name.includes("Shield")) && (r.equipped ? a.equipped.groups.shield.items.push({ item: e, uses: o }) : a.equipped.groups.unequipped.items.push({ item: e, uses: o })), c && d && !p)
       switch (t) {
         case "feat":
           this._prepareFeat(e, r, o, a);
@@ -618,16 +618,16 @@ class ct {
     else s.type === "npc" && a.passive.items.push({ item: e, uses: o });
   }
   _prepareFeat(e, t, a, s) {
-    var o, l;
-    const i = (o = t.type) == null ? void 0 : o.value, r = (l = t.type) == null ? void 0 : l.subtype;
+    var o, c;
+    const i = (o = t.type) == null ? void 0 : o.value, r = (c = t.type) == null ? void 0 : c.subtype;
     r && s.feature.groups[r] ? s.feature.groups[r].items.push({ item: e, uses: a }) : i && s.feature.groups[i] ? s.feature.groups[i].items.push({ item: e, uses: a }) : s.feature.groups.general.items.push({ item: e, uses: a });
   }
   _prepareSpell(e, t, a, s, i) {
     var o;
     switch (t == null ? void 0 : t.method) {
       case "spell":
-        const l = (t == null ? void 0 : t.prepared) === 1, d = (t == null ? void 0 : t.prepared) === 2, p = i && ((o = t.properties) == null ? void 0 : o.has("ritual")), c = t.level == 0 && this.settingShowUnpreparedCantrips, g = t.level > 0 && this.settingShowUnpreparedSpells;
-        (d || l || p || c || g) && s.spell.groups[`spell${t.level}`].items.push({ item: e, uses: a });
+        const c = (t == null ? void 0 : t.prepared) === 1, d = (t == null ? void 0 : t.prepared) === 2, p = i && ((o = t.properties) == null ? void 0 : o.has("ritual")), l = t.level == 0 && this.settingShowUnpreparedCantrips, u = t.level > 0 && this.settingShowUnpreparedSpells;
+        (d || c || p || l || u) && s.spell.groups[`spell${t.level}`].items.push({ item: e, uses: a });
         break;
       case "atwill":
         s.spell.groups.atwill.items.push({ item: e, uses: a });
@@ -683,7 +683,7 @@ class ct {
     return Object.entries(e).reduce((a, [s, i]) => (t(i) && (a[s] = i), a), {});
   }
   addSpellPointUses(e, t, a) {
-    var r, o, l, d, p, c, g, m, y;
+    var r, o, c, d, p, l, u, m, y;
     const s = {
       0: 0,
       1: 2,
@@ -697,26 +697,26 @@ class ct {
       9: 13
     }, i = {
       available: ((o = (r = t.system) == null ? void 0 : r.uses) == null ? void 0 : o.value) || 0,
-      maximum: ((d = (l = t.system) == null ? void 0 : l.uses) == null ? void 0 : d.max) || 0
+      maximum: ((d = (c = t.system) == null ? void 0 : c.uses) == null ? void 0 : d.max) || 0
     };
     if (e.spell) {
       e.spell.uses = i;
-      for (let _ = 1; _ <= 9; _++) {
-        const S = (p = e.spell) == null ? void 0 : p.groups[`spell${_}`];
-        S && (S.cost = s[_]);
+      for (let k = 1; k <= 9; k++) {
+        const S = (p = e.spell) == null ? void 0 : p.groups[`spell${k}`];
+        S && (S.cost = s[k]);
       }
     }
-    return (g = (c = a.spells) == null ? void 0 : c.pact) != null && g.max && ((y = (m = e.spell) == null ? void 0 : m.groups) != null && y.pact) && (e.spell.groups.pact.uses = {
+    return (u = (l = a.spells) == null ? void 0 : l.pact) != null && u.max && ((y = (m = e.spell) == null ? void 0 : m.groups) != null && y.pact) && (e.spell.groups.pact.uses = {
       available: a.spells.pact.value,
       maximum: a.spells.pact.max
     }), e;
   }
   addSpellLevelUses(e, t) {
     var a, s, i, r, o;
-    for (let l = 1; l <= 9; l++) {
-      const d = (a = e.spell) == null ? void 0 : a.groups[`spell${l}`];
+    for (let c = 1; c <= 9; c++) {
+      const d = (a = e.spell) == null ? void 0 : a.groups[`spell${c}`];
       if (d) {
-        const p = t.spells[`spell${l}`];
+        const p = t.spells[`spell${c}`];
         d.uses = { available: p.value, maximum: p.max };
       }
     }
@@ -1619,9 +1619,9 @@ let M = class extends HTMLElement {
     var i, r;
     const a = this.constructor, s = a._$Eh.get(e);
     if (s !== void 0 && this._$Em !== s) {
-      const o = a.getPropertyOptions(s), l = typeof o.converter == "function" ? { fromAttribute: o.converter } : ((i = o.converter) == null ? void 0 : i.fromAttribute) !== void 0 ? o.converter : ie;
+      const o = a.getPropertyOptions(s), c = typeof o.converter == "function" ? { fromAttribute: o.converter } : ((i = o.converter) == null ? void 0 : i.fromAttribute) !== void 0 ? o.converter : ie;
       this._$Em = s;
-      const d = l.fromAttribute(t, o.type);
+      const d = c.fromAttribute(t, o.type);
       this[s] = d ?? ((r = this._$Ej) == null ? void 0 : r.get(s)) ?? d, this._$Em = null;
     }
   }
@@ -1660,8 +1660,8 @@ let M = class extends HTMLElement {
       }
       const s = this.constructor.elementProperties;
       if (s.size > 0) for (const [i, r] of s) {
-        const { wrapped: o } = r, l = this[i];
-        o !== !0 || this._$AL.has(i) || l === void 0 || this.C(i, void 0, r, l);
+        const { wrapped: o } = r, c = this[i];
+        o !== !0 || this._$AL.has(i) || c === void 0 || this.C(i, void 0, r, c);
       }
     }
     let e = !1;
@@ -1713,7 +1713,7 @@ M.elementStyles = [], M.shadowRootOptions = { mode: "open" }, M[z("elementProper
  */
 const N = globalThis, Ee = (n) => n, G = N.trustedTypes, Pe = G ? G.createPolicy("lit-html", { createHTML: (n) => n }) : void 0, Ne = "$lit$", A = `lit$${Math.random().toFixed(9).slice(2)}$`, je = "?" + A, kt = `<${je}>`, U = document, j = () => U.createComment(""), B = (n) => n === null || typeof n != "object" && typeof n != "function", oe = Array.isArray, wt = (n) => oe(n) || typeof (n == null ? void 0 : n[Symbol.iterator]) == "function", ee = `[ 	
 \f\r]`, H = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Oe = /-->/g, qe = />/g, O = RegExp(`>|${ee}(?:([^\\s"'>=/]+)(${ee}*=${ee}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), Te = /'/g, Ue = /"/g, Be = /^(?:script|style|textarea|title)$/i, _t = (n) => (e, ...t) => ({ _$litType$: n, strings: e, values: t }), u = _t(1), I = Symbol.for("lit-noChange"), h = Symbol.for("lit-nothing"), Ie = /* @__PURE__ */ new WeakMap(), q = U.createTreeWalker(U, 129);
+\f\r"'\`<>=]|("|')|))|$)`, "g"), Te = /'/g, Ue = /"/g, Be = /^(?:script|style|textarea|title)$/i, _t = (n) => (e, ...t) => ({ _$litType$: n, strings: e, values: t }), h = _t(1), I = Symbol.for("lit-noChange"), g = Symbol.for("lit-nothing"), Ie = /* @__PURE__ */ new WeakMap(), q = U.createTreeWalker(U, 129);
 function Le(n, e) {
   if (!oe(n) || !n.hasOwnProperty("raw")) throw Error("invalid template strings array");
   return Pe !== void 0 ? Pe.createHTML(e) : e;
@@ -1722,11 +1722,11 @@ const St = (n, e) => {
   const t = n.length - 1, a = [];
   let s, i = e === 2 ? "<svg>" : e === 3 ? "<math>" : "", r = H;
   for (let o = 0; o < t; o++) {
-    const l = n[o];
-    let d, p, c = -1, g = 0;
-    for (; g < l.length && (r.lastIndex = g, p = r.exec(l), p !== null); ) g = r.lastIndex, r === H ? p[1] === "!--" ? r = Oe : p[1] !== void 0 ? r = qe : p[2] !== void 0 ? (Be.test(p[2]) && (s = RegExp("</" + p[2], "g")), r = O) : p[3] !== void 0 && (r = O) : r === O ? p[0] === ">" ? (r = s ?? H, c = -1) : p[1] === void 0 ? c = -2 : (c = r.lastIndex - p[2].length, d = p[1], r = p[3] === void 0 ? O : p[3] === '"' ? Ue : Te) : r === Ue || r === Te ? r = O : r === Oe || r === qe ? r = H : (r = O, s = void 0);
+    const c = n[o];
+    let d, p, l = -1, u = 0;
+    for (; u < c.length && (r.lastIndex = u, p = r.exec(c), p !== null); ) u = r.lastIndex, r === H ? p[1] === "!--" ? r = Oe : p[1] !== void 0 ? r = qe : p[2] !== void 0 ? (Be.test(p[2]) && (s = RegExp("</" + p[2], "g")), r = O) : p[3] !== void 0 && (r = O) : r === O ? p[0] === ">" ? (r = s ?? H, l = -1) : p[1] === void 0 ? l = -2 : (l = r.lastIndex - p[2].length, d = p[1], r = p[3] === void 0 ? O : p[3] === '"' ? Ue : Te) : r === Ue || r === Te ? r = O : r === Oe || r === qe ? r = H : (r = O, s = void 0);
     const m = r === O && n[o + 1].startsWith("/>") ? " " : "";
-    i += r === H ? l + kt : c >= 0 ? (a.push(d), l.slice(0, c) + Ne + l.slice(c) + A + m) : l + A + (c === -2 ? o : m);
+    i += r === H ? c + kt : l >= 0 ? (a.push(d), c.slice(0, l) + Ne + c.slice(l) + A + m) : c + A + (l === -2 ? o : m);
   }
   return [Le(n, i + (n[t] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), a];
 };
@@ -1735,29 +1735,29 @@ class L {
     let s;
     this.parts = [];
     let i = 0, r = 0;
-    const o = e.length - 1, l = this.parts, [d, p] = St(e, t);
+    const o = e.length - 1, c = this.parts, [d, p] = St(e, t);
     if (this.el = L.createElement(d, a), q.currentNode = this.el.content, t === 2 || t === 3) {
-      const c = this.el.content.firstChild;
-      c.replaceWith(...c.childNodes);
+      const l = this.el.content.firstChild;
+      l.replaceWith(...l.childNodes);
     }
-    for (; (s = q.nextNode()) !== null && l.length < o; ) {
+    for (; (s = q.nextNode()) !== null && c.length < o; ) {
       if (s.nodeType === 1) {
-        if (s.hasAttributes()) for (const c of s.getAttributeNames()) if (c.endsWith(Ne)) {
-          const g = p[r++], m = s.getAttribute(c).split(A), y = /([.?@])?(.*)/.exec(g);
-          l.push({ type: 1, index: i, name: y[2], strings: m, ctor: y[1] === "." ? xt : y[1] === "?" ? Ct : y[1] === "@" ? Et : Z }), s.removeAttribute(c);
-        } else c.startsWith(A) && (l.push({ type: 6, index: i }), s.removeAttribute(c));
+        if (s.hasAttributes()) for (const l of s.getAttributeNames()) if (l.endsWith(Ne)) {
+          const u = p[r++], m = s.getAttribute(l).split(A), y = /([.?@])?(.*)/.exec(u);
+          c.push({ type: 1, index: i, name: y[2], strings: m, ctor: y[1] === "." ? xt : y[1] === "?" ? Ct : y[1] === "@" ? Et : Z }), s.removeAttribute(l);
+        } else l.startsWith(A) && (c.push({ type: 6, index: i }), s.removeAttribute(l));
         if (Be.test(s.tagName)) {
-          const c = s.textContent.split(A), g = c.length - 1;
-          if (g > 0) {
+          const l = s.textContent.split(A), u = l.length - 1;
+          if (u > 0) {
             s.textContent = G ? G.emptyScript : "";
-            for (let m = 0; m < g; m++) s.append(c[m], j()), q.nextNode(), l.push({ type: 2, index: ++i });
-            s.append(c[g], j());
+            for (let m = 0; m < u; m++) s.append(l[m], j()), q.nextNode(), c.push({ type: 2, index: ++i });
+            s.append(l[u], j());
           }
         }
-      } else if (s.nodeType === 8) if (s.data === je) l.push({ type: 2, index: i });
+      } else if (s.nodeType === 8) if (s.data === je) c.push({ type: 2, index: i });
       else {
-        let c = -1;
-        for (; (c = s.data.indexOf(A, c + 1)) !== -1; ) l.push({ type: 7, index: i }), c += A.length - 1;
+        let l = -1;
+        for (; (l = s.data.indexOf(A, l + 1)) !== -1; ) c.push({ type: 7, index: i }), l += A.length - 1;
       }
       i++;
     }
@@ -1787,13 +1787,13 @@ class At {
   u(e) {
     const { el: { content: t }, parts: a } = this._$AD, s = ((e == null ? void 0 : e.creationScope) ?? U).importNode(t, !0);
     q.currentNode = s;
-    let i = q.nextNode(), r = 0, o = 0, l = a[0];
-    for (; l !== void 0; ) {
-      if (r === l.index) {
+    let i = q.nextNode(), r = 0, o = 0, c = a[0];
+    for (; c !== void 0; ) {
+      if (r === c.index) {
         let d;
-        l.type === 2 ? d = new F(i, i.nextSibling, this, e) : l.type === 1 ? d = new l.ctor(i, l.name, l.strings, this, e) : l.type === 6 && (d = new Pt(i, this, e)), this._$AV.push(d), l = a[++o];
+        c.type === 2 ? d = new F(i, i.nextSibling, this, e) : c.type === 1 ? d = new c.ctor(i, c.name, c.strings, this, e) : c.type === 6 && (d = new Pt(i, this, e)), this._$AV.push(d), c = a[++o];
       }
-      r !== (l == null ? void 0 : l.index) && (i = q.nextNode(), r++);
+      r !== (c == null ? void 0 : c.index) && (i = q.nextNode(), r++);
     }
     return q.currentNode = U, s;
   }
@@ -1808,7 +1808,7 @@ class F {
     return ((e = this._$AM) == null ? void 0 : e._$AU) ?? this._$Cv;
   }
   constructor(e, t, a, s) {
-    this.type = 2, this._$AH = h, this._$AN = void 0, this._$AA = e, this._$AB = t, this._$AM = a, this.options = s, this._$Cv = (s == null ? void 0 : s.isConnected) ?? !0;
+    this.type = 2, this._$AH = g, this._$AN = void 0, this._$AA = e, this._$AB = t, this._$AM = a, this.options = s, this._$Cv = (s == null ? void 0 : s.isConnected) ?? !0;
   }
   get parentNode() {
     let e = this._$AA.parentNode;
@@ -1822,7 +1822,7 @@ class F {
     return this._$AB;
   }
   _$AI(e, t = this) {
-    e = D(this, e, t), B(e) ? e === h || e == null || e === "" ? (this._$AH !== h && this._$AR(), this._$AH = h) : e !== this._$AH && e !== I && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : wt(e) ? this.k(e) : this._(e);
+    e = D(this, e, t), B(e) ? e === g || e == null || e === "" ? (this._$AH !== g && this._$AR(), this._$AH = g) : e !== this._$AH && e !== I && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : wt(e) ? this.k(e) : this._(e);
   }
   O(e) {
     return this._$AA.parentNode.insertBefore(e, this._$AB);
@@ -1831,7 +1831,7 @@ class F {
     this._$AH !== e && (this._$AR(), this._$AH = this.O(e));
   }
   _(e) {
-    this._$AH !== h && B(this._$AH) ? this._$AA.nextSibling.data = e : this.T(U.createTextNode(e)), this._$AH = e;
+    this._$AH !== g && B(this._$AH) ? this._$AA.nextSibling.data = e : this.T(U.createTextNode(e)), this._$AH = e;
   }
   $(e) {
     var i;
@@ -1873,7 +1873,7 @@ class Z {
     return this._$AM._$AU;
   }
   constructor(e, t, a, s, i) {
-    this.type = 1, this._$AH = h, this._$AN = void 0, this.element = e, this.name = t, this._$AM = s, this.options = i, a.length > 2 || a[0] !== "" || a[1] !== "" ? (this._$AH = Array(a.length - 1).fill(new String()), this.strings = a) : this._$AH = h;
+    this.type = 1, this._$AH = g, this._$AN = void 0, this.element = e, this.name = t, this._$AM = s, this.options = i, a.length > 2 || a[0] !== "" || a[1] !== "" ? (this._$AH = Array(a.length - 1).fill(new String()), this.strings = a) : this._$AH = g;
   }
   _$AI(e, t = this, a, s) {
     const i = this.strings;
@@ -1881,13 +1881,13 @@ class Z {
     if (i === void 0) e = D(this, e, t, 0), r = !B(e) || e !== this._$AH && e !== I, r && (this._$AH = e);
     else {
       const o = e;
-      let l, d;
-      for (e = i[0], l = 0; l < i.length - 1; l++) d = D(this, o[a + l], t, l), d === I && (d = this._$AH[l]), r || (r = !B(d) || d !== this._$AH[l]), d === h ? e = h : e !== h && (e += (d ?? "") + i[l + 1]), this._$AH[l] = d;
+      let c, d;
+      for (e = i[0], c = 0; c < i.length - 1; c++) d = D(this, o[a + c], t, c), d === I && (d = this._$AH[c]), r || (r = !B(d) || d !== this._$AH[c]), d === g ? e = g : e !== g && (e += (d ?? "") + i[c + 1]), this._$AH[c] = d;
     }
     r && !s && this.j(e);
   }
   j(e) {
-    e === h ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
+    e === g ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
   }
 }
 class xt extends Z {
@@ -1895,7 +1895,7 @@ class xt extends Z {
     super(...arguments), this.type = 3;
   }
   j(e) {
-    this.element[this.name] = e === h ? void 0 : e;
+    this.element[this.name] = e === g ? void 0 : e;
   }
 }
 class Ct extends Z {
@@ -1903,7 +1903,7 @@ class Ct extends Z {
     super(...arguments), this.type = 4;
   }
   j(e) {
-    this.element.toggleAttribute(this.name, !!e && e !== h);
+    this.element.toggleAttribute(this.name, !!e && e !== g);
   }
 }
 class Et extends Z {
@@ -1911,8 +1911,8 @@ class Et extends Z {
     super(e, t, a, s, i), this.type = 5;
   }
   _$AI(e, t = this) {
-    if ((e = D(this, e, t, 0) ?? h) === I) return;
-    const a = this._$AH, s = e === h && a !== h || e.capture !== a.capture || e.once !== a.once || e.passive !== a.passive, i = e !== h && (a === h || s);
+    if ((e = D(this, e, t, 0) ?? g) === I) return;
+    const a = this._$AH, s = e === g && a !== g || e.capture !== a.capture || e.once !== a.once || e.passive !== a.passive, i = e !== g && (a === g || s);
     s && this.element.removeEventListener(this.name, this, a), i && this.element.addEventListener(this.name, this, e), this._$AH = e;
   }
   handleEvent(e) {
@@ -1948,7 +1948,7 @@ const Ot = (n, e, t) => {
  * SPDX-License-Identifier: BSD-3-Clause
  */
 const T = globalThis;
-let w = class extends M {
+let _ = class extends M {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = void 0;
   }
@@ -1974,9 +1974,9 @@ let w = class extends M {
   }
 };
 var Me;
-w._$litElement$ = !0, w.finalized = !0, (Me = T.litElementHydrateSupport) == null || Me.call(T, { LitElement: w });
+_._$litElement$ = !0, _.finalized = !0, (Me = T.litElementHydrateSupport) == null || Me.call(T, { LitElement: _ });
 const ae = T.litElementPolyfillSupport;
-ae == null || ae({ LitElement: w });
+ae == null || ae({ LitElement: _ });
 (T.litElementVersions ?? (T.litElementVersions = [])).push("4.2.2");
 /**
  * @license
@@ -2007,10 +2007,10 @@ class Ut {
  */
 class ne extends Ut {
   constructor(e) {
-    if (super(e), this.it = h, e.type !== qt.CHILD) throw Error(this.constructor.directiveName + "() can only be used in child bindings");
+    if (super(e), this.it = g, e.type !== qt.CHILD) throw Error(this.constructor.directiveName + "() can only be used in child bindings");
   }
   render(e) {
-    if (e === h || e == null) return this._t = void 0, this.it = e;
+    if (e === g || e == null) return this._t = void 0, this.it = e;
     if (e === I) return e;
     if (typeof e != "string") throw Error(this.constructor.directiveName + "() called with a non-string value");
     if (e === this.it) return this._t;
@@ -2020,8 +2020,11 @@ class ne extends Ut {
   }
 }
 ne.directiveName = "unsafeHTML", ne.resultType = 1;
-const It = Tt(ne);
-class We extends w {
+const It = Tt(ne), Rt = [
+  { name: "Elf", type: "Elf Lineage", values: ["Drow", "High", "Wood"] },
+  { name: "Tiefling", type: "Fiendish Legacy", values: ["Abyssal", "Chthonic", "Infernal"] }
+];
+class We extends _ {
   // Use Light DOM to inherit global styles
   createRenderRoot() {
     return this;
@@ -2044,20 +2047,20 @@ class We extends w {
   }
   render() {
     var ue, he, ge, me, ye, fe, be, ve, $e, ke, we, _e;
-    if (!this.item) return h;
-    const e = this.item.system, t = this.item.actor, a = e.rarity !== "" ? e.rarity : this.item.type === "weapon" ? "common" : "", s = this.item.type === "spell", i = e.method === "innate", r = this.uses && (!s || i), o = (ue = e.properties) == null ? void 0 : ue.has("ritual"), l = (he = e.properties) == null ? void 0 : he.has("concentration"), d = ((ge = e.activation) == null ? void 0 : ge.type) === "bonus", p = ((me = e.activation) == null ? void 0 : me.type) === "reaction", c = ((ye = e.activation) == null ? void 0 : ye.type) === "legendary", g = (fe = this.item) == null ? void 0 : fe.hasRecharge, m = !this.item.isOnCooldown, y = e.equipped, _ = this.item.type === "equipment" && (e.identified && e.identifier === "shield" || this.item.name.includes("Shield"));
+    if (!this.item) return g;
+    const e = this.item.system, t = this.item.actor, a = e.rarity !== "" ? e.rarity : this.item.type === "weapon" ? "common" : "", s = this.item.type === "spell", i = e.method === "innate", r = this.uses && (!s || i), o = (ue = e.properties) == null ? void 0 : ue.has("ritual"), c = (he = e.properties) == null ? void 0 : he.has("concentration"), d = ((ge = e.activation) == null ? void 0 : ge.type) === "bonus", p = ((me = e.activation) == null ? void 0 : me.type) === "reaction", l = ((ye = e.activation) == null ? void 0 : ye.type) === "legendary", u = (fe = this.item) == null ? void 0 : fe.hasRecharge, m = !this.item.isOnCooldown, y = e.equipped, k = this.item.type === "equipment" && (e.identified && e.identifier === "shield" || this.item.name.includes("Shield"));
     let S = null;
-    if (g && ((be = e.uses) != null && be.recovery)) {
-      const k = e.uses.recovery.find((J) => J.period === "recharge");
-      k && (S = k.formula);
+    if (u && ((be = e.uses) != null && be.recovery)) {
+      const w = e.uses.recovery.find((J) => J.period === "recharge");
+      w && (S = w.formula);
     }
     let E = !1, f = !1, b = "";
-    if (game.modules.find((k) => k.id === "wm5e") && ((ve = game.modules.get("wm5e")) != null && ve.active) && (E = e.mastery || !1, E && this.item.type === "weapon")) {
-      const k = ($e = e.type) == null ? void 0 : $e.baseItem, J = new Set(this.masteryIds || ((_e = (we = (ke = t.system.traits) == null ? void 0 : ke.weaponProf) == null ? void 0 : we.mastery) == null ? void 0 : _e.value) || []);
-      f = k && J.has(k), b = game.i18n.localize(`action-pack-enhanced.masteries.${E}`);
+    if (game.modules.find((w) => w.id === "wm5e") && ((ve = game.modules.get("wm5e")) != null && ve.active) && (E = e.mastery || !1, E && this.item.type === "weapon")) {
+      const w = ($e = e.type) == null ? void 0 : $e.baseItem, J = new Set(this.masteryIds || ((_e = (we = (ke = t.system.traits) == null ? void 0 : ke.weaponProf) == null ? void 0 : we.mastery) == null ? void 0 : _e.value) || []);
+      f = w && J.has(w), b = game.i18n.localize(`action-pack-enhanced.masteries.${E}`);
     }
-    const P = !!t.itemTypes.feat.find((k) => k.name === "Ritual Adept"), v = e.prepared === 0 && !(o && P);
-    return u`
+    const P = !!t.itemTypes.feat.find((w) => w.name === "Ritual Adept"), v = e.prepared === 0 && !(o && P);
+    return h`
             <div class="item-name rollable flexrow ${v ? "unprepared" : ""}">
                 <div class="item-image ${a}${v ? " unprepared" : ""}" 
                         style="background-image: url('${this.item.img}')"
@@ -2068,21 +2071,21 @@ class We extends w {
                 <div class="item-name-wrap flexrow">
                     <h4 @mousedown="${this._onClick}">
                         <span class="item-text ${a}">${this.item.name}</span>
-                        ${r ? u` (${this.uses.available}${this.uses.maximum ? "/" + this.uses.maximum : ""})` : h}
+                        ${r ? h` (${this.uses.available}${this.uses.maximum ? "/" + this.uses.maximum : ""})` : g}
                     </h4>
-                    ${this.showWeaponMastery ? this._renderWeaponMastery(E, f, b) : h}
+                    ${this.showWeaponMastery ? this._renderWeaponMastery(E, f, b) : g}
                 </div>
 
-                ${o ? u`<div class="ritual flag" title="${game.i18n.localize("action-pack-enhanced.flag.ritual-title")}"></div>` : h}
-                ${l ? u`<div class="concentration flag" title="${game.i18n.localize("action-pack-enhanced.flag.concentration-title")}"></div>` : h}
-                ${d ? u`<div class="bonus flag" title="${game.i18n.localize("action-pack-enhanced.flag.bonus-title")}">${game.i18n.localize("action-pack-enhanced.flag.bonus")}</div>` : h}
-                ${p ? u`<div class="reaction flag" title="${game.i18n.localize("action-pack-enhanced.flag.reaction-title")}">${game.i18n.localize("action-pack-enhanced.flag.reaction")}</div>` : h}
-                ${c ? u`<div class="legendary flag" title="${game.i18n.localize("action-pack-enhanced.flag.legendary-title")}">${game.i18n.localize("action-pack-enhanced.flag.legendary")}</div>` : h}
+                ${o ? h`<div class="ritual flag" title="${game.i18n.localize("action-pack-enhanced.flag.ritual-title")}"></div>` : g}
+                ${c ? h`<div class="concentration flag" title="${game.i18n.localize("action-pack-enhanced.flag.concentration-title")}"></div>` : g}
+                ${d ? h`<div class="bonus flag" title="${game.i18n.localize("action-pack-enhanced.flag.bonus-title")}">${game.i18n.localize("action-pack-enhanced.flag.bonus")}</div>` : g}
+                ${p ? h`<div class="reaction flag" title="${game.i18n.localize("action-pack-enhanced.flag.reaction-title")}">${game.i18n.localize("action-pack-enhanced.flag.reaction")}</div>` : g}
+                ${l ? h`<div class="legendary flag" title="${game.i18n.localize("action-pack-enhanced.flag.legendary-title")}">${game.i18n.localize("action-pack-enhanced.flag.legendary")}</div>` : g}
 
-                ${g ? m ? u`<div class="flag"><i class="fas fa-bolt"></i></div>` : u`<div class="flag"><a class="rollable item-recharge" @mousedown="${this._onRecharge}"><i class="fas fa-dice-six"></i> ${S}+</a></div>` : h}
+                ${u ? m ? h`<div class="flag"><i class="fas fa-bolt"></i></div>` : h`<div class="flag"><a class="rollable item-recharge" @mousedown="${this._onRecharge}"><i class="fas fa-dice-six"></i> ${S}+</a></div>` : g}
 
-                ${v ? u`<div class="unprepared flag" title="${game.i18n.localize("action-pack-enhanced.flag.unprepared-title")}">${game.i18n.localize("action-pack-enhanced.flag.unprepared")}</div>` : h}
-                ${(this.item.type === "weapon" || _) && !y ? u`<div class="unequipped flag" title="${game.i18n.localize("action-pack-enhanced.flag.unequipped-title")}" @mousedown="${this._onEquip}">${game.i18n.localize("action-pack-enhanced.flag.unequipped")}</div>` : h}
+                ${v ? h`<div class="unprepared flag" title="${game.i18n.localize("action-pack-enhanced.flag.unprepared-title")}">${game.i18n.localize("action-pack-enhanced.flag.unprepared")}</div>` : g}
+                ${(this.item.type === "weapon" || k) && !y ? h`<div class="unequipped flag" title="${game.i18n.localize("action-pack-enhanced.flag.unequipped-title")}" @mousedown="${this._onEquip}">${game.i18n.localize("action-pack-enhanced.flag.unequipped")}</div>` : g}
             </div>
             
             <div class="item-drag-handle" 
@@ -2092,48 +2095,71 @@ class We extends w {
                 <i class="fas fa-grip-vertical"></i>
             </div>
 
-            ${this.expanded ? u`
+            ${this.expanded ? h`
                 <div class="item-summary" style="display:block">
                     ${this._renderItemDetails()}
-                    ${this.description ? u`<p>${It(this.description.description)}</p>` : u`<i class="fas fa-spinner fa-spin"></i>`}
+                    ${this.description ? h`<p>${It(this.description.description)}</p>` : h`<i class="fas fa-spinner fa-spin"></i>`}
                     <div class="item-properties">
                         ${this._renderItemProperties(this.item)}
                     </div>
                 </div>
-            ` : h}
+            ` : g}
         `;
   }
   _onEquip(e) {
     e.preventDefault(), e.stopPropagation(), this.item.update({ "system.equipped": !0 });
   }
   _renderItemDetails() {
-    const e = Ye(this.item);
-    return u`
-            ${e.school ? u`<p><strong>School:</strong> ${e.school}</p>` : h}
-            ${e.castingTime ? u`<p><strong>Casting Time:</strong> ${e.castingTime}</p>` : h}
-            ${e.range ? u`<p><strong>Range:</strong> ${e.range}</p>` : h}
-            ${e.duration ? u`<p><strong>Duration:</strong> ${e.duration}</p>` : h}
-            ${e.materials ? u`<p><strong>Materials:</strong> ${e.materials}</p>` : h}
+    const e = this.item, t = e.actor;
+    let a = Ye(e), s = null;
+    return e.type === "spell" && e.getFlag("dnd5e", "advancementOrigin") && (s = this._getItemSource(e, t)), h`
+            ${s ? h`<p><strong>Source:</strong> ${s.name} (${s.type})</p>` : g}
+            ${a.school ? h`<p><strong>School:</strong> ${a.school}</p>` : g}
+            ${a.castingTime ? h`<p><strong>Casting Time:</strong> ${a.castingTime}</p>` : g}
+            ${a.range ? h`<p><strong>Range:</strong> ${a.range}</p>` : g}
+            ${a.duration ? h`<p><strong>Duration:</strong> ${a.duration}</p>` : g}
+            ${a.materials ? h`<p><strong>Materials:</strong> ${a.materials}</p>` : g}
         `;
   }
   _renderItemProperties(e) {
-    var i, r, o, l, d;
-    const t = ((i = e == null ? void 0 : e.labels) == null ? void 0 : i.properties) || [], a = e.labels.hasOwnProperty("damageTypes") ? (o = (r = e == null ? void 0 : e.labels) == null ? void 0 : r.damageTypes) != null && o.includes(",") ? (l = e == null ? void 0 : e.labels) == null ? void 0 : l.damageTypes.split(",") : [(d = e == null ? void 0 : e.labels) == null ? void 0 : d.damageTypes] : [], s = [];
+    var i, r, o, c, d;
+    const t = ((i = e == null ? void 0 : e.labels) == null ? void 0 : i.properties) || [], a = e.labels.hasOwnProperty("damageTypes") ? (o = (r = e == null ? void 0 : e.labels) == null ? void 0 : r.damageTypes) != null && o.includes(",") ? (c = e == null ? void 0 : e.labels) == null ? void 0 : c.damageTypes.split(",") : [(d = e == null ? void 0 : e.labels) == null ? void 0 : d.damageTypes] : [], s = [];
     if (a.length > 0) {
-      const c = a.map((g) => ({ label: g })).map((g) => g.label);
-      s.push(...c);
+      const l = a.map((u) => ({ label: u })).map((u) => u.label);
+      s.push(...l);
     }
     if (t.length > 0) {
-      const p = t.map((c) => c.label);
-      p.sort((c, g) => c.toLowerCase().localeCompare(g.toLowerCase())), s.push(...p);
+      const p = t.map((l) => l.label);
+      p.sort((l, u) => l.toLowerCase().localeCompare(u.toLowerCase())), s.push(...p);
     }
-    return s.length === 0 ? h : u`
-            ${s ? u`${s.map((p) => u`<span class="tag">${p}</span>`)} ` : h}
+    return s.length === 0 ? g : h`
+            ${s ? h`${s.map((p) => h`<span class="tag">${p}</span>`)} ` : g}
         `;
   }
   _renderWeaponMastery(e, t, a) {
     var s;
-    return (s = game.modules.get("wm5e")) != null && s.active && e ? u`<div class="mastery ${t ? "active" : "inactive"} flag">${a}</div>` : h;
+    return (s = game.modules.get("wm5e")) != null && s.active && e ? h`<div class="mastery ${t ? "active" : "inactive"} flag">${a}</div>` : g;
+  }
+  _getItemSource(e, t) {
+    var i, r;
+    let a = null;
+    const s = (r = (i = e.flags) == null ? void 0 : i.dnd5e) == null ? void 0 : r.advancementOrigin;
+    if (s) {
+      const o = s.split(".");
+      if (o.length >= 1) {
+        const c = o[0], d = t.items.get(c);
+        if (d && d.type === "feat")
+          a = { name: `${d.name}`, type: `${d.system.type.label}` };
+        else if (d && d.type === "race") {
+          const p = d.name;
+          let l = "";
+          const u = p.split(", ")[0], m = p.split(", ")[1], y = Rt.find((k) => k.name === u && k.values.includes(m));
+          y ? l = `${m} ${y.type}` : l = "Species Trait", a = { name: `${u}`, type: `${l}` };
+        } else
+          a = null;
+      }
+    }
+    return a;
   }
 }
 R(We, "properties", {
@@ -2146,7 +2172,7 @@ R(We, "properties", {
   showWeaponMastery: { type: Boolean }
 });
 customElements.define("ape-item", We);
-class Fe extends w {
+class Fe extends _ {
   _openJournal(e) {
     fromUuid(e).then((t) => {
       var a;
@@ -2171,50 +2197,50 @@ class Fe extends w {
     s.uuid && this.api.setWeaponSetItem(this.actor, t, a, s.uuid, s.rarity);
   }
   _renderWeaponSets() {
-    return this.weaponSets ? u`
+    return this.weaponSets ? h`
             <div class="ape-weapon-sets">
-                ${this.weaponSets.map((e) => u`
+                ${this.weaponSets.map((e) => h`
                     <div class="ape-weapon-set ${e.active ? "active" : ""}" @click="${() => this.api.equipWeaponSet(this.actor, e.index)}">
                         <div class="ape-weapon-slot ${e.main ? "filled " + e.main.rarity : "empty"}" 
                                 @drop="${(t) => this._onDrop(t, e.index, "main")}" 
                                 @dragover="${(t) => t.preventDefault()}"
                                 @contextmenu="${(t) => this.api.clearWeaponSetItem(this.actor, e.index, "main")}">
-                            ${e.main ? u`<img src="${e.main.img}" title="${e.main.name}">` : u`<i class="fas fa-sword"></i>`}
+                            ${e.main ? h`<img src="${e.main.img}" title="${e.main.name}">` : h`<i class="fas fa-sword"></i>`}
                         </div>
                         <div class="ape-weapon-slot ${e.off ? "filled " + e.off.rarity : "empty"}" 
                                 @drop="${(t) => this._onDrop(t, e.index, "off")}" 
                                 @dragover="${(t) => t.preventDefault()}"
                                 @contextmenu="${(t) => this.api.clearWeaponSetItem(this.actor, e.index, "off")}">
-                            ${e.off ? u`<img src="${e.off.img}" title="${e.off.name}" style="height: 100%; width: auto;">` : u`<i class="fas fa-shield"></i>`}
+                            ${e.off ? h`<img src="${e.off.img}" title="${e.off.name}" style="height: 100%; width: auto;">` : h`<i class="fas fa-shield"></i>`}
                         </div>
                     </div>
                 `)}
             </div>
-        ` : h;
+        ` : g;
   }
   _getReversedPercent(e, t) {
     return Math.floor((t - e) / t * 100);
   }
   render() {
-    return u`
-            ${this.title ? u`
+    return h`
+            ${this.title ? h`
                 <h2 @click="${this._toggleOpen}">
                     <span><i class="fas fa-caret-down"></i> ${game.i18n.localize(this.title)}</span>
                 </h2>
-            ` : h}
+            ` : g}
 
-            ${this.uses ? u`<div class="section-uses" style="--percent: ${this._getReversedPercent(this.uses.available, this.uses.maximum)}%; --spellPointsTextColor: ${game.settings.get("action-pack-enhanced", "spellPointsTextColor")}; --spellPointsBarColorStart: ${game.settings.get("action-pack-enhanced", "spellPointsBarColorStart")}; --spellPointsBarColorEnd: ${game.settings.get("action-pack-enhanced", "spellPointsBarColorEnd")}">
+            ${this.uses ? h`<div class="section-uses" style="--percent: ${this._getReversedPercent(this.uses.available, this.uses.maximum)}%; --spellPointsTextColor: ${game.settings.get("action-pack-enhanced", "spellPointsTextColor")}; --spellPointsBarColorStart: ${game.settings.get("action-pack-enhanced", "spellPointsBarColorStart")}; --spellPointsBarColorEnd: ${game.settings.get("action-pack-enhanced", "spellPointsBarColorEnd")}">
                 <div class="section-uses-text">${this.uses.available} / ${this.uses.maximum}</div>
                 <div class="section-uses-bar"></div>
-            </div>` : h}
+            </div>` : g}
 
             ${this._renderWeaponSets()}
 
-            ${this.items && this.items.length > 0 ? u`
+            ${this.items && this.items.length > 0 ? h`
                 <div class="ape-items">
                     ${this.items.map((e) => {
       var t, a, s, i, r;
-      return u`
+      return h`
                         <ape-item class="ape-item item" 
                             data-item-uuid="${e.item.uuid}" 
                             .item="${e.item}" 
@@ -2226,9 +2252,9 @@ class Fe extends w {
                     `;
     })}
                 </div>
-            ` : h}
+            ` : g}
 
-            ${this.groups ? Object.entries(this.groups).map(([e, t]) => u`
+            ${this.groups ? Object.entries(this.groups).map(([e, t]) => h`
                 <ape-group 
                     class="ape-group"
                     .group="${t}" 
@@ -2238,7 +2264,7 @@ class Fe extends w {
                     .showSpellDots="${this.showSpellDots}"
                     .showSpellUses="${this.showSpellUses}">
                 </ape-group>
-            `) : h}
+            `) : g}
         `;
   }
 }
@@ -2262,7 +2288,7 @@ R(Fe, "properties", {
   showWeaponMastery: { type: Boolean }
 });
 customElements.define("ape-section", Fe);
-class Xe extends w {
+class Xe extends _ {
   constructor() {
     var e;
     super(), this.isOpen = !0, this.showCost = !!((e = game.modules.get("dnd5e-spellpoints")) != null && e.active);
@@ -2277,39 +2303,39 @@ class Xe extends w {
     e.target.closest(".group-dots") || (this.isOpen = !this.isOpen);
   }
   render() {
-    if (!this.group) return h;
+    if (!this.group) return g;
     const { items: e, uses: t, title: a, cost: s } = this.group, i = e && e.length > 0, r = t && t.maximum, o = s || null;
-    if (!i && !r) return h;
-    const l = r && this.showSpellDots, d = t && this.showSpellUses, p = o && this.showCost, c = [
+    if (!i && !r) return g;
+    const c = r && this.showSpellDots, d = t && this.showSpellUses, p = o && this.showCost, l = [
       "flexrow",
       "ape-group-header",
-      l ? "has-dots" : "",
+      c ? "has-dots" : "",
       d ? "has-uses" : "",
       p ? "has-cost" : ""
     ].filter(Boolean).join(" ");
-    return u`
-            <div class="${c}" @click="${this._toggleOpen}">
+    return h`
+            <div class="${l}" @click="${this._toggleOpen}">
                 <h3>
                     <i class="fas fa-caret-down"></i> ${game.i18n.localize(a)}
                 </h3>
-                ${l ? this._renderDots(t) : h}
-                ${d ? u`<div class="group-uses">${t.available}/${t.maximum}</div>` : h}
-                ${p ? u`<div class="group-cost">Cost: ${s} SP</div>` : h}
+                ${c ? this._renderDots(t) : g}
+                ${d ? h`<div class="group-uses">${t.available}/${t.maximum}</div>` : g}
+                ${p ? h`<div class="group-cost">Cost: ${s} SP</div>` : g}
             </div>
 
-            ${i ? u`
+            ${i ? h`
                 <div class="ape-items">
-                    ${e.map((g) => u`
-                        <ape-item class="ape-item item" data-item-uuid="${g.item.uuid}" .item="${g.item}" .uses="${g.uses}" .api="${this.api}"></ape-item>
+                    ${e.map((u) => h`
+                        <ape-item class="ape-item item" data-item-uuid="${u.item.uuid}" .item="${u.item}" .uses="${u.uses}" .api="${this.api}"></ape-item>
                     `)}
                 </div>
-            ` : h}
+            ` : g}
         `;
   }
   _renderDots(e) {
-    return u`
+    return h`
             <div class="group-dots" data-group-name="${this.groupName}">
-                ${Array.from({ length: e.maximum }).map((t, a) => u`
+                ${Array.from({ length: e.maximum }).map((t, a) => h`
                     <div class="dot ${a < e.available ? "" : "empty"}" 
                          data-slot="${a}"
                          @click="${(s) => {
@@ -2333,7 +2359,7 @@ R(Xe, "properties", {
   forceOpen: { type: Boolean }
 });
 customElements.define("ape-group", Xe);
-class Ve extends w {
+class Ve extends _ {
   createRenderRoot() {
     return this;
   }
@@ -2341,9 +2367,9 @@ class Ve extends w {
     e.has("actorData") && this.actorData && (this.dataset.actorUuid = this.actorData.actor.uuid);
   }
   render() {
-    if (!this.actorData) return h;
-    const { actor: e, name: t, sections: a, needsInitiative: s } = this.actorData, i = e.system.attributes.hp, r = e.system.attributes.ac.value, o = e.type, l = i.value <= 0 && o === "character", d = e.system.attributes.inspiration;
-    return u`
+    if (!this.actorData) return g;
+    const { actor: e, name: t, sections: a, needsInitiative: s } = this.actorData, i = e.system.attributes.hp, r = e.system.attributes.ac.value, o = e.type, c = i.value <= 0 && o === "character", d = e.system.attributes.inspiration;
+    return h`
             <div class="ape-actor-header">
                 <div class="ape-actor-header-wrap">
                     <a class="ape-actor-name" @click="${(p) => this.api.openSheet(e)}">${t.split(" ")[0]}</a>
@@ -2363,15 +2389,15 @@ class Ve extends w {
                  </div>
             </div>
 
-            ${this.globalData.staticInfo ? u`
+            ${this.globalData.staticInfo ? h`
                 <div class="ape-static-info">
-                    ${o === "character" ? u`
+                    ${o === "character" ? h`
                         <div class="ape-actor-race-class">
                             ${this._renderRaceClass(e)}
                         </div>
-                    ` : h}
+                    ` : g}
 
-                    ${game.settings.get("action-pack-enhanced", "show-xp-info") && o === "character" ? this._renderExperience(e) : h}
+                    ${game.settings.get("action-pack-enhanced", "show-xp-info") && o === "character" ? this._renderExperience(e) : g}
 
                     ${this._renderHpBar(e, i)}
 
@@ -2380,19 +2406,19 @@ class Ve extends w {
                         <button class="btn ape-actor-rest-button" @click="${() => this.api.longRest(e)}"><i class="fa-solid fa-campground"></i> Long Rest</button>
                     </div>
                 </div>
-            ` : u`
+            ` : h`
                 <div class="ape-accordion ${this._infoOpen ? "is-open" : ""}">
                     <h2 class="ape-accordion-header" @click="${() => this._toggleAccordion("info")}">
                         <i class="fas fa-caret-down"></i> XP/HP/Rest
                     </h2>
                     <div class="ape-accordion-body">
-                        ${o === "character" ? u`
+                        ${o === "character" ? h`
                             <div class="ape-actor-race-class">
                                 ${this._renderRaceClass(e)}
                             </div>
-                        ` : h}
+                        ` : g}
 
-                        ${game.settings.get("action-pack-enhanced", "show-xp-info") && o === "character" ? this._renderExperience(e) : h}
+                        ${game.settings.get("action-pack-enhanced", "show-xp-info") && o === "character" ? this._renderExperience(e) : g}
 
                         ${this._renderHpBar(e, i)}
 
@@ -2404,14 +2430,14 @@ class Ve extends w {
                 </div>
             `}
 
-            ${l && !game.settings.get("action-pack-enhanced", "show-death-saves") ? this._renderDeathSaves(e) : h}
+            ${c && !game.settings.get("action-pack-enhanced", "show-death-saves") ? this._renderDeathSaves(e) : g}
 
-            ${s ? u`
+            ${s ? h`
                 <div class="ape-initiative" @click="${() => this.api.rollInitiative(e)}">
                     <i class="fas fa-swords ape-initiative-icon"></i>
                     <span class="ape-initiative-text">${game.i18n.localize("action-pack-enhanced.roll-initiative")}</span>
                 </div>
-            ` : h}
+            ` : g}
 
             <div class="ape-accordion ${this._abilitiesOpen ? "is-open" : ""}">
                 <h2 class="ape-accordion-header" @click="${() => this._toggleAccordion("abilities")}">
@@ -2431,7 +2457,7 @@ class Ve extends w {
   }
   _renderExperience(e) {
     const t = e.system.details, a = t.xp.pct, s = t.xp.max, i = t.xp.min, r = t.xp.value;
-    return u`
+    return h`
             <div class="ape-actor-xp bar-group">
                 <div class="bar-label">
                     <span>XP</span>
@@ -2472,11 +2498,11 @@ class Ve extends w {
   }
   _renderRaceClass(e) {
     const t = it(e);
-    return u`<div style="display:contents" .innerHTML="${t}"></div>`;
+    return h`<div style="display:contents" .innerHTML="${t}"></div>`;
   }
   _renderHpBar(e, t) {
     const a = Math.min(100, Math.max(0, t.value / t.max * 100));
-    return u`
+    return h`
             <div class="ape-actor-hp-wrapper hp-container">
                 <div class="hp-main">
                     <div class="bar-label">
@@ -2529,9 +2555,9 @@ class Ve extends w {
   }
   _renderAbilities(e) {
     const t = this.globalData.abilityColumns;
-    return u`
+    return h`
             <div class="ape-abilities">
-                ${t.map((a) => u`
+                ${t.map((a) => h`
                     <div class="flex-col">
                         <span class="ape-ability">
                              <span class="ape-ability-label">&nbsp;</span>
@@ -2540,9 +2566,9 @@ class Ve extends w {
                         </span>
                         ${a.map((s) => {
       const i = e.system.abilities[s.key];
-      return u`
+      return h`
                                 <span class="ape-ability">
-                                    <span class="ape-ability-label">${s.key}</span>
+                                    <span class="ape-ability-label">${s.key}<br>${i.value}</span>
                                     <a class="fas fa-dice-d20 ape-ability-check" 
                                        title="${s.label} check"
                                        @click="${(r) => this.api.rollAbilityCheck(e, s.key, r)}">
@@ -2563,7 +2589,7 @@ class Ve extends w {
   }
   _renderSkills(e) {
     const t = this.actorData.skills, a = e.system.skills;
-    return u`
+    return h`
             <div class="ape-accordion ape-skill-container ${this._skillsOpen ? "is-open" : ""}">
                 <h2 class="ape-accordion-header ape-skill-header" @click="${() => this._toggleAccordion("skills")}">
                     <i class="fas fa-caret-down"></i> Skills
@@ -2571,12 +2597,12 @@ class Ve extends w {
                 <div class="ape-accordion-body ape-skills">
                     ${Object.keys(a).map((s) => {
       const i = a[s], r = t[s];
-      if (!r) return h;
+      if (!r) return g;
       let o = "far fa-circle";
-      return i.proficient === 0.5 ? o = "fas fa-adjust" : i.proficient === 1 ? o = "fas fa-check" : i.proficient === 2 && (o = "fas fa-star"), u`
+      return i.proficient === 0.5 ? o = "fas fa-adjust" : i.proficient === 1 ? o = "fas fa-check" : i.proficient === 2 && (o = "fas fa-star"), h`
                             <div class="ape-skill-row flexrow ${i.proficient === 1 ? "proficient" : i.proficient === 2 ? "expert" : ""}"
-                               @click="${(l) => this.api.rollSkill(e, s, l)}"
-                               @contextmenu="${(l) => this.api.rollSkill(e, s, l, !0)}">
+                               @click="${(c) => this.api.rollSkill(e, s, c)}"
+                               @contextmenu="${(c) => this.api.rollSkill(e, s, c, !0)}">
                                 <span class="ape-skill-icon ${o}"></span>
                                 <span class="ape-skill-ability">${i.ability}</span>
                                 <span class="ape-skill-label">${r.label}</span>
@@ -2590,12 +2616,12 @@ class Ve extends w {
         `;
   }
   _renderDeathSaves(e) {
-    const t = e.system.attributes.death.failure, a = e.system.attributes.death.success, s = (r, o, l) => Array.from({ length: 3 }).map((d, p) => u`
+    const t = e.system.attributes.death.failure, a = e.system.attributes.death.success, s = (r, o, c) => Array.from({ length: 3 }).map((d, p) => h`
                 <span class="ape-death-dot ${p < r ? "filled" : ""}">
-                    ${p < r ? u`<span class="fas ${l}"></span>` : h}
+                    ${p < r ? h`<span class="fas ${c}"></span>` : g}
                 </span>
              `), i = t < 3 && a < 3;
-    return u`
+    return h`
              <div class="ape-death-saving">
                 <span class="ape-death-throws failed">
                     ${s(t, "failed", "fa-skull-crossbones")}
@@ -2612,7 +2638,7 @@ class Ve extends w {
   _renderSections(e, t) {
     return ["equipped", "feature", "spell", "inventory", "passive"].map((s) => {
       const i = t[s];
-      return i ? u`
+      return i ? h`
                 <ape-section 
                     class="ape-category"
                     .title="${i.title}" 
@@ -2628,7 +2654,7 @@ class Ve extends w {
                     .showWeaponMastery="${this.globalData.showWeaponMastery}"
                     .forceOpen="${i.forceOpen}">
                 </ape-section>
-            ` : h;
+            ` : g;
     });
   }
 }
@@ -2644,7 +2670,7 @@ R(Ve, "properties", {
   _abilitiesOpen: { state: !1 }
 });
 customElements.define("ape-actor", Ve);
-class Ge extends w {
+class Ge extends _ {
   createRenderRoot() {
     return this;
   }
@@ -2664,20 +2690,20 @@ class Ge extends w {
     }
   }
   render() {
-    if (!this.data) return h;
+    if (!this.data) return g;
     const { actors: e } = this.data, t = !e || e.length === 0;
-    return u`
+    return h`
             <div class="${[
       "ape-wrapper"
     ].join(" ")}" @scroll="${this._onScroll}">
                 ${this._renderHeader()}
 
                 <div class="ape-actors">
-                    ${t ? u`
+                    ${t ? h`
                         <div class="ape-empty-tray">
                             <i class="fas fa-dice-d20"></i>
                         </div>
-                    ` : e.map((s) => u`
+                    ` : e.map((s) => h`
                         <ape-actor 
                             class="ape-actor"
                             .actorData="${s}"
@@ -2694,7 +2720,7 @@ class Ge extends w {
         `;
   }
   _renderHeader() {
-    return h;
+    return g;
   }
 }
 R(Ge, "properties", {
@@ -2706,7 +2732,7 @@ R(Ge, "properties", {
 });
 customElements.define("ape-app", Ge);
 let K, W, Re, se;
-function Rt(n) {
+function Mt(n) {
   var r;
   if (!n || n === "") return null;
   let e = n.split(".");
@@ -2718,12 +2744,12 @@ function Rt(n) {
   if (!s) return null;
   let i = s.get(a);
   for (; i && e.length > 1; ) {
-    const [o, l] = e.slice(0, 2);
-    i = i.getEmbeddedDocument(o, l), e = e.slice(2);
+    const [o, c] = e.slice(0, 2);
+    i = i.getEmbeddedDocument(o, c), e = e.slice(2);
   }
   return i || null;
 }
-function jt(n) {
+function Bt(n) {
   if (n instanceof CONFIG.Actor.documentClass)
     return n;
   if (n instanceof CONFIG.Token.documentClass)
@@ -2746,7 +2772,7 @@ Hooks.on("ready", () => {
     return t.id == ((a = game.combat) == null ? void 0 : a.current.combatantId);
   })) == null ? void 0 : e.actor, W = K, ce() && $("#ape-app").addClass("is-open always-on"), de();
 });
-function Mt() {
+function Dt() {
   const n = game.settings.get("action-pack-enhanced", "tray-display");
   return n === "selected" || n === "auto";
 }
@@ -2814,7 +2840,7 @@ Hooks.on("getSceneControlButtons", (n) => {
 });
 function de() {
   const n = $("#ape-app");
-  Mt() && (canvas.tokens.controlled.filter((t) => {
+  Dt() && (canvas.tokens.controlled.filter((t) => {
     var a;
     return ["character", "npc"].includes((a = t.actor) == null ? void 0 : a.type);
   }).length ? n.addClass("is-open") : n.removeClass("is-open")), ce() ? n.addClass("is-open always-on") : n.removeClass("always-on"), le(), C();
@@ -2824,23 +2850,23 @@ async function C() {
   const n = X(), e = se.build(n, {
     /* scrollPosition stub */
   });
-  function t(g, m) {
-    return g && [m, g].join("-");
+  function t(u, m) {
+    return u && [m, u].join("-");
   }
-  const a = t(game.settings.get("action-pack-enhanced", "icon-size"), "icon"), s = t(game.settings.get("action-pack-enhanced", "tray-size"), "tray"), i = game.settings.get("action-pack-enhanced", "show-spell-dots"), r = game.settings.get("action-pack-enhanced", "show-spell-uses"), o = game.settings.get("action-pack-enhanced", "show-weapon-mastery"), l = game.settings.get("action-pack-enhanced", "static-info"), d = Object.entries(CONFIG.DND5E.abilities), p = [
-    d.slice(0, 3).map(([g, m]) => ({ key: g, label: m.label })),
-    d.slice(3, 6).map(([g, m]) => ({ key: g, label: m.label }))
-  ], c = document.querySelector("#ape-app");
-  Array.from(c.classList).forEach((g) => {
-    (g.startsWith("tray-") || g.startsWith("icon-")) && c.classList.remove(g);
-  }), c.classList.add(a), c.classList.add(s), c && (c.data = {
+  const a = t(game.settings.get("action-pack-enhanced", "icon-size"), "icon"), s = t(game.settings.get("action-pack-enhanced", "tray-size"), "tray"), i = game.settings.get("action-pack-enhanced", "show-spell-dots"), r = game.settings.get("action-pack-enhanced", "show-spell-uses"), o = game.settings.get("action-pack-enhanced", "show-weapon-mastery"), c = game.settings.get("action-pack-enhanced", "static-info"), d = Object.entries(CONFIG.DND5E.abilities), p = [
+    d.slice(0, 3).map(([u, m]) => ({ key: u, label: m.label })),
+    d.slice(3, 6).map(([u, m]) => ({ key: u, label: m.label }))
+  ], l = document.querySelector("#ape-app");
+  Array.from(l.classList).forEach((u) => {
+    (u.startsWith("tray-") || u.startsWith("icon-")) && l.classList.remove(u);
+  }), l.classList.add(a), l.classList.add(s), l && (l.data = {
     actors: e
-  }, c.globalData = {
+  }, l.globalData = {
     abilityColumns: p,
     showSpellDots: i,
     showSpellUses: r,
     showWeaponMastery: o,
-    staticInfo: l
+    staticInfo: c
   });
 }
 Hooks.on("dnd5e.getItemContextOptions", (n, e) => {
@@ -2862,7 +2888,7 @@ Hooks.on("dnd5e.getItemContextOptions", (n, e) => {
 Hooks.on("dropCanvasData", (n, e) => {
   var t;
   if (e.type === "ActionPackItem" && e.uuid) {
-    const a = Rt(e.uuid);
+    const a = Mt(e.uuid);
     if (!a) return;
     const s = n.tokens.placeables.find((i) => e.x >= i.x && e.x <= i.x + i.w && e.y >= i.y && e.y <= i.y + i.h);
     if (s) {
@@ -2874,6 +2900,6 @@ Hooks.on("dropCanvasData", (n, e) => {
   }
 });
 export {
-  jt as fudgeToActor
+  Bt as fudgeToActor
 };
 //# sourceMappingURL=ape.mjs.map

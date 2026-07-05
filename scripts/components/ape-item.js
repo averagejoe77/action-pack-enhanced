@@ -1,7 +1,10 @@
 import { LitElement, html, nothing } from 'lit';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { getItemDetails } from '../utils.js';
-
+const speciesTraits = [
+    {name: "Elf", type: "Elf Lineage",  values: [ "Drow", "High", "Wood"]},
+    {name: "Tiefling", type: "Fiendish Legacy", values: ["Abyssal", "Chthonic", "Infernal"]}
+];
 export class ApeItem extends LitElement {
     static properties = {
         item: { type: Object },
@@ -151,8 +154,18 @@ export class ApeItem extends LitElement {
     }
 
     _renderItemDetails() {
-        const details = getItemDetails(this.item);
+        const item = this.item;
+        const actor  = item.actor;
+        let details = getItemDetails(item);
+        let sourceData = null;
+        if(item.type === "spell") {
+            if(item.getFlag('dnd5e', 'advancementOrigin')) {
+                sourceData = this._getItemSource(item, actor);
+            }
+        }
+
         return html`
+            ${sourceData ? html`<p><strong>Source:</strong> ${sourceData.name} (${sourceData.type})</p>` : nothing}
             ${details.school ? html`<p><strong>School:</strong> ${details.school}</p>` : nothing}
             ${details.castingTime ? html`<p><strong>Casting Time:</strong> ${details.castingTime}</p>` : nothing}
             ${details.range ? html`<p><strong>Range:</strong> ${details.range}</p>` : nothing}
@@ -195,5 +208,38 @@ export class ApeItem extends LitElement {
         }
         return nothing;
     }
+
+    _getItemSource(item, actor) {
+        let sourceData = null;
+        const originString = item.flags?.dnd5e?.advancementOrigin;
+        if (originString) {
+            const parts = originString.split('.');
+            if (parts.length >= 1) {
+                const originId = parts[0];
+                const originItem = actor.items.get(originId);
+                if (originItem && originItem.type === "feat") {
+                    sourceData = {name: `${originItem.name}`, type: `${originItem.system.type.label}`};
+                } else if(originItem && originItem.type === "race") {
+                    const name = originItem.name;
+                    let raceType = "";
+                    const species = name.split(', ')[0];
+                    const trait = name.split(', ')[1];
+                    // get the trait from the species trait list
+                    const traitData = speciesTraits.find(st => st.name === species && st.values.includes(trait));
+                    if(traitData) {
+                        raceType = `${trait} ${traitData.type}`;
+                    } else {
+                        raceType = "Species Trait";
+                    }
+
+                    sourceData = {name: `${species}`, type: `${raceType}`};
+                } else {
+                    sourceData = null;
+                }
+            }
+        }
+        return sourceData;
+    }
+
 }
 customElements.define('ape-item', ApeItem);

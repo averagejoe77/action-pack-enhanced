@@ -256,10 +256,10 @@ export class ApeActor extends LitElement {
                              <span class="ape-ability-hdr">save</span>
                         </span>
                         ${col.map(c => {
-                            const details = actor.system.abilities[c.key];
-                            return html`
+            const details = actor.system.abilities[c.key];
+            return html`
                                 <span class="ape-ability">
-                                    <span class="ape-ability-label">${c.key}</span>
+                                    <span class="ape-ability-label">${c.key}<br>${details.value}</span>
                                     <a class="fas fa-dice-d20 ape-ability-check" 
                                        title="${c.label} check"
                                        @click="${(e) => this.api.rollAbilityCheck(actor, c.key, e)}">
@@ -272,7 +272,7 @@ export class ApeActor extends LitElement {
                                     </a>
                                 </span>
                             `;
-                        })}
+        })}
                     </div>
                 `)}
             </div>
@@ -290,16 +290,16 @@ export class ApeActor extends LitElement {
                 </h2>
                 <div class="ape-accordion-body ape-skills">
                     ${Object.keys(actorSkills).map(key => {
-                        const skill = actorSkills[key];
-                        const config = skillsObj[key];
-                        if (!config) return nothing;
-                        
-                        let iconClass = 'far fa-circle';
-                        if (skill.proficient === 0.5) iconClass = 'fas fa-adjust';
-                        else if (skill.proficient === 1) iconClass = 'fas fa-check';
-                        else if (skill.proficient === 2) iconClass = 'fas fa-star';
+            const skill = actorSkills[key];
+            const config = skillsObj[key];
+            if (!config) return nothing;
 
-                        return html`
+            let iconClass = 'far fa-circle';
+            if (skill.proficient === 0.5) iconClass = 'fas fa-adjust';
+            else if (skill.proficient === 1) iconClass = 'fas fa-check';
+            else if (skill.proficient === 2) iconClass = 'fas fa-star';
+
+            return html`
                             <div class="ape-skill-row flexrow ${skill.proficient === 1 ? 'proficient' : skill.proficient === 2 ? 'expert' : ''}"
                                @click="${(e) => this.api.rollSkill(actor, key, e)}"
                                @contextmenu="${(e) => this.api.rollSkill(actor, key, e, true)}">
@@ -310,7 +310,7 @@ export class ApeActor extends LitElement {
                                 <span class="ape-skill-passive">(${skill.passive})</span>
                             </div>
                         `;
-                    })}
+        })}
                 </div>
             </div>
         `;
@@ -319,10 +319,10 @@ export class ApeActor extends LitElement {
     _renderDeathSaves(actor) {
         const deathFails = actor.system.attributes.death.failure;
         const deathSaves = actor.system.attributes.death.success;
-        
+
         // Helper to render dots
         const renderDots = (count, filledClass, icon) => {
-             return Array.from({length: 3}).map((_, i) => html`
+            return Array.from({ length: 3 }).map((_, i) => html`
                 <span class="ape-death-dot ${i < count ? 'filled' : ''}">
                     ${i < count ? html`<span class="fas ${icon}"></span>` : nothing}
                 </span>
