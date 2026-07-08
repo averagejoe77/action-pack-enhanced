@@ -119,6 +119,36 @@ Hooks.on("updateActor", (actor) => {
     }
 });
 
+// Re-renders a single ape-actor element in place, reading straight off the live actor
+// document. Much cheaper than updateTray(), which rebuilds sections/items for every
+// actor via the data builder - overkill for attributes (exhaustion, AC, HP) that
+// ape-actor already reads directly off `actor` rather than from precomputed actorData.
+function refreshActorElement(actor) {
+    const el = document.querySelector(`ape-actor[data-actor-uuid="${actor.uuid}"]`);
+    if (el) el.requestUpdate();
+}
+
+function checkActiveEffectUpdate(effect) {
+    if (getActiveActors().includes(effect.parent)) {
+        refreshActorElement(effect.parent);
+    }
+}
+
+// Exhaustion (and other status conditions) are tracked via ActiveEffects that dnd5e
+// syncs asynchronously after the actor's "updateActor" hook already fired, so the
+// tray needs its own refresh once that sync completes or the display lags by one change.
+Hooks.on("createActiveEffect", (effect) => {
+    checkActiveEffectUpdate(effect);
+});
+
+Hooks.on("updateActiveEffect", (effect) => {
+    checkActiveEffectUpdate(effect);
+});
+
+Hooks.on("deleteActiveEffect", (effect) => {
+    checkActiveEffectUpdate(effect);
+});
+
 function checkItemUpdate(item) {
     if (getActiveActors().includes(item.actor)) {
         updateTray();
@@ -283,7 +313,7 @@ Hooks.on("dnd5e.getItemContextOptions", (item, options) => {
     }
 });
 
-Hooks.on("dropCanvasData", (canvas, data) => {
+Hooks.on("dropCanvasData", (canvas, data, event) => {
     if (data.type === "ActionPackItem" && data.uuid) {
         const item = fromUuid(data.uuid);
         if (!item) return;
@@ -306,7 +336,7 @@ Hooks.on("dropCanvasData", (canvas, data) => {
             }
         }
 
-        item.use();
+        item.use({ event });
         return false;
     }
 });

@@ -114,6 +114,8 @@
             "show-weapon-mastery-hint": "Mostra le etichette delle maestrie delle armi sugli oggetti arma nella sezione Equipaggiato del pannello APE.",
             "show-xp-info": "Mostra progresso punti esperienza",
             "show-xp-info-hint": "Disattiva se usi il livellamento a traguardi. Attiva per mostrare PX attuali e del prossimo livello con barra di progresso e pulsanti di incremento/decremento cliccando sul valore dei PX.",
+            "show-detailed-info": "Mostra informazioni dettagliate del personaggio",
+            "show-detailed-info-hint": "Mostra la sezione delle informazioni dettagliate del personaggio nel pannello APE. Questa sezione mostra le Resistenze ai Danni, le Immunità ai Danni, le Vulnerabilità ai Danni, le Immunità alle Condizioni e le Lingue del personaggio.",
             "show-no-uses": "Mostra oggetti senza utilizzi rimasti",
             "sort-alphabetic": "Ordina oggetti alfabeticamente",
             "show-unprepared-cantrips": "Mostra i trucchetti anche se non preparati",

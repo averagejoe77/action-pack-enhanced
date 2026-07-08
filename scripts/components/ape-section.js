@@ -212,8 +212,8 @@ export class ApeGroup extends LitElement {
             <div class="group-dots" data-group-name="${this.groupName}">
                 ${Array.from({length: uses.maximum}).map((_, i) => html`
                     <div class="dot ${i < uses.available ? '' : 'empty'}" 
-                         data-slot="${i}"
-                         @click="${(e) => { e.stopPropagation(); this.api.adjustSpellSlot(this.actor, this.groupName, i); }}">
+                        data-slot="${i}"
+                        @click="${(e) => { e.stopPropagation(); this.api.adjustSpellSlot(this.actor, this.groupName, i); }}">
                     </div>
                 `)}
             </div>

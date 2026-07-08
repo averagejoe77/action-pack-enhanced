@@ -6,6 +6,14 @@ export function formatNumber(val) {
     return `${sign}${val}`;
 }
 
+// Items no longer carry a top-level system.activation - each Activity in
+// system.activities has its own activation.type (e.g. "legendary", "lair").
+export function getItemActivationTypes(item) {
+    const activities = item.system?.activities;
+    if (!activities) return new Set();
+    return new Set(Array.from(activities, a => a.activation?.type).filter(Boolean));
+}
+
 export function getItemDetails(item) {
     const school = item.type === 'spell' ? _formatSchool(item) : '';
     const castingTime = _formatCastingTime(item);

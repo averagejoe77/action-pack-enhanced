@@ -382,7 +382,7 @@ export class ActionPackAPI {
                 return;
             }
         }
-        return item.use({}, event);
+        return item.use({ event });
     }
 
     /**
@@ -561,5 +561,25 @@ export class ActionPackAPI {
         if (updates.length > 0) {
             await actor.updateEmbeddedDocuments("Item", updates);
         }
+    }
+
+    /**
+     * Update Exhaustion Level
+     * @param {Actor} actor 
+     * @param {number} level 
+     */
+    async updateExhaustion(actor, level) {
+        if (!actor) return;
+        return actor.update({ "system.attributes.exhaustion": level });
+    }
+
+    /**
+     * Toggle a condition on/off for an actor
+     * @param {Actor} actor
+     * @param {string} conditionId
+     */
+    async toggleCondition(actor, conditionId) {
+        if (!actor) return;
+        return actor.toggleStatusEffect(conditionId);
     }
 }

@@ -1,6 +1,6 @@
 import { LitElement, html, nothing } from 'lit';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { getItemDetails } from '../utils.js';
+import { getItemDetails, getItemActivationTypes } from '../utils.js';
 const speciesTraits = [
     {name: "Elf", type: "Elf Lineage",  values: [ "Drow", "High", "Wood"]},
     {name: "Tiefling", type: "Fiendish Legacy", values: ["Abyssal", "Chthonic", "Infernal"]}
@@ -61,9 +61,11 @@ export class ApeItem extends LitElement {
         // Flags
         const isRitual = sys.properties?.has("ritual");
         const isConcentration = sys.properties?.has("concentration");
-        const isBonus = sys.activation?.type === 'bonus';
-        const isReaction = sys.activation?.type === 'reaction';
-        const isLegendary = sys.activation?.type === 'legendary';
+        const activationTypes = getItemActivationTypes(this.item);
+        const isBonus = activationTypes.has('bonus');
+        const isReaction = activationTypes.has('reaction');
+        const isLegendary = activationTypes.has('legendary');
+        const isLair = activationTypes.has('lair');
         const isRecharge = this.item?.hasRecharge;
         const isCharged = !this.item.isOnCooldown;
         const isEquipped = sys.equipped;
@@ -118,6 +120,7 @@ export class ApeItem extends LitElement {
                 ${isBonus ? html`<div class="bonus flag" title="${game.i18n.localize("action-pack-enhanced.flag.bonus-title")}">${game.i18n.localize("action-pack-enhanced.flag.bonus")}</div>` : nothing}
                 ${isReaction ? html`<div class="reaction flag" title="${game.i18n.localize("action-pack-enhanced.flag.reaction-title")}">${game.i18n.localize("action-pack-enhanced.flag.reaction")}</div>` : nothing}
                 ${isLegendary ? html`<div class="legendary flag" title="${game.i18n.localize("action-pack-enhanced.flag.legendary-title")}">${game.i18n.localize("action-pack-enhanced.flag.legendary")}</div>` : nothing}
+                ${isLair ? html`<div class="lair flag" title="${game.i18n.localize("action-pack-enhanced.flag.lair-title")}">${game.i18n.localize("action-pack-enhanced.flag.lair")}</div>` : nothing}
 
                 ${isRecharge ? (isCharged ? 
                     html`<div class="flag"><i class="fas fa-bolt"></i></div>` : 

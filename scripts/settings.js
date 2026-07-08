@@ -3,18 +3,6 @@ export function registerSettings(callbacks) {
 
     const spellPointsInstalled = !!game.modules.get("dnd5e-spellpoints")?.active;
 
-    // we need to reset the loclaStroage settings for the spell-dots and spell-uses when the module is installed
-    // if (spellPointsInstalled) {
-    //     let dots = localStorage.getItem("dnd5e-spellpoints.spell-dots");
-    //     let uses = localStorage.getItem("dnd5e-spellpoints.spell-uses");
-    //     if (dots) {
-    //         localStorage.setItem("dnd5e-spellpoints.spell-dots", false);
-    //     }
-    //     if (uses) {
-    //         localStorage.setItem("dnd5e-spellpoints.spell-uses", true);
-    //     }
-    // }
-
     function isTrayAlwaysOn() {
         const config = game.settings.get("action-pack-enhanced", "tray-display");
         return config === "always";
@@ -107,20 +95,6 @@ export function registerSettings(callbacks) {
         }
     );
 
-    // game.settings.register(
-    //     "action-pack-enhanced",
-    //     "use-custom-icons",
-    //     {
-    //         name: "action-pack-enhanced.settings.use-custom-icons",
-    //         hint: "action-pack-enhanced.settings.use-custom-icons-hint",
-    //         scope: "client",
-    //         config: true,
-    //         default: false,
-    //         type: Boolean,
-    //         onChange: () => updateTray()
-    //     }
-    // );
-
     game.settings.register(
         "action-pack-enhanced",
         "show-xp-info",
@@ -151,13 +125,27 @@ export function registerSettings(callbacks) {
 
     game.settings.register(
         "action-pack-enhanced",
+        "show-detailed-info",
+        {
+            name: "action-pack-enhanced.settings.show-detailed-info",
+            hint: "action-pack-enhanced.settings.show-detailed-info-hint",
+            scope: "client",
+            config: true,
+            default: true,
+            type: Boolean,
+            onChange: () => updateTray()
+        }
+    );
+
+    game.settings.register(
+        "action-pack-enhanced",
         "show-death-saves",
         {
             name: "action-pack-enhanced.settings.show-death-saves",
             hint: "action-pack-enhanced.settings.show-death-saves-hint",
             scope: "client",
             config: true,
-            default: true,
+            default: false,
             type: Boolean,
             onChange: () => updateTray()
         }

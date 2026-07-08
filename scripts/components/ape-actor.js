@@ -10,7 +10,8 @@ export class ApeActor extends LitElement {
         _xpActionsOpen: { state: false },
         _infoOpen: { state: false },
         _skillsOpen: { state: false },
-        _abilitiesOpen: { state: false }
+        _abilitiesOpen: { state: false },
+        _conditionsOpen: { state: false }
     };
 
     createRenderRoot() { return this; }
@@ -47,7 +48,7 @@ export class ApeActor extends LitElement {
                         <img class="ape-actor-ac-icon" src="/modules/action-pack-enhanced/images/ac-icon.svg">
                         <span class="ape-actor-ac-display">${ac}</span>
                     </span>
-                 </div>
+                </div>
             </div>
 
             ${this.globalData.staticInfo ? html`
@@ -58,14 +59,14 @@ export class ApeActor extends LitElement {
                         </div>
                     ` : nothing}
 
+                    ${game.settings.get("action-pack-enhanced", "show-detailed-info") ? this._renderPlayerInfo(actor) : nothing}
+
                     ${game.settings.get("action-pack-enhanced", "show-xp-info") && type === "character" ? this._renderExperience(actor) : nothing}
 
                     ${this._renderHpBar(actor, hp)}
 
-                    <div class="ape-actor-rest-buttons rest-row">
-                        <button class="btn ape-actor-rest-button" @click="${() => this.api.shortRest(actor)}"><i class="fa-solid fa-utensils"></i> Short Rest</button>
-                        <button class="btn ape-actor-rest-button" @click="${() => this.api.longRest(actor)}"><i class="fa-solid fa-campground"></i> Long Rest</button>
-                    </div>
+                    ${this._renderRestButtons(actor)}
+                    
                 </div>
             ` : html`
                 <div class="ape-accordion ${this._infoOpen ? 'is-open' : ''}">
@@ -79,14 +80,13 @@ export class ApeActor extends LitElement {
                             </div>
                         ` : nothing}
 
-                        ${game.settings.get("action-pack-enhanced", "show-xp-info") && type === "character" ? this._renderExperience(actor) : nothing}
+                        ${game.settings.get("action-pack-enhanced", "show-detailed-info") ? this._renderPlayerInfo(actor) : nothing}
+
+                        ${game.settings.get("action-pack-enhanced", "show-xp-info") ? this._renderExperience(actor) : nothing}
 
                         ${this._renderHpBar(actor, hp)}
 
-                        <div class="ape-actor-rest-buttons rest-row">
-                            <button class="btn ape-actor-rest-button" @click="${() => this.api.shortRest(actor)}"><i class="fa-solid fa-utensils"></i> Short Rest</button>
-                            <button class="btn ape-actor-rest-button" @click="${() => this.api.longRest(actor)}"><i class="fa-solid fa-campground"></i> Long Rest</button>
-                        </div>
+                        ${this._renderRestButtons(actor)}
                     </div>
                 </div>
             `}
@@ -99,6 +99,8 @@ export class ApeActor extends LitElement {
                     <span class="ape-initiative-text">${game.i18n.localize("action-pack-enhanced.roll-initiative")}</span>
                 </div>
             ` : nothing}
+
+            ${this._renderConditions(actor)}
 
             <div class="ape-accordion ${this._abilitiesOpen ? 'is-open' : ''}">
                 <h2 class="ape-accordion-header" @click="${() => this._toggleAccordion('abilities')}">
@@ -172,6 +174,85 @@ export class ApeActor extends LitElement {
         return html`<div style="display:contents" .innerHTML="${htmlString}"></div>`;
     }
 
+    _renderPlayerInfo(actor) {
+        const traits = actor.system.traits ?? {};
+        const senses = actor.system.attributes?.senses ?? {};
+
+        // Resolve a SimpleTraitField/DamageTraitField (picklist Set + free-text "custom") into display labels.
+        const resolveTrait = (traitKey, category) => {
+            const data = traits[traitKey];
+            const keyed = Array.from(data?.value ?? []).map(key => dnd5e.documents.Trait.keyLabel(key, { trait: category }));
+            const custom = dnd5e.utils.splitSemicolons(data?.custom ?? "");
+            return [...keyed, ...custom];
+        };
+
+        const senseUnits = senses.units ?? "ft";
+        const senseLabels = Object.entries(senses.ranges ?? {})
+            .filter(([, range]) => range > 0)
+            .map(([key, range]) => `${CONFIG.DND5E.senses[key] ?? key}: ${range}${senseUnits}`);
+
+        const movement = actor.system.attributes?.movement ?? {};
+        const moveUnits = movement.units ?? "ft";
+        const speedLabels = Object.entries(CONFIG.DND5E.movementTypes)
+            .filter(([key, config]) => !config.hidden && (movement[key] || key === "walk"))
+            .map(([key, config]) => {
+                const label = (key === "fly" && movement.hover)
+                    ? game.i18n.format("DND5E.MOVEMENT.HoverSpeed", { speed: config.label })
+                    : config.label;
+                return `${label}: ${movement[key] ?? 0}${moveUnits}`;
+            });
+
+        // traits.weaponProf.mastery.value holds weapon base-item keys (e.g. "handaxe"), not mastery keys.
+        // The actual mastery (e.g. "Vex") lives on the actor's own weapon item of that base type.
+        const weaponsByBaseType = new Map();
+        for (const item of actor.itemTypes.weapon) {
+            const baseItem = item.system.type?.baseItem;
+            if (baseItem && !weaponsByBaseType.has(baseItem)) weaponsByBaseType.set(baseItem, item);
+        }
+
+        const masteryLabels = Array.from(traits.weaponProf?.mastery?.value ?? [])
+            .map(key => {
+                const weaponName = dnd5e.documents.Trait.keyLabel(key, { trait: "weapon" });
+                const masteryKey = weaponsByBaseType.get(key)?.system.mastery;
+                const masteryName = masteryKey
+                    ? game.i18n.localize(CONFIG.DND5E.weaponMasteries[masteryKey]?.label ?? masteryKey)
+                    : null;
+                return masteryName ? `${weaponName}: ${masteryName}` : weaponName;
+            });
+
+        const playerinfo = [
+            { trait: "speed", icon: "fas fa-person-running", label: "Speed", values: speedLabels },
+            { trait: "dr", icon: "fas fa-shield-halved", label: "Damage Resistances", values: resolveTrait("dr", "dr") },
+            { trait: "di", icon: "fas fa-shield-alt", label: "Damage Immunities", values: resolveTrait("di", "di") },
+            { trait: "dv", icon: "fas fa-heart-crack", label: "Damage Vulnerabilities", values: resolveTrait("dv", "dv") },
+            { trait: "ci", icon: "fas fa-slash", label: "Condition Immunities", values: resolveTrait("ci", "ci") },
+            { trait: "languages", icon: "fas fa-flag", label: "Languages", values: resolveTrait("languages", "languages") },
+            { trait: "armor", icon: "fas fa-shield", label: "Armor Proficiencies", values: resolveTrait("armorProf", "armor") },
+            { trait: "weapon", icon: "fas fa-swords", label: "Weapon Proficiencies", values: resolveTrait("weaponProf", "weapon") },
+            { trait: "senses", icon: "fas fa-eye", label: "Senses", values: senseLabels },
+            { trait: "mastery", icon: "fas fa-award", label: "Weapon Masteries", values: masteryLabels }
+        ];
+
+        return html`
+            <div class="ape-actor-player-info">
+                ${playerinfo.map((info) => {
+                    if (info.values.length === 0) return nothing;
+                    return html`
+                        <div class="ape-actor-player-info-row">
+                            <span class="ape-actor-player-info-label">
+                                ${info.icon ? html`<i class="${info.icon}"></i>` : nothing}
+                                ${info.label}
+                            </span>
+                            <div class="ape-actor-player-info-values">
+                                ${info.values.map(val => html`<span class="ape-actor-player-info-value ${info.trait}">${val}</span>`)}
+                            </div>
+                        </div>
+                    `;
+                })}
+            </div>
+        `;
+    }
+
     _renderHpBar(actor, hp) {
         const percent = Math.min(100, Math.max(0, (hp.value / hp.max) * 100));
         return html`
@@ -204,6 +285,59 @@ export class ApeActor extends LitElement {
                      <span class="hp-temp-lbl">Temp</span>
                 </div>
              </div>
+        `;
+    }
+
+    _renderExhaustion(actor) {
+        const exhaustion = actor.system.attributes.exhaustion;
+        return html`
+            <p>Exhaustion Level</p>
+            <div class="ape-actor-exhaustion">
+                ${Array.from({ length: 6 }).map((_, i) => html`
+                    <span class="ape-exhaustion-dot ${i + 1 <= exhaustion ? 'filled' : ''}" title="${game.i18n.localize(`DND5E.Exhaustion${i + 1}`)}" @click="${() => this.api.updateExhaustion(actor, i + 1)}">
+                        ${i + 1}
+                    </span>
+                `)}
+            </div>
+        `;
+    }
+
+    _renderConditions(actor) {
+        const conditions = Object.entries(CONFIG.DND5E.conditionTypes)
+            .filter(([id, c]) => !c.pseudo && id !== 'exhaustion');
+
+        return html`
+            <div class="ape-accordion ${this._conditionsOpen ? 'is-open' : ''}">
+                <h2 class="ape-accordion-header" @click="${() => this._toggleAccordion('conditions')}">
+                    <i class="fas fa-caret-down"></i> Conditions
+                </h2>
+                <div class="ape-accordion-body">
+                    <div class="ape-conditions">
+                        ${conditions.map(([id, c]) => {
+                            const active = actor.statuses.has(id);
+                            const label = game.i18n.localize(c.name);
+                            return html`
+                                <span class="ape-condition-chip ${active ? 'active' : ''}"
+                                    title="${label}"
+                                    @click="${() => this.api.toggleCondition(actor, id)}">
+                                    <img class="ape-condition-icon" src="${c.img}">
+                                    <span class="ape-condition-label">${label}</span>
+                                </span>
+                            `;
+                        })}
+                    </div>
+                    ${this._renderExhaustion(actor)}
+                </div>
+            </div>
+        `;
+    }
+
+    _renderRestButtons(actor) {
+        return html`
+            <div class="ape-actor-rest-buttons rest-row">
+                <button class="btn ape-actor-rest-button" @click="${() => this.api.shortRest(actor)}"><i class="fa-solid fa-utensils"></i> Short Rest</button>
+                <button class="btn ape-actor-rest-button" @click="${() => this.api.longRest(actor)}"><i class="fa-solid fa-campground"></i> Long Rest</button>
+            </div>
         `;
     }
 
@@ -251,9 +385,9 @@ export class ApeActor extends LitElement {
                 ${columns.map(col => html`
                     <div class="flex-col">
                         <span class="ape-ability">
-                             <span class="ape-ability-label">&nbsp;</span>
-                             <span class="ape-ability-hdr">check</span>
-                             <span class="ape-ability-hdr">save</span>
+                            <span class="ape-ability-label">&nbsp;</span>
+                            <span class="ape-ability-hdr">check</span>
+                            <span class="ape-ability-hdr">save</span>
                         </span>
                         ${col.map(c => {
             const details = actor.system.abilities[c.key];
@@ -261,13 +395,13 @@ export class ApeActor extends LitElement {
                                 <span class="ape-ability">
                                     <span class="ape-ability-label">${c.key}<br>${details.value}</span>
                                     <a class="fas fa-dice-d20 ape-ability-check" 
-                                       title="${c.label} check"
-                                       @click="${(e) => this.api.rollAbilityCheck(actor, c.key, e)}">
+                                        title="${c.label} check"
+                                        @click="${(e) => this.api.rollAbilityCheck(actor, c.key, e)}">
                                         <span class="ape-ability-text">${formatNumber(details.mod)}</span>
                                     </a>
                                     <a class="fas fa-dice-d20 ape-ability-save" 
-                                       title="${c.label} saving throw"
-                                       @click="${(e) => this.api.rollSavingThrow(actor, c.key, e)}">
+                                        title="${c.label} saving throw"
+                                        @click="${(e) => this.api.rollSavingThrow(actor, c.key, e)}">
                                         <span class="ape-ability-text">${formatNumber(details.save.value)}</span>
                                     </a>
                                 </span>
@@ -290,9 +424,14 @@ export class ApeActor extends LitElement {
                 </h2>
                 <div class="ape-accordion-body ape-skills">
                     ${Object.keys(actorSkills).map(key => {
-            const skill = actorSkills[key];
-            const config = skillsObj[key];
-            if (!config) return nothing;
+                        const skill = actorSkills[key];
+                        const config = skillsObj[key];
+                        if (!config) return nothing;
+
+                        let iconClass = 'far fa-circle';
+                        if (skill.proficient === 0.5) iconClass = 'fas fa-adjust';
+                        else if (skill.proficient === 1) iconClass = 'fas fa-check';
+                        else if (skill.proficient === 2) iconClass = 'fas fa-star';
 
             let iconClass = 'far fa-circle';
             if (skill.proficient === 0.5) iconClass = 'fas fa-adjust';
@@ -301,8 +440,8 @@ export class ApeActor extends LitElement {
 
             return html`
                             <div class="ape-skill-row flexrow ${skill.proficient === 1 ? 'proficient' : skill.proficient === 2 ? 'expert' : ''}"
-                               @click="${(e) => this.api.rollSkill(actor, key, e)}"
-                               @contextmenu="${(e) => this.api.rollSkill(actor, key, e, true)}">
+                                @click="${(e) => this.api.rollSkill(actor, key, e)}"
+                                @contextmenu="${(e) => this.api.rollSkill(actor, key, e, true)}">
                                 <span class="ape-skill-icon ${iconClass}"></span>
                                 <span class="ape-skill-ability">${skill.ability}</span>
                                 <span class="ape-skill-label">${config.label}</span>
@@ -326,29 +465,29 @@ export class ApeActor extends LitElement {
                 <span class="ape-death-dot ${i < count ? 'filled' : ''}">
                     ${i < count ? html`<span class="fas ${icon}"></span>` : nothing}
                 </span>
-             `);
+            `);
         };
 
         const canRoll = deathFails < 3 && deathSaves < 3;
 
         return html`
-             <div class="ape-death-saving">
+            <div class="ape-death-saving">
                 <span class="ape-death-throws failed">
                     ${renderDots(deathFails, 'failed', 'fa-skull-crossbones')}
                 </span>
                 <span class="ape-death-icon" 
-                      style="${canRoll ? 'cursor:pointer' : 'cursor:default'}"
-                      @mousedown="${canRoll ? (e) => this.api.rollDeathSave(actor, e) : null}"></span>
+                    style="${canRoll ? 'cursor:pointer' : 'cursor:default'}"
+                    @mousedown="${canRoll ? (e) => this.api.rollDeathSave(actor, e) : null}"></span>
                 <span class="ape-death-throws saved">
                     ${renderDots(deathSaves, 'saved', 'fa-check')}
                 </span>
-             </div>
+            </div>
         `;
     }
 
     _renderSections(actor, sections) {
-        // Sections: equipped, feature, spell, inventory, passive
-        const list = ['equipped', 'feature', 'spell', 'inventory', 'passive'];
+        // Sections: equipped, feature, legendary, lair, spell, inventory, passive
+        const list = ['equipped', 'feature', 'legendary', 'lair', 'spell', 'inventory', 'passive'];
         return list.map(id => {
             const data = sections[id];
             if (!data) return nothing;

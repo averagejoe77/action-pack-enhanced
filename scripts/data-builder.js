@@ -1,4 +1,4 @@
-import { calculateUsesForItem } from "./utils.js";
+import { calculateUsesForItem, getItemActivationTypes } from "./utils.js";
 
 export class ActionPackDataBuilder {
     constructor() {
@@ -56,6 +56,8 @@ export class ActionPackDataBuilder {
                 }
             },
             feature: { items: [], title: "action-pack-enhanced.category.feature", groups: this.systemFeatureGroups() },
+            legendary: { items: [], title: "action-pack-enhanced.category.legendary" },
+            lair: { items: [], title: "action-pack-enhanced.category.lair" },
             spell: {
                 title: "action-pack-enhanced.category.spell",
                 groups: {
@@ -99,9 +101,12 @@ export class ActionPackDataBuilder {
         const spItem = spModule && spModule?.active ? getSpellPointsItem(actor) : null;
 
         const preparedSections = this.sortItems(this.removeEmptySections(sections));
-        const finalSections = spItem 
-            ? this.addSpellPointUses(preparedSections, spItem, actorData)
-            : this.addSpellLevelUses(preparedSections, actorData);
+        const finalSections = this.addLegendaryActionUses(
+            spItem
+                ? this.addSpellPointUses(preparedSections, spItem, actorData)
+                : this.addSpellLevelUses(preparedSections, actorData),
+            actorData
+        );
 
         return {
             actor: actor,
@@ -157,6 +162,16 @@ export class ActionPackDataBuilder {
     }
 
     _prepareFeat(item, itemData, uses, sections) {
+        const activationTypes = getItemActivationTypes(item);
+        if (activationTypes.has("legendary")) {
+            sections.legendary.items.push({ item, uses });
+            return;
+        }
+        if (activationTypes.has("lair")) {
+            sections.lair.items.push({ item, uses });
+            return;
+        }
+
         const type = itemData.type?.value;
         const subtype = itemData.type?.subtype;
 
@@ -317,6 +332,18 @@ export class ActionPackDataBuilder {
                 available: actorData.spells.pact.value,
                 maximum: actorData.spells.pact.max
             }
+        }
+
+        return sections;
+    }
+
+    addLegendaryActionUses(sections, actorData) {
+        const legact = actorData.resources?.legact;
+        if (sections.legendary && legact?.max) {
+            sections.legendary.uses = {
+                available: Math.max(0, legact.max - legact.spent),
+                maximum: legact.max
+            };
         }
 
         return sections;

@@ -33,6 +33,10 @@
                 --action-pack-icon: 36px;
             }
         }
+
+        .ape-condition-chip {
+            font-size: 0.55rem;
+        }
     }
 
     &.always-on {
@@ -331,6 +335,52 @@
         width: 40px;
     }
 
+    .ape-actor-player-info {
+        margin-bottom: 15px;
+    }
+
+    .ape-actor-player-info-row {
+        margin-bottom: 10px;
+    }
+
+    .ape-actor-player-info-label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.85rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #a9a9a9;
+
+        i {
+            width: 14px;
+            text-align: center;
+        }
+    }
+
+    .ape-actor-player-info-values {
+        padding: 4px 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .ape-actor-player-info-value {
+        background: #3d3d3d;
+        border-radius: 4px;
+        padding: 0 5px;
+        font-size: 0.9rem;
+
+        &.dr, &.di, &.ci {
+            background: var(--pill-background-green, #205b15);
+        }
+
+        &.dv {
+            background: var(--pill-background-red, #5b1515);
+        }
+    }
+
     .bar-group {
         margin-bottom: 15px;
         width: 100%;
@@ -470,6 +520,73 @@
         font-size: 10px;
         color: #a5b4fc;
         text-transform: uppercase;
+    }
+
+    .ape-actor-exhaustion {
+        display: flex;
+        gap: 5px;
+        justify-content: space-between;
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
+
+    .ape-exhaustion-dot {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #535353;
+        font-weight: bold;
+        cursor: pointer;
+        &:hover {
+            background-color: rgba(64, 17, 17, 0.3);
+            border-color: rgba(180, 50, 50, 0.3);
+        }
+        &.filled {
+            background-color: #fa1515;
+            border-color: #3a1616;
+            color: black;
+        }
+    }
+
+    .ape-conditions {
+        display: grid;
+        grid-template: min-content / repeat(2, 1fr);
+        gap: 5px;
+    }
+
+    .ape-condition-chip {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 8px;
+        border-radius: 12px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #a9a9a9;
+        font-size: 0.85rem;
+        cursor: pointer;
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        &.active {
+            background-color: #2f2f2f;
+            border-color: #676767;
+            color: black;
+            font-weight: bold;
+        }
+    }
+
+    .ape-condition-icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
     }
 
     .rest-row {
@@ -896,6 +1013,11 @@
 
         .legendary {
             background: rgba(255, 241, 166, 0.8);
+            color: black;
+        }
+
+        .lair {
+            background: rgba(166, 214, 255, 0.8);
             color: black;
         }
 
