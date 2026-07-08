@@ -39,7 +39,7 @@ export class ApeSection extends LitElement {
         if (changedProperties.has('forceOpen') && this.forceOpen) {
             // Only force open if not already open
             if (!this.isOpen) {
-               this.isOpen = true;
+                this.isOpen = true;
             }
         }
     }

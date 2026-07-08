@@ -267,24 +267,24 @@ export class ApeActor extends LitElement {
                                 <span class="ape-actor-hp-max">${hp.max}</span>
                             </span>
                             <input type="text" class="ape-actor-hp-input" value="${hp.value}" 
-                                   style="display:none"
-                                   @blur="${this._finishHpEdit}"
-                                   @keydown="${this._hpInputKey}"
-                                   @change="${(e) => this.api.updateHP(actor, parseInt(e.target.value))}">
+                                style="display:none"
+                                @blur="${this._finishHpEdit}"
+                                @keydown="${this._hpInputKey}"
+                                @change="${(e) => this.api.updateHP(actor, parseInt(e.target.value))}">
                         </span>
                     </div>
                     <div class="bar-track ape-actor-hp"><div class="bar-fill hp-fill" style="width: ${percent}%"></div></div>
                 </div>
                 <div class="ape-actor-temp hp-temp">
-                     <span class="ape-actor-temp-display hp-temp-val" @click="${this._toggleTempInput}">${hp.temp || 0}</span>
-                     <input type="text" class="ape-actor-temp-input hp-temp-val" value="${hp.temp || 0}" 
+                    <span class="ape-actor-temp-display hp-temp-val" @click="${this._toggleTempInput}">${hp.temp || 0}</span>
+                    <input type="text" class="ape-actor-temp-input hp-temp-val" value="${hp.temp || 0}" 
                             style="display:none; width: 100%; text-align: center; background: transparent; border: none; color: inherit; font-family: inherit;padding:0;line-height:1;height:fit-content"
                             @blur="${this._finishTempEdit}"
                             @keydown="${this._hpInputKey}"
                             @change="${(e) => this.api.updateTempHP(actor, parseInt(e.target.value))}">
-                     <span class="hp-temp-lbl">Temp</span>
+                    <span class="hp-temp-lbl">Temp</span>
                 </div>
-             </div>
+            </div>
         `;
     }
 
@@ -390,8 +390,8 @@ export class ApeActor extends LitElement {
                             <span class="ape-ability-hdr">save</span>
                         </span>
                         ${col.map(c => {
-            const details = actor.system.abilities[c.key];
-            return html`
+                            const details = actor.system.abilities[c.key];
+                            return html`
                                 <span class="ape-ability">
                                     <span class="ape-ability-label">${c.key}<br>${details.value}</span>
                                     <a class="fas fa-dice-d20 ape-ability-check" 
@@ -406,7 +406,7 @@ export class ApeActor extends LitElement {
                                     </a>
                                 </span>
                             `;
-        })}
+                        })}
                     </div>
                 `)}
             </div>
@@ -433,12 +433,7 @@ export class ApeActor extends LitElement {
                         else if (skill.proficient === 1) iconClass = 'fas fa-check';
                         else if (skill.proficient === 2) iconClass = 'fas fa-star';
 
-            let iconClass = 'far fa-circle';
-            if (skill.proficient === 0.5) iconClass = 'fas fa-adjust';
-            else if (skill.proficient === 1) iconClass = 'fas fa-check';
-            else if (skill.proficient === 2) iconClass = 'fas fa-star';
-
-            return html`
+                        return html`
                             <div class="ape-skill-row flexrow ${skill.proficient === 1 ? 'proficient' : skill.proficient === 2 ? 'expert' : ''}"
                                 @click="${(e) => this.api.rollSkill(actor, key, e)}"
                                 @contextmenu="${(e) => this.api.rollSkill(actor, key, e, true)}">
@@ -449,7 +444,7 @@ export class ApeActor extends LitElement {
                                 <span class="ape-skill-passive">(${skill.passive})</span>
                             </div>
                         `;
-        })}
+                    })}
                 </div>
             </div>
         `;

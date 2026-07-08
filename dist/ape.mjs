@@ -180,7 +180,7 @@ class Ye {
         default: !0,
         callback: async (n, o, l) => {
           const d = [];
-          return c.element.querySelectorAll('input[name="mastery"]:checked').forEach((p) => {
+          return l.element.querySelectorAll('input[name="mastery"]:checked').forEach((p) => {
             d.push(p.value);
           }), d.length > a && (ui.notifications.warn(`You selected more than ${a} masteries. Only the first ${a} will be applied.`), d.splice(a)), await e.update({ "system.traits.weaponProf.mastery.value": d }), await e.setFlag("action-pack-enhanced", "masterySelectionPending", !1), !0;
         }
@@ -494,17 +494,17 @@ function nt(i) {
     }
     e = p;
   }
-  a.length === s.length ? a.forEach((p, l) => {
-    e.classes[l].icon = p.img, e.classes[l].subclass.icon = p.subclass.img;
-  }) : a.forEach((p, l) => {
-    e.classes[l].icon = p.img, e.classes[l].subclass.name !== "" && s.forEach((u) => {
-      u.system.class === p.name && (e.classes[l].subclass.icon = u.img);
+  a.length === s.length ? a.forEach((p, c) => {
+    e.classes[c].icon = p.img, e.classes[c].subclass.icon = p.subclass.img;
+  }) : a.forEach((p, c) => {
+    e.classes[c].icon = p.img, e.classes[c].subclass.name !== "" && s.forEach((g) => {
+      g.system.class === p.name && (e.classes[c].subclass.icon = g.img);
     });
   });
   let n = `${e.race}`, o = [];
   for (let p = 0; p < e.classes.length; p++) {
-    let l = "", u = "";
-    e.classes[p].subclass.name !== "" ? (l = e.classes[p].subclass.icon, u = `${e.classes[p].subclass.name} ${e.classes[p].name} (${e.classes[p].level})`) : (l = e.classes[p].icon, u = `${e.classes[p].name} (${e.classes[p].level})`), o.push(`<img class="ape-actor-class-icon" src="${l}" title="${u}">`);
+    let c = "", g = "";
+    e.classes[p].subclass.name !== "" ? (c = e.classes[p].subclass.icon, g = `${e.classes[p].subclass.name} ${e.classes[p].name} (${e.classes[p].level})`) : (c = e.classes[p].icon, g = `${e.classes[p].name} (${e.classes[p].level})`), o.push(`<img class="ape-actor-class-icon" src="${c}" title="${g}">`);
   }
   return n + `<span class="ape-actor-class-icons">${o.join("")}</span>`;
 }
@@ -756,7 +756,7 @@ class pt {
     for (let l = 1; l <= 9; l++) {
       const d = (a = e.spell) == null ? void 0 : a.groups[`spell${l}`];
       if (d) {
-        const p = t.spells[`spell${c}`];
+        const p = t.spells[`spell${l}`];
         d.uses = { available: p.value, maximum: p.max };
       }
     }
@@ -1800,7 +1800,7 @@ class X {
       const c = this.el.content.firstChild;
       c.replaceWith(...c.childNodes);
     }
-    for (; (s = q.nextNode()) !== null && c.length < o; ) {
+    for (; (s = q.nextNode()) !== null && l.length < o; ) {
       if (s.nodeType === 1) {
         if (s.hasAttributes()) for (const c of s.getAttributeNames()) if (c.endsWith(Be)) {
           const g = p[n++], f = s.getAttribute(c).split(C), b = /([.?@])?(.*)/.exec(g);
@@ -1868,7 +1868,7 @@ class V {
     return ((e = this._$AM) == null ? void 0 : e._$AU) ?? this._$Cv;
   }
   constructor(e, t, a, s) {
-    this.type = 2, this._$AH = g, this._$AN = void 0, this._$AA = e, this._$AB = t, this._$AM = a, this.options = s, this._$Cv = (s == null ? void 0 : s.isConnected) ?? !0;
+    this.type = 2, this._$AH = h, this._$AN = void 0, this._$AA = e, this._$AB = t, this._$AM = a, this.options = s, this._$Cv = (s == null ? void 0 : s.isConnected) ?? !0;
   }
   get parentNode() {
     let e = this._$AA.parentNode;
@@ -1947,7 +1947,7 @@ class Y {
     n && !s && this.j(e);
   }
   j(e) {
-    e === g ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
+    e === h ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
   }
 }
 class Ct extends Y {
@@ -1955,7 +1955,7 @@ class Ct extends Y {
     super(...arguments), this.type = 3;
   }
   j(e) {
-    this.element[this.name] = e === g ? void 0 : e;
+    this.element[this.name] = e === h ? void 0 : e;
   }
 }
 class Et extends Y {
@@ -1963,7 +1963,7 @@ class Et extends Y {
     super(...arguments), this.type = 4;
   }
   j(e) {
-    this.element.toggleAttribute(this.name, !!e && e !== g);
+    this.element.toggleAttribute(this.name, !!e && e !== h);
   }
 }
 class Ot extends Y {
@@ -2067,7 +2067,7 @@ class Ut {
  */
 class oe extends Ut {
   constructor(e) {
-    if (super(e), this.it = g, e.type !== qt.CHILD) throw Error(this.constructor.directiveName + "() can only be used in child bindings");
+    if (super(e), this.it = h, e.type !== qt.CHILD) throw Error(this.constructor.directiveName + "() can only be used in child bindings");
   }
   render(e) {
     if (e === h || e == null) return this._t = void 0, this.it = e;
@@ -2156,7 +2156,7 @@ class Fe extends A {
                 <i class="fas fa-grip-vertical"></i>
             </div>
 
-            ${this.expanded ? h`
+            ${this.expanded ? u`
                 <div class="item-summary" style="display:block">
                     ${this._renderItemDetails()}
                     ${this.description ? u`<p>${Dt(this.description.description)}</p>` : u`<i class="fas fa-spinner fa-spin"></i>`}
@@ -2164,7 +2164,7 @@ class Fe extends A {
                         ${this._renderItemProperties(this.item)}
                     </div>
                 </div>
-            ` : g}
+            ` : h}
         `;
   }
   _onEquip(e) {
@@ -2186,20 +2186,20 @@ class Fe extends A {
     var r, n, o, l, d;
     const t = ((r = e == null ? void 0 : e.labels) == null ? void 0 : r.properties) || [], a = e.labels.hasOwnProperty("damageTypes") ? (o = (n = e == null ? void 0 : e.labels) == null ? void 0 : n.damageTypes) != null && o.includes(",") ? (l = e == null ? void 0 : e.labels) == null ? void 0 : l.damageTypes.split(",") : [(d = e == null ? void 0 : e.labels) == null ? void 0 : d.damageTypes] : [], s = [];
     if (a.length > 0) {
-      const l = a.map((u) => ({ label: u })).map((u) => u.label);
-      s.push(...l);
+      const c = a.map((g) => ({ label: g })).map((g) => g.label);
+      s.push(...c);
     }
     if (t.length > 0) {
-      const p = t.map((l) => l.label);
-      p.sort((l, u) => l.toLowerCase().localeCompare(u.toLowerCase())), s.push(...p);
+      const p = t.map((c) => c.label);
+      p.sort((c, g) => c.toLowerCase().localeCompare(g.toLowerCase())), s.push(...p);
     }
-    return s.length === 0 ? g : h`
-            ${s ? h`${s.map((p) => h`<span class="tag">${p}</span>`)} ` : g}
+    return s.length === 0 ? h : u`
+            ${s ? u`${s.map((p) => u`<span class="tag">${p}</span>`)} ` : h}
         `;
   }
   _renderWeaponMastery(e, t, a) {
     var s;
-    return (s = game.modules.get("wm5e")) != null && s.active && e ? h`<div class="mastery ${t ? "active" : "inactive"} flag">${a}</div>` : g;
+    return (s = game.modules.get("wm5e")) != null && s.active && e ? u`<div class="mastery ${t ? "active" : "inactive"} flag">${a}</div>` : h;
   }
   _getItemSource(e, t) {
     var r, n;
@@ -2258,46 +2258,46 @@ class Xe extends A {
     s.uuid && this.api.setWeaponSetItem(this.actor, t, a, s.uuid, s.rarity);
   }
   _renderWeaponSets() {
-    return this.weaponSets ? h`
+    return this.weaponSets ? u`
             <div class="ape-weapon-sets">
-                ${this.weaponSets.map((e) => h`
+                ${this.weaponSets.map((e) => u`
                     <div class="ape-weapon-set ${e.active ? "active" : ""}" @click="${() => this.api.equipWeaponSet(this.actor, e.index)}">
                         <div class="ape-weapon-slot ${e.main ? "filled " + e.main.rarity : "empty"}" 
                                 @drop="${(t) => this._onDrop(t, e.index, "main")}" 
                                 @dragover="${(t) => t.preventDefault()}"
                                 @contextmenu="${(t) => this.api.clearWeaponSetItem(this.actor, e.index, "main")}">
-                            ${e.main ? h`<img src="${e.main.img}" title="${e.main.name}">` : h`<i class="fas fa-sword"></i>`}
+                            ${e.main ? u`<img src="${e.main.img}" title="${e.main.name}">` : u`<i class="fas fa-sword"></i>`}
                         </div>
                         <div class="ape-weapon-slot ${e.off ? "filled " + e.off.rarity : "empty"}" 
                                 @drop="${(t) => this._onDrop(t, e.index, "off")}" 
                                 @dragover="${(t) => t.preventDefault()}"
                                 @contextmenu="${(t) => this.api.clearWeaponSetItem(this.actor, e.index, "off")}">
-                            ${e.off ? h`<img src="${e.off.img}" title="${e.off.name}" style="height: 100%; width: auto;">` : h`<i class="fas fa-shield"></i>`}
+                            ${e.off ? u`<img src="${e.off.img}" title="${e.off.name}" style="height: 100%; width: auto;">` : u`<i class="fas fa-shield"></i>`}
                         </div>
                     </div>
                 `)}
             </div>
-        ` : g;
+        ` : h;
   }
   _getReversedPercent(e, t) {
     return Math.floor((t - e) / t * 100);
   }
   render() {
-    return h`
-            ${this.title ? h`
+    return u`
+            ${this.title ? u`
                 <h2 @click="${this._toggleOpen}">
                     <span><i class="fas fa-caret-down"></i> ${game.i18n.localize(this.title)}</span>
                 </h2>
-            ` : g}
+            ` : h}
 
-            ${this.uses ? h`<div class="section-uses" style="--percent: ${this._getReversedPercent(this.uses.available, this.uses.maximum)}%; --spellPointsTextColor: ${game.settings.get("action-pack-enhanced", "spellPointsTextColor")}; --spellPointsBarColorStart: ${game.settings.get("action-pack-enhanced", "spellPointsBarColorStart")}; --spellPointsBarColorEnd: ${game.settings.get("action-pack-enhanced", "spellPointsBarColorEnd")}">
+            ${this.uses ? u`<div class="section-uses" style="--percent: ${this._getReversedPercent(this.uses.available, this.uses.maximum)}%; --spellPointsTextColor: ${game.settings.get("action-pack-enhanced", "spellPointsTextColor")}; --spellPointsBarColorStart: ${game.settings.get("action-pack-enhanced", "spellPointsBarColorStart")}; --spellPointsBarColorEnd: ${game.settings.get("action-pack-enhanced", "spellPointsBarColorEnd")}">
                 <div class="section-uses-text">${this.uses.available} / ${this.uses.maximum}</div>
                 <div class="section-uses-bar"></div>
-            </div>` : g}
+            </div>` : h}
 
             ${this._renderWeaponSets()}
 
-            ${this.items && this.items.length > 0 ? h`
+            ${this.items && this.items.length > 0 ? u`
                 <div class="ape-items">
                     ${this.items.map((e) => {
       var t, a, s, r, n;
@@ -2313,9 +2313,9 @@ class Xe extends A {
                     `;
     })}
                 </div>
-            ` : g}
+            ` : h}
 
-            ${this.groups ? Object.entries(this.groups).map(([e, t]) => h`
+            ${this.groups ? Object.entries(this.groups).map(([e, t]) => u`
                 <ape-group 
                     class="ape-group"
                     .group="${t}" 
@@ -2325,7 +2325,7 @@ class Xe extends A {
                     .showSpellDots="${this.showSpellDots}"
                     .showSpellUses="${this.showSpellUses}">
                 </ape-group>
-            `) : g}
+            `) : h}
         `;
   }
 }
@@ -2370,33 +2370,33 @@ class Ge extends A {
     const l = n && this.showSpellDots, d = t && this.showSpellUses, p = o && this.showCost, c = [
       "flexrow",
       "ape-group-header",
-      c ? "has-dots" : "",
+      l ? "has-dots" : "",
       d ? "has-uses" : "",
       p ? "has-cost" : ""
     ].filter(Boolean).join(" ");
-    return h`
-            <div class="${l}" @click="${this._toggleOpen}">
+    return u`
+            <div class="${c}" @click="${this._toggleOpen}">
                 <h3>
                     <i class="fas fa-caret-down"></i> ${game.i18n.localize(a)}
                 </h3>
-                ${c ? this._renderDots(t) : g}
-                ${d ? h`<div class="group-uses">${t.available}/${t.maximum}</div>` : g}
-                ${p ? h`<div class="group-cost">Cost: ${s} SP</div>` : g}
+                ${l ? this._renderDots(t) : h}
+                ${d ? u`<div class="group-uses">${t.available}/${t.maximum}</div>` : h}
+                ${p ? u`<div class="group-cost">Cost: ${s} SP</div>` : h}
             </div>
 
             ${r ? u`
                 <div class="ape-items">
-                    ${e.map((u) => h`
-                        <ape-item class="ape-item item" data-item-uuid="${u.item.uuid}" .item="${u.item}" .uses="${u.uses}" .api="${this.api}"></ape-item>
+                    ${e.map((g) => u`
+                        <ape-item class="ape-item item" data-item-uuid="${g.item.uuid}" .item="${g.item}" .uses="${g.uses}" .api="${this.api}"></ape-item>
                     `)}
                 </div>
-            ` : g}
+            ` : h}
         `;
   }
   _renderDots(e) {
-    return h`
+    return u`
             <div class="group-dots" data-group-name="${this.groupName}">
-                ${Array.from({ length: e.maximum }).map((t, a) => h`
+                ${Array.from({ length: e.maximum }).map((t, a) => u`
                     <div class="dot ${a < e.available ? "" : "empty"}" 
                         data-slot="${a}"
                         @click="${(s) => {
@@ -2450,13 +2450,13 @@ class Ve extends A {
                 </div>
             </div>
 
-            ${this.globalData.staticInfo ? h`
+            ${this.globalData.staticInfo ? u`
                 <div class="ape-static-info">
-                    ${o === "character" ? h`
+                    ${o === "character" ? u`
                         <div class="ape-actor-race-class">
                             ${this._renderRaceClass(e)}
                         </div>
-                    ` : g}
+                    ` : h}
 
                     ${game.settings.get("action-pack-enhanced", "show-detailed-info") ? this._renderPlayerInfo(e) : h}
 
@@ -2467,17 +2467,17 @@ class Ve extends A {
                     ${this._renderRestButtons(e)}
                     
                 </div>
-            ` : h`
+            ` : u`
                 <div class="ape-accordion ${this._infoOpen ? "is-open" : ""}">
                     <h2 class="ape-accordion-header" @click="${() => this._toggleAccordion("info")}">
                         <i class="fas fa-caret-down"></i> XP/HP/Rest
                     </h2>
                     <div class="ape-accordion-body">
-                        ${o === "character" ? h`
+                        ${o === "character" ? u`
                             <div class="ape-actor-race-class">
                                 ${this._renderRaceClass(e)}
                             </div>
-                        ` : g}
+                        ` : h}
 
                         ${game.settings.get("action-pack-enhanced", "show-detailed-info") ? this._renderPlayerInfo(e) : h}
 
@@ -2490,14 +2490,14 @@ class Ve extends A {
                 </div>
             `}
 
-            ${c && !game.settings.get("action-pack-enhanced", "show-death-saves") ? this._renderDeathSaves(e) : g}
+            ${l && !game.settings.get("action-pack-enhanced", "show-death-saves") ? this._renderDeathSaves(e) : h}
 
-            ${s ? h`
+            ${s ? u`
                 <div class="ape-initiative" @click="${() => this.api.rollInitiative(e)}">
                     <i class="fas fa-swords ape-initiative-icon"></i>
                     <span class="ape-initiative-text">${game.i18n.localize("action-pack-enhanced.roll-initiative")}</span>
                 </div>
-            ` : g}
+            ` : h}
 
             ${this._renderConditions(e)}
 
@@ -2606,7 +2606,7 @@ class Ve extends A {
   }
   _renderHpBar(e, t) {
     const a = Math.min(100, Math.max(0, t.value / t.max * 100));
-    return h`
+    return u`
             <div class="ape-actor-hp-wrapper hp-container">
                 <div class="hp-main">
                     <div class="bar-label">
@@ -2618,24 +2618,24 @@ class Ve extends A {
                                 <span class="ape-actor-hp-max">${t.max}</span>
                             </span>
                             <input type="text" class="ape-actor-hp-input" value="${t.value}" 
-                                   style="display:none"
-                                   @blur="${this._finishHpEdit}"
-                                   @keydown="${this._hpInputKey}"
-                                   @change="${(s) => this.api.updateHP(e, parseInt(s.target.value))}">
+                                style="display:none"
+                                @blur="${this._finishHpEdit}"
+                                @keydown="${this._hpInputKey}"
+                                @change="${(s) => this.api.updateHP(e, parseInt(s.target.value))}">
                         </span>
                     </div>
                     <div class="bar-track ape-actor-hp"><div class="bar-fill hp-fill" style="width: ${a}%"></div></div>
                 </div>
                 <div class="ape-actor-temp hp-temp">
-                     <span class="ape-actor-temp-display hp-temp-val" @click="${this._toggleTempInput}">${t.temp || 0}</span>
-                     <input type="text" class="ape-actor-temp-input hp-temp-val" value="${t.temp || 0}" 
+                    <span class="ape-actor-temp-display hp-temp-val" @click="${this._toggleTempInput}">${t.temp || 0}</span>
+                    <input type="text" class="ape-actor-temp-input hp-temp-val" value="${t.temp || 0}" 
                             style="display:none; width: 100%; text-align: center; background: transparent; border: none; color: inherit; font-family: inherit;padding:0;line-height:1;height:fit-content"
                             @blur="${this._finishTempEdit}"
                             @keydown="${this._hpInputKey}"
                             @change="${(s) => this.api.updateTempHP(e, parseInt(s.target.value))}">
-                     <span class="hp-temp-lbl">Temp</span>
+                    <span class="hp-temp-lbl">Temp</span>
                 </div>
-             </div>
+            </div>
         `;
   }
   _renderExhaustion(e) {
@@ -2706,9 +2706,9 @@ class Ve extends A {
   }
   _renderAbilities(e) {
     const t = this.globalData.abilityColumns;
-    return h`
+    return u`
             <div class="ape-abilities">
-                ${t.map((a) => h`
+                ${t.map((a) => u`
                     <div class="flex-col">
                         <span class="ape-ability">
                             <span class="ape-ability-label">&nbsp;</span>
@@ -2740,7 +2740,7 @@ class Ve extends A {
   }
   _renderSkills(e) {
     const t = this.actorData.skills, a = e.system.skills;
-    return h`
+    return u`
             <div class="ape-accordion ape-skill-container ${this._skillsOpen ? "is-open" : ""}">
                 <h2 class="ape-accordion-header ape-skill-header" @click="${() => this._toggleAccordion("skills")}">
                     <i class="fas fa-caret-down"></i> Skills
@@ -2805,7 +2805,7 @@ class Ve extends A {
                     .showWeaponMastery="${this.globalData.showWeaponMastery}"
                     .forceOpen="${r.forceOpen}">
                 </ape-section>
-            ` : g;
+            ` : h;
     });
   }
 }
@@ -2842,20 +2842,20 @@ class Ke extends A {
     }
   }
   render() {
-    if (!this.data) return g;
+    if (!this.data) return h;
     const { actors: e } = this.data, t = !e || e.length === 0;
-    return h`
+    return u`
             <div class="${[
       "ape-wrapper"
     ].join(" ")}" @scroll="${this._onScroll}">
                 ${this._renderHeader()}
 
                 <div class="ape-actors">
-                    ${t ? h`
+                    ${t ? u`
                         <div class="ape-empty-tray">
                             <i class="fas fa-dice-d20"></i>
                         </div>
-                    ` : e.map((s) => h`
+                    ` : e.map((s) => u`
                         <ape-actor 
                             class="ape-actor"
                             .actorData="${s}"
@@ -2872,7 +2872,7 @@ class Ke extends A {
         `;
   }
   _renderHeader() {
-    return g;
+    return h;
   }
 }
 R(Ke, "properties", {
@@ -3029,12 +3029,12 @@ async function O() {
     (g.startsWith("tray-") || g.startsWith("icon-")) && c.classList.remove(g);
   }), c.classList.add(a), c.classList.add(s), c && (c.data = {
     actors: e
-  }, l.globalData = {
+  }, c.globalData = {
     abilityColumns: p,
     showSpellDots: r,
     showSpellUses: n,
     showWeaponMastery: o,
-    staticInfo: c
+    staticInfo: l
   });
 }
 Hooks.on("dnd5e.getItemContextOptions", (i, e) => {
