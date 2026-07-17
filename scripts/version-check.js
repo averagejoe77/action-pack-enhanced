@@ -1,5 +1,12 @@
 const MODULE_ID = "action-pack-enhanced";
-const CHANGELOG_URL = "https://raw.githubusercontent.com/averagejoe77/action-pack-enhanced/main/CHANGELOG.md";
+// raw.githubusercontent.com sends Access-Control-Allow-Origin: *, so it's fetchable from
+// the browser. github.com/.../releases/latest/download/... is NOT - that redirect (302)
+// carries no CORS header, so the browser blocks reading it even though the request
+// itself succeeds. main's module.json version is kept in sync with releases by this
+// repo's version-bump workflow, so it's a reliable stand-in for "latest published version".
+const REPO_RAW_BASE = "https://raw.githubusercontent.com/averagejoe77/action-pack-enhanced/main";
+const MANIFEST_URL = `${REPO_RAW_BASE}/module.json`;
+const CHANGELOG_URL = `${REPO_RAW_BASE}/CHANGELOG.md`;
 const FETCH_TIMEOUT_MS = 5000;
 
 class VersionCheck {
@@ -23,10 +30,10 @@ class VersionCheck {
 
         const module = game.modules.get(MODULE_ID);
         this.installedVersion = module?.version ?? null;
-        if (!this.installedVersion || !module?.manifest) return;
+        if (!this.installedVersion) return;
 
         try {
-            const manifestRes = await fetch(module.manifest, { cache: "no-store", signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+            const manifestRes = await fetch(MANIFEST_URL, { cache: "no-store", signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
             if (!manifestRes.ok) return;
             const manifest = await manifestRes.json();
             this.latestVersion = manifest.version ?? null;
