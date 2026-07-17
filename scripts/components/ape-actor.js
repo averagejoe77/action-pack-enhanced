@@ -489,8 +489,9 @@ export class ApeActor extends LitElement {
             return html`
                 <ape-section 
                     class="ape-category"
-                    .title="${data.title}" 
+                    .title="${data.title}"
                     .uses="${data.uses}"
+                    .prepared="${data.prepared}"
                     .items="${data.items}"
                     .weaponSets="${data.weaponSets}"
                     .groups="${data.groups}"
@@ -500,6 +501,7 @@ export class ApeActor extends LitElement {
                     .showSpellDots="${this.globalData.showSpellDots}"
                     .showSpellUses="${this.globalData.showSpellUses}"
                     .showWeaponMastery="${this.globalData.showWeaponMastery}"
+                    .canManage="${this.globalData.canManage}"
                     .forceOpen="${data.forceOpen}">
                 </ape-section>
             `;

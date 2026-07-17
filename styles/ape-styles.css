@@ -97,6 +97,119 @@
             gap: 10px;
         }
 
+        .ape-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .ape-premium-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+
+            &.connected .ape-premium-tier {
+                color: #f1c40f;
+            }
+
+            .ape-premium-action {
+                cursor: pointer;
+                text-decoration: underline;
+
+                &:hover {
+                    color: #ffffff;
+                }
+            }
+
+            .ape-premium-connect {
+                text-decoration: none;
+                background: rgba(255, 255, 255, 0.15);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 4px;
+                padding: 2px 8px;
+            }
+        }
+
+        .ape-version-badge {
+            position: relative;
+            font-size: 0.8rem;
+            font-family: monospace;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: default;
+
+            &.up-to-date {
+                color: #2ecc71;
+            }
+
+            &.has-update {
+                color: #f1c40f;
+                cursor: help;
+            }
+
+            .ape-version-tooltip {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                z-index: 10;
+                margin-top: 4px;
+                width: 260px;
+                max-height: 300px;
+                overflow-y: auto;
+                background: #1a1a1a;
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 6px;
+                padding: 8px 10px;
+                font-family: inherit;
+                font-size: 0.8rem;
+                line-height: 1.4;
+                color: rgba(255, 255, 255, 0.9);
+                white-space: normal;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            }
+
+            &:hover .ape-version-tooltip {
+                display: block;
+            }
+
+            .ape-version-tooltip-header {
+                font-weight: bold;
+                color: #f1c40f;
+                margin-bottom: 6px;
+            }
+
+            .ape-version-entry {
+                & + .ape-version-entry {
+                    margin-top: 8px;
+                    padding-top: 8px;
+                    border-top: 1px solid rgba(255, 255, 255, 0.15);
+                }
+            }
+
+            .ape-version-entry-title {
+                font-weight: bold;
+            }
+
+            .ape-version-entry-date {
+                font-weight: normal;
+                color: rgba(255, 255, 255, 0.5);
+            }
+
+            ul {
+                margin: 4px 0 0;
+                padding-left: 16px;
+
+                li {
+                    margin-bottom: 2px;
+                }
+            }
+        }
+
         h2 {
             background-color: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -107,8 +220,10 @@
             font-family: "Modesto Condensed", "Palatino Linotype", serif;
             font-size: 1.5rem;
             cursor: pointer;
+            display: flex;
+            align-items: center;
 
-            i {
+            .ape-section-arrow > i {
                 display: inline-block;
                 margin-right: 2px;
                 text-align: center;
@@ -790,6 +905,28 @@
         text-align: center;
     }
 
+    .section-prepared {
+        background: rgba(255, 255, 255, 0.8);
+        color: black;
+        font-family: initial;
+        font-size: 0.8rem;
+        font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 5px;
+        margin-left: 6px;
+    }
+
+    .ape-add-item {
+        cursor: pointer;
+        color: rgba(255, 255, 255, 0.6);
+        margin-left: auto;
+        padding: 0 5px;
+
+        &:hover {
+            color: rgba(255, 255, 255, 1);
+        }
+    }
+
     .ape-group-header {
         cursor: pointer;
         display: flex;
@@ -865,6 +1002,7 @@
             align-items: center;
             flex: 1;
             padding-right: 5px;
+            gap: 0 3px;
 
             h4 {
                 color: #ffffff;
@@ -1003,6 +1141,60 @@
 
         .item-recharge {
             white-space: nowrap;
+        }
+
+        .item-ammo {
+            font-size: 0.85rem;
+            font-weight: normal;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .item-qty {
+            flex: 0 0 auto;
+            padding: 0 5px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+
+            .item-qty-display {
+                cursor: pointer;
+            }
+
+            .item-qty-input {
+                width: 3em;
+                text-align: center;
+                background: transparent;
+                border: 1px solid rgba(255, 255, 255, 0.5);
+                color: inherit;
+                font-family: inherit;
+                padding: 0;
+                line-height: 1.4;
+            }
+        }
+
+        .prepared-toggle,
+        .delete-item {
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.6);
+            background: none;
+
+            &:hover {
+                color: rgba(255, 255, 255, 1);
+            }
+        }
+
+        .prepared-toggle {
+            &.prepared {
+                color: rgba(47, 233, 47, 0.8);
+                background: none;
+            }
+            &.unprepared {
+                color: rgba(100, 100, 100, 0.8);
+                background: none;
+            }
+        }
+
+        .delete-item:hover {
+            color: rgba(233, 47, 47, 0.9);
         }
 
         .bonus,

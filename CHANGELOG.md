@@ -2,6 +2,21 @@
 
 All notable changes to Action Pack Enhanced are documented in this file.
 
+## [1.4.0] - 2026-07-16
+- Added ammo display next to the weapon name for weapons that use ammo (Bows, Crossbows, etc)
+- Added prepared spell count to the Spell section header for classes that have prepared spells; it won't stop you from preparing every spell you have though... maybe on the next update
+- Added version number display for DMs with a color coded status indicator in the top left hand corner 
+  - Green - you are on the latest version
+  - Yellow - There is an update - hover over the version number to get the changelog details (hopefully this works, as I will not know if this is working correctly until I push this update 🤞)
+- I have added patreon support to the module as well as a patreon only feature
+  - You can now add/remove and increment/decrement items to/in your inventory directly from APE
+  - You can now add/remove/prepare/unprepare spells directly from APE
+  - Subscribing to patreon as the DM will unlock the feature for all players 
+  - This was a decision I had to make in order to continue to develop this module and I appreciate everyone who has used and is using it and the feedback I have gotten on it
+  - **Let me be clear - you do not need this feature to use this module**
+  - **This module is a free module and will remain a free module that you are freely able to use**
+
+
 ## [1.3.0] - 2026-07-08
 - Added more detailed info for actors
   - Speed

@@ -1,6 +1,9 @@
 import { ActionPackDataBuilder } from "./data-builder.js";
 import { ActionPackAPI } from "./api.js";
 import { registerSettings } from "./settings.js";
+import { premiumGate } from "./premium/premium-gate.js";
+import { PREMIUM_CONFIG } from "./premium/premium-config.js";
+import { versionCheck } from "./version-check.js";
 import "./components/ape-app.js";
 
 let lastKnownActiveActor;
@@ -56,7 +59,7 @@ function updateCombatStatus() {
     }
 }
 
-Hooks.on("ready", () => {
+Hooks.on("ready", async () => {
     // Mount the Lit App
     // Check if already exists to avoid duplicate on reloads if not full reload
     if (!document.querySelector('#ape-app')) {
@@ -71,8 +74,8 @@ Hooks.on("ready", () => {
         const interfaceElement = document.getElementById('interface');
         if(interfaceElement) {
             document.body.insertBefore(app, interfaceElement);
-        }   
-        
+        }
+
         // Initialize API
         api = new ActionPackAPI();
         app.api = api;
@@ -85,7 +88,20 @@ Hooks.on("ready", () => {
         $('#ape-app').addClass("is-open always-on");
     }
 
+    // Populate cached entitlements before the first render if the GM is already
+    // connected. Only a GM's connection matters - refresh() no-ops for players anyway,
+    // but skipping the call for them avoids a pointless isAuthenticated() check.
+    if (game.user.isGM && premiumGate.isAuthenticated()) {
+        await premiumGate.refresh();
+    }
+
     updateTrayState();
+
+    // Fire-and-forget: don't delay the initial render on a network round-trip. The
+    // version badge just picks up the result on the next tray update once it resolves.
+    if (game.user.isGM) {
+        versionCheck.check().then(() => updateTray());
+    }
 });
 
 function isTrayAutoHide() {
@@ -165,6 +181,13 @@ Hooks.on("deleteItem", (item) => {
 
 Hooks.on("createItem", (item) => {
     checkItemUpdate(item);
+});
+
+Hooks.on("updateSetting", (setting) => {
+    if (setting.key === "action-pack-enhanced.patreon-auth-data"
+        || setting.key === "action-pack-enhanced.patreon-gm-entitlement") {
+        updateTray();
+    }
 });
 
 Hooks.on("updateCombat", (combat) => {
@@ -267,6 +290,16 @@ async function updateTray() {
         allAbilities.slice(3, 6).map(([key, config]) => ({ key, label: config.label }))
     ];
 
+    // Resolved before touching app.data/app.globalData - if this throws for any reason,
+    // we fall back to locked rather than leaving app.data set with app.globalData still
+    // undefined (ape-app would then render <ape-actor> children with no globalData at all).
+    let canManage = false;
+    try {
+        canManage = premiumGate.can(PREMIUM_CONFIG.featureId);
+    } catch (e) {
+        console.error("action-pack-enhanced | premiumGate.can() failed, defaulting to locked", e);
+    }
+
     const app = document.querySelector('#ape-app');
     // remove all the tray-* and icon-* classes
     Array.from(app.classList).forEach(c => {
@@ -283,7 +316,8 @@ async function updateTray() {
             showSpellDots,
             showSpellUses,
             showWeaponMastery,
-            staticInfo
+            staticInfo,
+            canManage
         };
         // API is already set on init
     }

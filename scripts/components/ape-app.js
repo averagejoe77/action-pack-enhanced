@@ -1,5 +1,8 @@
 import { LitElement, html, nothing } from 'lit';
 import './ape-actor.js';
+import './ape-premium-badge.js';
+import './ape-version-badge.js';
+import { versionCheck } from '../version-check.js';
 
 export class ApeApp extends LitElement {
     static properties = {
@@ -39,8 +42,8 @@ export class ApeApp extends LitElement {
     }
 
     render() {
-        if (!this.data) return nothing;
-        
+        if (!this.data || !this.globalData) return nothing;
+
         const { actors } = this.data;
 
         const isEmpty = !actors || actors.length === 0;
@@ -77,7 +80,20 @@ export class ApeApp extends LitElement {
     }
     
     _renderHeader() {
-        return nothing; // Header logic was just H1 in render.js? No, render.js container had children.
+        return html`
+            <div class="ape-header-bar">
+                <ape-version-badge
+                    .installedVersion="${versionCheck.installedVersion}"
+                    .hasUpdate="${versionCheck.hasUpdate}"
+                    .latestVersion="${versionCheck.latestVersion}"
+                    .changelogEntries="${versionCheck.changelogEntries}">
+                </ape-version-badge>
+                <ape-premium-badge
+                    .authData="${game.settings.get("action-pack-enhanced", "patreon-auth-data")}"
+                    .tableEntitlement="${game.settings.get("action-pack-enhanced", "patreon-gm-entitlement")}">
+                </ape-premium-badge>
+            </div>
+        `;
     }
 }
 customElements.define('ape-app', ApeApp);

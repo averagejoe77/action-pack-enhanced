@@ -5,6 +5,7 @@ export class ApeSection extends LitElement {
     static properties = {
         title: { type: String },
         uses: { type: Object },
+        prepared: { type: Object }, // { value, max } - prepared spell count/limit (spell section only)
         items: { type: Array }, // Array of {item, uses} objects
         weaponSets: { type: Array }, // Array of Weapon Sets
         groups: { type: Object }, // Object of groups
@@ -16,7 +17,8 @@ export class ApeSection extends LitElement {
         actor: { type: Object },
         masteries: { type: Object },
         forceOpen: { type: Boolean },
-        showWeaponMastery: { type: Boolean }
+        showWeaponMastery: { type: Boolean },
+        canManage: { type: Boolean }
     };
 
     _openJournal(uuid) {
@@ -47,6 +49,11 @@ export class ApeSection extends LitElement {
     _toggleOpen(e) {
         e.stopPropagation();
         this.isOpen = !this.isOpen;
+    }
+
+    _onAddItem(e) {
+        e.stopPropagation();
+        this.api.addItemFromCompendium(this.actor, this.sectionId === 'spell' ? 'spell' : 'inventory');
     }
 
     _onDrop(e, setIndex, slot) {
@@ -86,10 +93,19 @@ export class ApeSection extends LitElement {
     }
 
     render() {
+        const canAdd = this.canManage && (this.sectionId === 'inventory' || this.sectionId === 'spell');
         return html`
             ${this.title ? html`
                 <h2 @click="${this._toggleOpen}">
-                    <span><i class="fas fa-caret-down"></i> ${game.i18n.localize(this.title)}</span>
+                    <span class="ape-section-arrow"><i class="fas fa-caret-down"></i> ${game.i18n.localize(this.title)}</span>
+                    ${this.prepared ? html`
+                        <span class="section-prepared" title="${game.i18n.localize("action-pack-enhanced.manage.prepared-count-title")}">${this.prepared.value}/${this.prepared.max} prepared</span>
+                    ` : nothing}
+                    ${canAdd ? html`
+                        <span class="ape-add-item" title="${game.i18n.localize(this.sectionId === 'spell' ? "action-pack-enhanced.manage.add-spell-title" : "action-pack-enhanced.manage.add-item-title")}" @click="${this._onAddItem}">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                    ` : nothing}
                 </h2>
             ` : nothing}
 
@@ -103,27 +119,29 @@ export class ApeSection extends LitElement {
             ${this.items && this.items.length > 0 ? html`
                 <div class="ape-items">
                     ${this.items.map(entry => html`
-                        <ape-item class="ape-item item" 
-                            data-item-uuid="${entry.item.uuid}" 
-                            .item="${entry.item}" 
-                            .uses="${entry.uses}" 
+                        <ape-item class="ape-item item"
+                            data-item-uuid="${entry.item.uuid}"
+                            .item="${entry.item}"
+                            .uses="${entry.uses}"
                             .api="${this.api}"
                             .masteryIds="${this.actor?.system?.traits?.weaponProf?.mastery?.value}"
-                            .showWeaponMastery="${this.showWeaponMastery}">
+                            .showWeaponMastery="${this.showWeaponMastery}"
+                            .canManage="${this.canManage}">
                         </ape-item>
                     `)}
                 </div>
             ` : nothing}
 
             ${this.groups ? Object.entries(this.groups).map(([groupName, group]) => html`
-                <ape-group 
+                <ape-group
                     class="ape-group"
-                    .group="${group}" 
-                    .groupName="${groupName}" 
+                    .group="${group}"
+                    .groupName="${groupName}"
                     .api="${this.api}"
                     .actor="${this.actor}"
                     .showSpellDots="${this.showSpellDots}"
-                    .showSpellUses="${this.showSpellUses}">
+                    .showSpellUses="${this.showSpellUses}"
+                    .canManage="${this.canManage}">
                 </ape-group>
             `) : nothing}
         `;
@@ -141,7 +159,8 @@ export class ApeGroup extends LitElement {
         showSpellUses: { type: Boolean },
         showCost: { type: Boolean },
         isOpen: { type: Boolean, state: true },
-        forceOpen: { type: Boolean }
+        forceOpen: { type: Boolean },
+        canManage: { type: Boolean }
     };
     
     constructor() {
@@ -200,7 +219,7 @@ export class ApeGroup extends LitElement {
             ${hasItems ? html`
                 <div class="ape-items">
                     ${items.map(entry => html`
-                        <ape-item class="ape-item item" data-item-uuid="${entry.item.uuid}" .item="${entry.item}" .uses="${entry.uses}" .api="${this.api}"></ape-item>
+                        <ape-item class="ape-item item" data-item-uuid="${entry.item.uuid}" .item="${entry.item}" .uses="${entry.uses}" .api="${this.api}" .canManage="${this.canManage}"></ape-item>
                     `)}
                 </div>
             ` : nothing}

@@ -148,11 +148,46 @@
         },
         "warning": {
             "quantity-limit": "Not enough quantity to equip in both slots.",
-            "two-handed": "You cannot have two two-handed weapons in the same set."
+            "two-handed": "You cannot have two two-handed weapons in the same set.",
+            "item-not-found": "Could not find the selected item.",
+            "premium-locked": "Managing spells and inventory requires an active Patreon subscription."
         },
         "item-context": {
             "show": "Show in APE display",
             "hide": "Hide in APE display"
+        },
+        "dialog": {
+            "delete-item-title": "Delete Item",
+            "delete-item-content": "Are you sure you want to delete <strong>{name}</strong>? This cannot be undone.",
+            "delete": "Delete",
+            "cancel": "Cancel"
+        },
+        "manage": {
+            "add-item-title": "Add item from compendium",
+            "add-spell-title": "Add spell from compendium",
+            "quantity-title": "Quantity",
+            "prepared-title": "Prepared",
+            "unprepared-toggle-title": "Not prepared (click to prepare)",
+            "delete-item-title": "Delete item",
+            "prepared-count-title": "Prepared spells / maximum you can prepare"
+        },
+        "premium": {
+            "connect": "Connect Patreon",
+            "connect-title": "Connect Patreon",
+            "connect-intro": "Click \"Start Authentication\" to connect your Patreon account. A browser tab will open for you to log in.",
+            "start-auth": "Start Authentication",
+            "waiting": "Waiting for authentication in your browser...",
+            "waiting-attempt": "Waiting for authentication in your browser... ({attempt}/{max})",
+            "connected": "Connected as a {tier} supporter!",
+            "auth-failed": "Authentication timed out or failed. Please try again.",
+            "disconnect": "Disconnect",
+            "disconnect-title": "Disconnect Patreon",
+            "disconnect-content": "Disconnect your Patreon account? Spell and inventory management will be locked again.",
+            "supporter-tier": "{tier} supporter",
+            "table-unlocked": "Spell/inventory management unlocked by GM"
+        },
+        "version": {
+            "update-available": "Update available: v{version}"
         }
     }
 }

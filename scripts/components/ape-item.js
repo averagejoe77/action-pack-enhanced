@@ -7,13 +7,17 @@ const speciesTraits = [
 ];
 export class ApeItem extends LitElement {
     static properties = {
-        item: { type: Object },
+        // Foundry mutates Item documents in place, so the reference passed down never
+        // changes even when system.prepared/quantity/etc. do. Force a re-render on every
+        // reassignment instead of relying on Lit's default reference-equality check.
+        item: { type: Object, hasChanged: () => true },
         uses: { type: Object },
         api: { type: Object },
         masteryIds: { type: Array },
         expanded: { type: Boolean, state: true },
         description: { type: Object, state: true },
-        showWeaponMastery: { type: Boolean }
+        showWeaponMastery: { type: Boolean },
+        canManage: { type: Boolean }
     };
 
     // Use Light DOM to inherit global styles
@@ -49,6 +53,39 @@ export class ApeItem extends LitElement {
         }
     }
 
+    _toggleQtyInput(e) {
+        e.stopPropagation();
+        const display = e.currentTarget;
+        const input = display.nextElementSibling;
+        display.style.display = 'none';
+        input.style.display = 'inline-block';
+        input.focus();
+        input.select();
+    }
+
+    _finishQtyEdit(e) {
+        const input = e.currentTarget;
+        const display = input.previousElementSibling;
+        input.style.display = 'none';
+        display.style.display = '';
+    }
+
+    _qtyInputKey(e) {
+        if (e.key === 'Enter') e.currentTarget.blur();
+    }
+
+    _onTogglePrepared(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.api.toggleSpellPrepared(this.item);
+    }
+
+    _onDelete(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.api.deleteItem(this.item);
+    }
+
     render() {
         if (!this.item) return nothing;
         const sys = this.item.system;
@@ -70,6 +107,15 @@ export class ApeItem extends LitElement {
         const isCharged = !this.item.isOnCooldown;
         const isEquipped = sys.equipped;
         const isShield = this.item.type === "equipment" && ((sys.identified && sys.identifier === "shield") || this.item.name.includes("Shield"));
+
+        // Ammunition count for weapons that require a specific ammo type (e.g. Shortbow -> arrow)
+        let ammoInfo = null;
+        if (this.item.type === "weapon" && sys.ammunition?.type) {
+            const options = sys.ammunitionOptions ?? [];
+            const total = options.reduce((sum, o) => sum + (o.item.system.quantity || 0), 0);
+            const typeKey = CONFIG.DND5E.consumableTypes?.ammo?.subtypes?.[sys.ammunition.type];
+            ammoInfo = { label: typeKey ? game.i18n.localize(typeKey) : sys.ammunition.type, total };
+        }
 
         let rechargeValue = null;
         if (isRecharge && sys.uses?.recovery) {
@@ -99,21 +145,50 @@ export class ApeItem extends LitElement {
         const canCastUnpreparedRituals = !!actor.itemTypes.feat.find(i => i.name === "Ritual Adept");
         const isUnprepared = sys.prepared === 0 && !(isRitual && canCastUnpreparedRituals);
 
+        let showUnpreparedIcon = false;
+
+        if(isUnprepared && !this.canManage) {
+            showUnpreparedIcon = true;
+            let unpreapredIcon = `<div class="unprepared flag" title="${game.i18n.localize("action-pack-enhanced.flag.unprepared-title")}">${game.i18n.localize("action-pack-enhanced.flag.unprepared")}</div>`;
+        }
+
+        // Management affordances (Feature A - gated by canManage)
+        const canEditQty = this.canManage && sys.quantity !== undefined;
+        const canTogglePrepared = this.canManage && isSpell && sys.method === 'spell' && sys.prepared !== 2;
+
         return html`
-            <div class="item-name rollable flexrow ${isUnprepared ? 'unprepared' : ''}">
-                <div class="item-image ${rarity}${isUnprepared ? ' unprepared' : ''}" 
+            <div class="item-name rollable flexrow ${isUnprepared && !this.canManage ? 'unprepared' : ''}">
+                ${this.canManage ? html`
+                    <div class="delete-item flag" title="${game.i18n.localize("action-pack-enhanced.manage.delete-item-title")}" @mousedown="${this._onDelete}">
+                        <i class="fas fa-trash"></i>
+                    </div>
+                ` : nothing}
+                <div class="item-image ${rarity}${isUnprepared && !this.canManage ? ' unprepared' : ''}"
                         style="background-image: url('${this.item.img}')"
                         @mousedown="${this._onRoll}">
                     <i class="fa fa-dice-d20"></i>
                 </div>
-                
+
                 <div class="item-name-wrap flexrow">
                     <h4 @mousedown="${this._onClick}">
                         <span class="item-text ${rarity}">${this.item.name}</span>
                         ${showUses ? html` (${this.uses.available}${this.uses.maximum ? '/' + this.uses.maximum : ''})` : nothing}
+                        ${ammoInfo ? html` <span class="item-ammo">(${ammoInfo.label}: ${ammoInfo.total})</span>` : nothing}
                     </h4>
                     ${this.showWeaponMastery ? this._renderWeaponMastery(itemMastery, isMastered, localizedMastery) : nothing}
                 </div>
+
+                ${canEditQty ? html`
+                    <span class="item-qty" title="${game.i18n.localize("action-pack-enhanced.manage.quantity-title")}">
+                        <span class="item-qty-display" @mousedown="${(e) => e.stopPropagation()}" @click="${this._toggleQtyInput}">x${sys.quantity}</span>
+                        <input type="text" class="item-qty-input" value="${sys.quantity}"
+                            style="display:none"
+                            @mousedown="${(e) => e.stopPropagation()}"
+                            @blur="${this._finishQtyEdit}"
+                            @keydown="${this._qtyInputKey}"
+                            @change="${(e) => this.api.updateItemQuantity(this.item, parseInt(e.target.value))}">
+                    </span>
+                ` : nothing}
 
                 ${isRitual ? html`<div class="ritual flag" title="${game.i18n.localize("action-pack-enhanced.flag.ritual-title")}"></div>` : nothing}
                 ${isConcentration ? html`<div class="concentration flag" title="${game.i18n.localize("action-pack-enhanced.flag.concentration-title")}"></div>` : nothing}
@@ -122,17 +197,24 @@ export class ApeItem extends LitElement {
                 ${isLegendary ? html`<div class="legendary flag" title="${game.i18n.localize("action-pack-enhanced.flag.legendary-title")}">${game.i18n.localize("action-pack-enhanced.flag.legendary")}</div>` : nothing}
                 ${isLair ? html`<div class="lair flag" title="${game.i18n.localize("action-pack-enhanced.flag.lair-title")}">${game.i18n.localize("action-pack-enhanced.flag.lair")}</div>` : nothing}
 
-                ${isRecharge ? (isCharged ? 
-                    html`<div class="flag"><i class="fas fa-bolt"></i></div>` : 
+                ${isRecharge ? (isCharged ?
+                    html`<div class="flag"><i class="fas fa-bolt"></i></div>` :
                     html`<div class="flag"><a class="rollable item-recharge" @mousedown="${this._onRecharge}"><i class="fas fa-dice-six"></i> ${rechargeValue}+</a></div>`
                 ) : nothing}
 
-                ${isUnprepared ? html`<div class="unprepared flag" title="${game.i18n.localize("action-pack-enhanced.flag.unprepared-title")}">${game.i18n.localize("action-pack-enhanced.flag.unprepared")}</div>` : nothing}
+                ${canTogglePrepared && !showUnpreparedIcon ? html`
+                    <div class="prepared-toggle flag ${isUnprepared ? 'unprepared' : 'prepared'}"
+                        title="${game.i18n.localize(!isUnprepared ? "action-pack-enhanced.manage.prepared-title" : "action-pack-enhanced.manage.unprepared-toggle-title")}"
+                        @mousedown="${this._onTogglePrepared}">
+                        <i class="${sys.prepared === 1 ? 'fas' : 'far'} fa-sun"></i>
+                    </div>
+                ` : showUnpreparedIcon ? html`<div class="unprepared flag" title="${game.i18n.localize("action-pack-enhanced.flag.unprepared-title")}">${game.i18n.localize("action-pack-enhanced.flag.unprepared")}</div>` : nothing}
                 ${(this.item.type === "weapon" || isShield) && !isEquipped ? html`<div class="unequipped flag" title="${game.i18n.localize("action-pack-enhanced.flag.unequipped-title")}" @mousedown="${this._onEquip}">${game.i18n.localize("action-pack-enhanced.flag.unequipped")}</div>` : nothing}
+                
             </div>
-            
-            <div class="item-drag-handle" 
-                    draggable="true" 
+
+            <div class="item-drag-handle"
+                    draggable="true"
                     title="${game.i18n.localize("action-pack-enhanced.drag-to-target")}"
                     @dragstart="${this._onDragStart}">
                 <i class="fas fa-grip-vertical"></i>

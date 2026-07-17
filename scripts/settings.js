@@ -746,6 +746,36 @@ export function registerSettings(callbacks) {
         }
     );
 
+    // Stores the connected Patreon account's auth state for THIS browser/user. Not
+    // user-editable directly (config: false) - managed via the "Connect Patreon"/
+    // "Disconnect" flow instead.
+    game.settings.register(
+        "action-pack-enhanced",
+        "patreon-auth-data",
+        {
+            scope: "client",
+            config: false,
+            default: null,
+            type: Object
+        }
+    );
+
+    // World-scoped: the GM's entitlement result, published here after a successful
+    // connect/refresh so every player at the table shares the GM's subscription
+    // rather than needing their own. World-scope settings can only be written by a
+    // GM (Foundry's SETTINGS_MODIFY permission), which is exactly the restriction
+    // we want here - players can only ever read this, never set it themselves.
+    game.settings.register(
+        "action-pack-enhanced",
+        "patreon-gm-entitlement",
+        {
+            scope: "world",
+            config: false,
+            default: null,
+            type: Object
+        }
+    );
+
     game.keybindings.register("action-pack-enhanced", "toggle-tray", {
         name: "action-pack-enhanced.keybindings.toggle-tray",
         editable: [

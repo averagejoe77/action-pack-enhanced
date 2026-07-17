@@ -1,4 +1,6 @@
 import { formatNumber } from "./utils.js";
+import { premiumGate } from "./premium/premium-gate.js";
+import { PREMIUM_CONFIG } from "./premium/premium-config.js";
 
 export class ActionPackAPI {
     constructor() {
@@ -581,5 +583,94 @@ export class ActionPackAPI {
     async toggleCondition(actor, conditionId) {
         if (!actor) return;
         return actor.toggleStatusEffect(conditionId);
+    }
+
+    /**
+     * Checks whether the current user has spell/inventory management entitlement,
+     * warning the user if not.
+     */
+    _checkManageAccess() {
+        if (premiumGate.can(PREMIUM_CONFIG.featureId)) return true;
+        ui.notifications.warn(game.i18n.localize("action-pack-enhanced.warning.premium-locked"));
+        return false;
+    }
+
+    /**
+     * Opens the system compendium browser and adds the selected item to the actor
+     * @param {Actor} actor
+     * @param {"spell"|"inventory"} category
+     */
+    async addItemFromCompendium(actor, category) {
+        if (!actor) return;
+        if (!this._checkManageAccess()) return null;
+
+        const typeMap = {
+            spell: ["spell"],
+            inventory: ["weapon", "equipment", "consumable", "tool", "loot", "container"]
+        };
+        const types = typeMap[category] ?? typeMap.inventory;
+
+        const uuid = await dnd5e.applications.CompendiumBrowser.selectOne({
+            filters: { locked: { documentClass: "Item", types: new Set(types) } }
+        });
+        if (!uuid) return null;
+
+        const sourceItem = await fromUuid(uuid);
+        if (!sourceItem) {
+            ui.notifications.warn(game.i18n.localize("action-pack-enhanced.warning.item-not-found"));
+            return null;
+        }
+
+        const itemData = game.items.fromCompendium(sourceItem, { keepId: true });
+        if (actor.items.has(itemData._id)) delete itemData._id;
+
+        const [created] = await actor.createEmbeddedDocuments("Item", [itemData]);
+        return created;
+    }
+
+    /**
+     * Updates an item's quantity
+     * @param {Item} item
+     * @param {number} quantity
+     */
+    async updateItemQuantity(item, quantity) {
+        if (!item) return;
+        if (!this._checkManageAccess()) return;
+        const qty = Math.max(0, Math.floor(Number(quantity) || 0));
+        if (qty === item.system.quantity) return;
+        return item.update({ "system.quantity": qty });
+    }
+
+    /**
+     * Toggles a spell between prepared/unprepared. No-op for non-"spell" methods
+     * or spells that are always prepared.
+     * @param {Item} item
+     */
+    async toggleSpellPrepared(item) {
+        if (!item || item.type !== "spell") return;
+        if (!this._checkManageAccess()) return;
+        if (item.system.method !== "spell" || item.system.prepared === 2) return;
+        return item.update({ "system.prepared": item.system.prepared === 1 ? 0 : 1 });
+    }
+
+    /**
+     * Deletes an item from its actor after a confirmation dialog
+     * @param {Item} item
+     */
+    async deleteItem(item) {
+        if (!item) return;
+        if (!this._checkManageAccess()) return;
+
+        const confirmed = await foundry.applications.api.DialogV2.confirm({
+            window: { title: game.i18n.localize("action-pack-enhanced.dialog.delete-item-title") },
+            content: `<p>${game.i18n.format("action-pack-enhanced.dialog.delete-item-content", { name: item.name })}</p>`,
+            modal: true,
+            rejectClose: false,
+            yes: { icon: "fas fa-trash", label: game.i18n.localize("action-pack-enhanced.dialog.delete") },
+            no: { icon: "fas fa-times", label: game.i18n.localize("action-pack-enhanced.dialog.cancel") }
+        });
+        if (!confirmed) return;
+
+        return item.delete();
     }
 }

@@ -140,6 +140,43 @@
         "item-context": {
             "show": "Mostra nel pannello APE",
             "hide": "Nascondi dal pannello APE"
+        },
+        "warning": {
+            "item-not-found": "Impossibile trovare l'oggetto selezionato.",
+            "premium-locked": "La gestione di incantesimi e inventario richiede un abbonamento Patreon attivo."
+        },
+        "dialog": {
+            "delete-item-title": "Elimina oggetto",
+            "delete-item-content": "Sei sicuro di voler eliminare <strong>{name}</strong>? L'azione non può essere annullata.",
+            "delete": "Elimina",
+            "cancel": "Annulla"
+        },
+        "manage": {
+            "add-item-title": "Aggiungi oggetto dal compendio",
+            "add-spell-title": "Aggiungi incantesimo dal compendio",
+            "quantity-title": "Quantità",
+            "prepared-title": "Preparato",
+            "unprepared-toggle-title": "Non preparato (clicca per preparare)",
+            "delete-item-title": "Elimina oggetto",
+            "prepared-count-title": "Incantesimi preparati / massimo preparabile"
+        },
+        "premium": {
+            "connect": "Connetti Patreon",
+            "connect-title": "Connetti Patreon",
+            "connect-intro": "Clicca \"Avvia autenticazione\" per collegare il tuo account Patreon. Si aprirà una scheda del browser per effettuare l'accesso.",
+            "start-auth": "Avvia autenticazione",
+            "waiting": "In attesa di autenticazione nel browser...",
+            "waiting-attempt": "In attesa di autenticazione nel browser... ({attempt}/{max})",
+            "connected": "Connesso come sostenitore {tier}!",
+            "auth-failed": "Autenticazione scaduta o non riuscita. Riprova.",
+            "disconnect": "Disconnetti",
+            "disconnect-title": "Disconnetti Patreon",
+            "disconnect-content": "Disconnettere il tuo account Patreon? La gestione di incantesimi e inventario verrà nuovamente bloccata.",
+            "supporter-tier": "Sostenitore {tier}",
+            "table-unlocked": "Gestione incantesimi/inventario sbloccata dal GM"
+        },
+        "version": {
+            "update-available": "Aggiornamento disponibile: v{version}"
         }
     }
 }

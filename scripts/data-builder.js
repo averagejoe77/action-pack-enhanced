@@ -84,6 +84,21 @@ export class ActionPackDataBuilder {
             }
         }
 
+        // Prepared spell count/limit, summed across all "prepares"-style spellcasting
+        // classes (e.g. Wizard/Cleric). Classes that just know a fixed number of spells
+        // (Sorcerer/Bard/Warlock) have no preparation.max, so they don't contribute.
+        const preparedInfo = Object.values(actor.spellcastingClasses ?? {}).reduce((acc, cls) => {
+            const prep = cls.system.spellcasting?.preparation;
+            if (prep?.max) {
+                acc.value += prep.value ?? 0;
+                acc.max += prep.max;
+            }
+            return acc;
+        }, { value: 0, max: 0 });
+        if (preparedInfo.max > 0) {
+            sections.spell.prepared = preparedInfo;
+        }
+
         const wm5eActive = game.modules.find(m => m.id === "wm5e") && game.modules.get("wm5e")?.active;
         if (actor.type === "character" && wm5eActive) {
             const weaponMaster = actor.itemTypes.feat.find(i => i.name === "Weapon Mastery" || i.name === "Weapon Master");
