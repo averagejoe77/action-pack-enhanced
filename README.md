@@ -32,7 +32,7 @@ However, that support takes time and effort, and while I do write code for a liv
 
 I have other modules that I have made for myself and my campaigns, but I have not put those modules out there becasue I don't think anyone would really use them the way I do and they are not really production quality if I am honest, but if the Patreon takes off, I may just add them as part of a tier reward like other creators do.
 
-So with that, please find me on ![Patreon](https://www.patreon.com/dungeonsandderps) if you would like to donate or get your mits on the newset shiny feature. Below are some screenshots of the new UI for Patreon, the verison number, and the Spell and Inventory when you are a supporter.
+So with that, please find me on [Patreon](https://www.patreon.com/dungeonsandderps) if you would like to donate or get your mits on the newset shiny feature. Below are some screenshots of the new UI for Patreon, the verison number, and the Spell and Inventory when you are a supporter.
 
 The header bar showing the verson number and the Patreon login button. This is what DMs will see, players will only see the version number
 ![image](images/readme/header-bar-dm-normal.png)
