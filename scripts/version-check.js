@@ -1,12 +1,8 @@
 const MODULE_ID = "action-pack-enhanced";
-// raw.githubusercontent.com sends Access-Control-Allow-Origin: *, so it's fetchable from
-// the browser. github.com/.../releases/latest/download/... is NOT - that redirect (302)
-// carries no CORS header, so the browser blocks reading it even though the request
-// itself succeeds. main's module.json version is kept in sync with releases by this
-// repo's version-bump workflow, so it's a reliable stand-in for "latest published version".
-const REPO_RAW_BASE = "https://raw.githubusercontent.com/averagejoe77/action-pack-enhanced/main";
-const MANIFEST_URL = `${REPO_RAW_BASE}/module.json`;
-const CHANGELOG_URL = `${REPO_RAW_BASE}/CHANGELOG.md`;
+// Dedicated update-check endpoint that returns only the latest version number,
+// avoiding the GitHub API rate limits a raw.githubusercontent.com manifest fetch
+// would eventually hit.
+const VERSION_CHECK_URL = "https://www.dungeonsandderps.com/foundry-modules/update-check.php?module=action-pack-enhanced";
 const FETCH_TIMEOUT_MS = 5000;
 
 class VersionCheck {
@@ -14,14 +10,13 @@ class VersionCheck {
         this.installedVersion = null;
         this.latestVersion = null;
         this.hasUpdate = false;
-        this.changelogEntries = []; // [{ version, date, items: string[] }], newest first
         this.checked = false;
     }
 
     /**
-     * Fetches the latest published manifest + changelog and compares against the
-     * installed version. Only does real work once per session. Never throws - any
-     * failure (offline, GitHub unreachable, unexpected format) just leaves hasUpdate
+     * Fetches the latest published version and compares against the installed
+     * version. Only does real work once per session. Never throws - any failure
+     * (offline, endpoint unreachable, unexpected format) just leaves hasUpdate
      * false so the badge quietly shows nothing new rather than breaking the tray.
      */
     async check() {
@@ -33,46 +28,16 @@ class VersionCheck {
         if (!this.installedVersion) return;
 
         try {
-            const manifestRes = await fetch(MANIFEST_URL, { cache: "no-store", signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
-            if (!manifestRes.ok) return;
-            const manifest = await manifestRes.json();
-            this.latestVersion = manifest.version ?? null;
+            const versionRes = await fetch(VERSION_CHECK_URL, { cache: "no-store", signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+            if (!versionRes.ok) return;
+            const versionData = await versionRes.json();
+            this.latestVersion = versionData.version ?? null;
             if (!this.latestVersion) return;
 
             this.hasUpdate = foundry.utils.isNewerVersion(this.latestVersion, this.installedVersion);
-            if (!this.hasUpdate) return;
-
-            const changelogRes = await fetch(CHANGELOG_URL, { cache: "no-store", signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
-            if (!changelogRes.ok) return;
-            const text = await changelogRes.text();
-            this.changelogEntries = this._parseChangelog(text, this.installedVersion);
         } catch (e) {
             console.warn(`${MODULE_ID} | version check failed`, e);
         }
-    }
-
-    /**
-     * Parses "## [x.y.z] - date" sections (newest-first, matching this repo's
-     * CHANGELOG.md convention) and keeps only entries newer than the installed version.
-     */
-    _parseChangelog(text, installedVersion) {
-        const entries = [];
-        const sectionRegex = /^##\s*\[([^\]]+)\]\s*-\s*(.+)$/gm;
-        const matches = [...text.matchAll(sectionRegex)];
-
-        for (let i = 0; i < matches.length; i++) {
-            const [fullMatch, version, date] = matches[i];
-            if (!foundry.utils.isNewerVersion(version, installedVersion)) break;
-
-            const start = matches[i].index + fullMatch.length;
-            const end = i + 1 < matches.length ? matches[i + 1].index : text.length;
-            const body = text.slice(start, end);
-            const items = [...body.matchAll(/^-\s+(.+)$/gm)].map(m => m[1].trim());
-
-            entries.push({ version, date: date.trim(), items });
-        }
-
-        return entries;
     }
 }
 

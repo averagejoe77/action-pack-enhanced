@@ -158,55 +158,22 @@
                 left: 0;
                 z-index: 10;
                 margin-top: 4px;
-                width: 260px;
-                max-height: 300px;
-                overflow-y: auto;
+                width: 220px;
                 background: #1a1a1a;
                 border: 1px solid rgba(255, 255, 255, 0.3);
                 border-radius: 6px;
                 padding: 8px 10px;
                 font-family: inherit;
                 font-size: 0.8rem;
+                font-weight: bold;
                 line-height: 1.4;
-                color: rgba(255, 255, 255, 0.9);
+                color: #f1c40f;
                 white-space: normal;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
             }
 
             &:hover .ape-version-tooltip {
                 display: block;
-            }
-
-            .ape-version-tooltip-header {
-                font-weight: bold;
-                color: #f1c40f;
-                margin-bottom: 6px;
-            }
-
-            .ape-version-entry {
-                & + .ape-version-entry {
-                    margin-top: 8px;
-                    padding-top: 8px;
-                    border-top: 1px solid rgba(255, 255, 255, 0.15);
-                }
-            }
-
-            .ape-version-entry-title {
-                font-weight: bold;
-            }
-
-            .ape-version-entry-date {
-                font-weight: normal;
-                color: rgba(255, 255, 255, 0.5);
-            }
-
-            ul {
-                margin: 4px 0 0;
-                padding-left: 16px;
-
-                li {
-                    margin-bottom: 2px;
-                }
             }
         }
 
@@ -862,6 +829,9 @@
 
         .ape-ability-label {
             flex: 1 0 20px;
+            &.proficient {
+                color: green;
+            }
         }
 
         .ape-ability-text {

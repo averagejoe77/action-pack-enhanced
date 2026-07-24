@@ -393,7 +393,7 @@ export class ApeActor extends LitElement {
                             const details = actor.system.abilities[c.key];
                             return html`
                                 <span class="ape-ability">
-                                    <span class="ape-ability-label">${c.key}<br>${details.value}</span>
+                                    <span class="ape-ability-label ${details.proficient === 1 ? 'proficient' : ''}">${c.key}<br>${details.value}</span>
                                     <a class="fas fa-dice-d20 ape-ability-check" 
                                         title="${c.label} check"
                                         @click="${(e) => this.api.rollAbilityCheck(actor, c.key, e)}">

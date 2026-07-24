@@ -1,6 +1,6 @@
-var $t = Object.defineProperty;
-var kt = (o, e, t) => e in o ? $t(o, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : o[e] = t;
-var E = (o, e, t) => kt(o, typeof e != "symbol" ? e + "" : e, t);
+var bt = Object.defineProperty;
+var vt = (i, e, t) => e in i ? bt(i, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : i[e] = t;
+var E = (i, e, t) => vt(i, typeof e != "symbol" ? e + "" : e, t);
 const q = Object.freeze({
   patreon: {
     clientId: "h8DeKFx_s9YWM1IIUqD1eBqc9toW3FqxBzs2Z9tg2P3n_ScxT9agAuKFTNG2gRkf",
@@ -17,13 +17,13 @@ const q = Object.freeze({
     maxAttempts: 20
   },
   featureId: "spell-inventory-management"
-}), ee = "action-pack-enhanced", wt = "patreon-auth-data", oe = "patreon-gm-entitlement";
-class _t {
+}), Y = "action-pack-enhanced", $t = "patreon-auth-data", oe = "patreon-gm-entitlement";
+class kt {
   constructor() {
     this._entitlements = {};
   }
   getAuthData() {
-    return game.settings.get(ee, wt);
+    return game.settings.get(Y, $t);
   }
   isAuthenticated() {
     const e = this.getAuthData();
@@ -40,7 +40,7 @@ class _t {
     var a;
     if (game.user.isGM)
       return !!this._entitlements[e];
-    const t = game.settings.get(ee, oe);
+    const t = game.settings.get(Y, oe);
     return !!((a = t == null ? void 0 : t.entitlements) != null && a[e]);
   }
   /**
@@ -80,12 +80,12 @@ class _t {
    */
   async _publishToTable() {
     var s;
-    const e = game.settings.get(ee, oe), t = {
+    const e = game.settings.get(Y, oe), t = {
       entitlements: this._entitlements,
       tier: ((s = this.getAuthData()) == null ? void 0 : s.tier) ?? null,
       updatedAt: Date.now()
     };
-    JSON.stringify((e == null ? void 0 : e.entitlements) ?? {}) === JSON.stringify(t.entitlements) && ((e == null ? void 0 : e.tier) ?? null) === t.tier || await game.settings.set(ee, oe, t);
+    JSON.stringify((e == null ? void 0 : e.entitlements) ?? {}) === JSON.stringify(t.entitlements) && ((e == null ? void 0 : e.tier) ?? null) === t.tier || await game.settings.set(Y, oe, t);
   }
   /**
    * Clears cached entitlements (e.g. on disconnect) and, for a GM, publishes that
@@ -95,8 +95,8 @@ class _t {
     this._entitlements = {}, game.user.isGM && await this._publishToTable();
   }
 }
-const H = new _t();
-class St {
+const H = new kt();
+class wt {
   constructor() {
     this.masteryRules = {
       Fighter: {
@@ -198,7 +198,7 @@ class St {
         if (s.type === "constant")
           n = s.value;
         else if (s.type === "table") {
-          const i = a.system.levels, r = s.values.find((l) => l.level === i);
+          const o = a.system.levels, r = s.values.find((l) => l.level === o);
           n = r ? r.mastery : 0;
         }
         n > t && (t = n);
@@ -216,19 +216,19 @@ class St {
     const t = await e.longRest();
     if (game.modules.get("wm5e") && ((s = game.modules.get("wm5e")) == null ? void 0 : s.active) && e.itemTypes.feat.find((n) => n.name === "Weapon Mastery" || n.name === "Weapon Master")) {
       await e.setFlag("action-pack-enhanced", "masterySelectionPending", !0);
-      const n = e.itemTypes.weapon.filter((d) => d.name !== "Unarmed Strike"), i = /* @__PURE__ */ new Map(), r = e.system.traits.weaponProf.mastery.value;
+      const n = e.itemTypes.weapon.filter((d) => d.name !== "Unarmed Strike"), o = /* @__PURE__ */ new Map(), r = e.system.traits.weaponProf.mastery.value;
       n.forEach((d) => {
         var m, g;
         const c = d.system.mastery, p = (m = d.system.type) == null ? void 0 : m.baseItem;
-        c && p && !i.has(p) && i.set(p, {
+        c && p && !o.has(p) && o.set(p, {
           id: p,
-          label: p.replace(/-/g, " ").replace(/\b\w/g, (y) => y.toUpperCase()),
+          label: p.replace(/-/g, " ").replace(/\b\w/g, (b) => b.toUpperCase()),
           masteryLabel: ((g = CONFIG.DND5E.weaponMasteries[c]) == null ? void 0 : g.label) || c,
-          selected: r.find((y) => y === p)
+          selected: r.find((b) => b === p)
         });
       });
       const l = this.calculateMaxMasteries(e);
-      await this.promptMasterySelection(e, i, l);
+      await this.promptMasterySelection(e, o, l);
     } else
       await e.setFlag("action-pack-enhanced", "masterySelectionPending", !1), await e.update({ "system.traits.weaponProf.mastery.value": [] });
     return t;
@@ -237,11 +237,11 @@ class St {
     const { DialogV2: s } = foundry.applications.api;
     let n = `<p>Select up to ${a} ${a === 1 ? "weapon" : "weapons"} to use ${a === 1 ? "its" : "their"} weapon mastery for the day:</p>`;
     n += '<form class="ape-mastery-dialog">';
-    for (const [i, r] of t)
+    for (const [o, r] of t)
       n += `
             <div class="ape-mastery-switch form-group">
-                <input id="${i}" class="ape-mastery-checkbox" type="checkbox" name="mastery" value="${i}" data-dtype="String" ${r.selected ? "checked" : ""}>
-                <label for="${i}" class="ape-mastery-label">${r.label} (${r.masteryLabel})</label>
+                <input id="${o}" class="ape-mastery-checkbox" type="checkbox" name="mastery" value="${o}" data-dtype="String" ${r.selected ? "checked" : ""}>
+                <label for="${o}" class="ape-mastery-label">${r.label} (${r.masteryLabel})</label>
             </div>`;
     return n += "</form>", n += `
         <script>
@@ -273,7 +273,7 @@ class St {
         action: "update",
         label: "Update",
         default: !0,
-        callback: async (i, r, l) => {
+        callback: async (o, r, l) => {
           const d = [];
           return l.element.querySelectorAll('input[name="mastery"]:checked').forEach((c) => {
             d.push(c.value);
@@ -284,7 +284,7 @@ class St {
         label: "Cancel",
         callback: async () => (await e.setFlag("action-pack-enhanced", "masterySelectionPending", !1), !1)
       }],
-      submit: (i) => {
+      submit: (o) => {
       }
     });
   }
@@ -294,9 +294,9 @@ class St {
    * @param {string} masteryId 
    */
   async toggleMastery(e, t) {
-    var s, n, i;
+    var s, n, o;
     if (!e || !t) return;
-    const a = new Set(((i = (n = (s = e.system.traits) == null ? void 0 : s.weaponProf) == null ? void 0 : n.mastery) == null ? void 0 : i.value) || []);
+    const a = new Set(((o = (n = (s = e.system.traits) == null ? void 0 : s.weaponProf) == null ? void 0 : n.mastery) == null ? void 0 : o.value) || []);
     if (a.has(t))
       a.delete(t);
     else {
@@ -379,8 +379,8 @@ class St {
    * @param {number} slotIndex 
    */
   async adjustSpellSlot(e, t, a) {
-    var i, r;
-    const s = a + 1, n = (r = (i = e.system.spells) == null ? void 0 : i[t]) == null ? void 0 : r.value;
+    var o, r;
+    const s = a + 1, n = (r = (o = e.system.spells) == null ? void 0 : o[t]) == null ? void 0 : r.value;
     if (n !== void 0) {
       const l = `system.spells.${t}.value`, d = n !== s ? s : s - 1;
       return e.update({ [l]: d });
@@ -412,8 +412,8 @@ class St {
    * @param {Item} item 
    */
   async getItemDescription(e) {
-    var i, r, l, d;
-    const t = await e.getChatData({ secrets: e.actor.isOwner }), a = ((r = (i = e.system) == null ? void 0 : i.activation) == null ? void 0 : r.type) || "", s = ((d = (l = e.system) == null ? void 0 : l.activation) == null ? void 0 : d.value) || "";
+    var o, r, l, d;
+    const t = await e.getChatData({ secrets: e.actor.isOwner }), a = ((r = (o = e.system) == null ? void 0 : o.activation) == null ? void 0 : r.type) || "", s = ((d = (l = e.system) == null ? void 0 : l.activation) == null ? void 0 : d.value) || "";
     let n = "";
     return s === "" ? n = a.charAt(0).toUpperCase() + a.slice(1) : s && a && (n = `${s} ${a.charAt(0).toUpperCase() + a.slice(1)}`), {
       description: t.description,
@@ -433,13 +433,13 @@ class St {
       return e.update({ "system.attributes.inspiration": !e.system.attributes.inspiration });
   }
   _formatRange(e) {
-    var s, n, i, r;
-    const t = (n = (s = e.system) == null ? void 0 : s.range) == null ? void 0 : n.value, a = (r = (i = e.system) == null ? void 0 : i.range) == null ? void 0 : r.units;
+    var s, n, o, r;
+    const t = (n = (s = e.system) == null ? void 0 : s.range) == null ? void 0 : n.value, a = (r = (o = e.system) == null ? void 0 : o.range) == null ? void 0 : r.units;
     return t && a ? `${t} ${a}` : a || "";
   }
   _formatDuration(e) {
-    var s, n, i, r;
-    const t = (n = (s = e.system) == null ? void 0 : s.duration) == null ? void 0 : n.value, a = (r = (i = e.system) == null ? void 0 : i.duration) == null ? void 0 : r.units;
+    var s, n, o, r;
+    const t = (n = (s = e.system) == null ? void 0 : s.duration) == null ? void 0 : n.value, a = (r = (o = e.system) == null ? void 0 : o.duration) == null ? void 0 : r.units;
     return t && a ? `${t} ${a}` : a ? a === "inst" ? "Instantaneous" : a : "";
   }
   /**
@@ -452,22 +452,22 @@ class St {
   async setWeaponSetItem(e, t, a, s, n) {
     var l, d, c;
     if (!e) return;
-    const i = e.getFlag("action-pack-enhanced", "weaponSets") || [];
+    const o = e.getFlag("action-pack-enhanced", "weaponSets") || [];
     for (let p = 0; p <= t; p++)
-      i[p] || (i[p] = { main: null, off: null, active: !1 });
+      o[p] || (o[p] = { main: null, off: null, active: !1 });
     const r = fromUuidSync(s);
     if (r) {
-      const p = a === "main" ? "off" : "main", m = i[t][p], g = [];
+      const p = a === "main" ? "off" : "main", m = o[t][p], g = [];
       if (m === s && ((l = r.system) == null ? void 0 : l.quantity) === 1 && g.push(game.i18n.localize("action-pack-enhanced.warning.quantity-limit") || "Not enough quantity to equip in both slots."), (d = r.system.properties) != null && d.has("two") && m) {
-        const y = fromUuidSync(m);
-        y && ((c = y.system.properties) != null && c.has("two")) && g.push(game.i18n.localize("action-pack-enhanced.warning.two-handed") || "You cannot have two two-handed weapons in the same set.");
+        const b = fromUuidSync(m);
+        b && ((c = b.system.properties) != null && c.has("two")) && g.push(game.i18n.localize("action-pack-enhanced.warning.two-handed") || "You cannot have two two-handed weapons in the same set.");
       }
       if (g.length > 0) {
-        g.forEach((y) => ui.notifications.warn(y));
+        g.forEach((b) => ui.notifications.warn(b));
         return;
       }
     }
-    if (i[t][a] = s, await e.setFlag("action-pack-enhanced", "weaponSets", i), i[t].active)
+    if (o[t][a] = s, await e.setFlag("action-pack-enhanced", "weaponSets", o), o[t].active)
       return this.equipWeaponSet(e, t);
   }
   /**
@@ -495,15 +495,15 @@ class St {
     if (!s.main && !s.off) return;
     const n = a.map((c, p) => ({ ...c, active: p === t }));
     await e.setFlag("action-pack-enhanced", "weaponSets", n);
-    const i = [], r = e.itemTypes.weapon.filter((c) => c.name !== "Unarmed Strike"), l = e.itemTypes.equipment.find((c) => c.name.includes("Shield"));
+    const o = [], r = e.itemTypes.weapon.filter((c) => c.name !== "Unarmed Strike"), l = e.itemTypes.equipment.find((c) => c.name.includes("Shield"));
     l && r.push(l);
     const d = /* @__PURE__ */ new Set();
     s.main && d.add(s.main), s.off && d.add(s.off);
     for (const c of r) {
       const p = d.has(c.uuid);
-      c.system.equipped !== p && i.push({ _id: c.id, "system.equipped": p });
+      c.system.equipped !== p && o.push({ _id: c.id, "system.equipped": p });
     }
-    i.length > 0 && await e.updateEmbeddedDocuments("Item", i);
+    o.length > 0 && await e.updateEmbeddedDocuments("Item", o);
   }
   /**
    * Update Exhaustion Level
@@ -545,10 +545,10 @@ class St {
       filters: { locked: { documentClass: "Item", types: new Set(s) } }
     });
     if (!n) return null;
-    const i = await fromUuid(n);
-    if (!i)
+    const o = await fromUuid(n);
+    if (!o)
       return ui.notifications.warn(game.i18n.localize("action-pack-enhanced.warning.item-not-found")), null;
-    const r = game.items.fromCompendium(i, { keepId: !0 });
+    const r = game.items.fromCompendium(o, { keepId: !0 });
     e.items.has(r._id) && delete r._id;
     const [l] = await e.createEmbeddedDocuments("Item", [r]);
     return l;
@@ -589,57 +589,57 @@ class St {
       return e.delete();
   }
 }
-function re(o) {
-  return o == null ? "0" : `${o >= 0 ? "+" : ""}${o}`;
+function re(i) {
+  return i == null ? "0" : `${i >= 0 ? "+" : ""}${i}`;
 }
-function et(o) {
+function Ye(i) {
   var t;
-  const e = (t = o.system) == null ? void 0 : t.activities;
+  const e = (t = i.system) == null ? void 0 : t.activities;
   return e ? new Set(Array.from(e, (a) => {
     var s;
     return (s = a.activation) == null ? void 0 : s.type;
   }).filter(Boolean)) : /* @__PURE__ */ new Set();
 }
-function At(o) {
-  const e = o.type === "spell" ? Ot(o) : "", t = Ct(o), a = xt(o), s = Et(o), n = o.type === "spell" ? Tt(o) : "";
+function _t(i) {
+  const e = i.type === "spell" ? Et(i) : "", t = St(i), a = At(i), s = Ct(i), n = i.type === "spell" ? xt(i) : "";
   return { school: e, castingTime: t, range: a, duration: s, materials: n };
 }
-function Ct(o) {
-  var a, s, n, i;
-  const e = ((s = (a = o.system) == null ? void 0 : a.activation) == null ? void 0 : s.type) || "", t = ((i = (n = o.system) == null ? void 0 : n.activation) == null ? void 0 : i.value) || "";
+function St(i) {
+  var a, s, n, o;
+  const e = ((s = (a = i.system) == null ? void 0 : a.activation) == null ? void 0 : s.type) || "", t = ((o = (n = i.system) == null ? void 0 : n.activation) == null ? void 0 : o.value) || "";
   return t === "" && e !== "" ? game.i18n.localize(`action-pack-enhanced.action-type.${e}`) : t && e ? `${t} ${e.charAt(0).toUpperCase() + e.slice(1)}` : "";
 }
-function xt(o) {
-  var s, n, i, r, l, d, c, p;
-  const e = ((n = (s = o.system) == null ? void 0 : s.range) == null ? void 0 : n.long) || null, t = (r = (i = o.system) == null ? void 0 : i.range) == null ? void 0 : r.units;
+function At(i) {
+  var s, n, o, r, l, d, c, p;
+  const e = ((n = (s = i.system) == null ? void 0 : s.range) == null ? void 0 : n.long) || null, t = (r = (o = i.system) == null ? void 0 : o.range) == null ? void 0 : r.units;
   let a;
-  return t !== "touch" && t !== "self" ? a = ((d = (l = o.system) == null ? void 0 : l.range) == null ? void 0 : d.value) || ((p = (c = o.system) == null ? void 0 : c.range) == null ? void 0 : p.reach) || 5 : a = null, a && e && t ? `${a} ${t} / ${e} ${t}` : a && t ? `${a} ${t}` : t ? game.i18n.localize(`action-pack-enhanced.range.${t}`) : "";
+  return t !== "touch" && t !== "self" ? a = ((d = (l = i.system) == null ? void 0 : l.range) == null ? void 0 : d.value) || ((p = (c = i.system) == null ? void 0 : c.range) == null ? void 0 : p.reach) || 5 : a = null, a && e && t ? `${a} ${t} / ${e} ${t}` : a && t ? `${a} ${t}` : t ? game.i18n.localize(`action-pack-enhanced.range.${t}`) : "";
 }
-function Et(o) {
-  var a, s, n, i;
-  const e = (s = (a = o.system) == null ? void 0 : a.duration) == null ? void 0 : s.value, t = (i = (n = o.system) == null ? void 0 : n.duration) == null ? void 0 : i.units;
+function Ct(i) {
+  var a, s, n, o;
+  const e = (s = (a = i.system) == null ? void 0 : a.duration) == null ? void 0 : s.value, t = (o = (n = i.system) == null ? void 0 : n.duration) == null ? void 0 : o.units;
   return e && t ? `${e} ${e > 1 ? t + "s" : t}` : t ? game.i18n.localize(`action-pack-enhanced.duration.${t}`) : "";
 }
-function Tt(o) {
+function xt(i) {
   var t, a;
-  const e = (a = (t = o.system) == null ? void 0 : t.materials) == null ? void 0 : a.value;
+  const e = (a = (t = i.system) == null ? void 0 : t.materials) == null ? void 0 : a.value;
   return e || "";
 }
-function Ot(o) {
+function Et(i) {
   var t, a;
-  if ((t = o.labels) != null && t.school)
-    return o.labels.school;
-  const e = (a = o.system) == null ? void 0 : a.school;
+  if ((t = i.labels) != null && t.school)
+    return i.labels.school;
+  const e = (a = i.system) == null ? void 0 : a.school;
   if (e) {
     const s = CONFIG.DND5E.spellSchools[e];
     return s ? s.label || s : e;
   }
   return "";
 }
-function Pt(o) {
+function Tt(i) {
   var l, d;
-  let e = {}, t = o.itemTypes.race, a = o.itemTypes.class, s = o.itemTypes.subclass;
-  const n = o.system.details.level;
+  let e = {}, t = i.itemTypes.race, a = i.itemTypes.class, s = i.itemTypes.subclass;
+  const n = i.system.details.level;
   if (a.length === s.length) {
     let c = { race: `<span>${(l = t[0]) == null ? void 0 : l.name} - ${n}</span>` || "Unknown", classes: [] };
     for (let p = 0; p < a.length; p++)
@@ -661,76 +661,76 @@ function Pt(o) {
       m.system.class === c.name && (e.classes[p].subclass.icon = m.img);
     });
   });
-  let i = `${e.race}`, r = [];
+  let o = `${e.race}`, r = [];
   for (let c = 0; c < e.classes.length; c++) {
     let p = "", m = "";
     e.classes[c].subclass.name !== "" ? (p = e.classes[c].subclass.icon, m = `${e.classes[c].subclass.name} ${e.classes[c].name} (${e.classes[c].level})`) : (p = e.classes[c].icon, m = `${e.classes[c].name} (${e.classes[c].level})`), r.push(`<img class="ape-actor-class-icon" src="${p}" title="${m}">`);
   }
-  return i + `<span class="ape-actor-class-icons">${r.join("")}</span>`;
+  return o + `<span class="ape-actor-class-icons">${r.join("")}</span>`;
 }
-const It = (o) => {
-  const e = o.system, t = e.consume;
+const Pt = (i) => {
+  const e = i.system, t = e.consume;
   if (t && t.target)
-    return Mt(o.actor, t);
+    return Ot(i.actor, t);
   const a = e.uses;
   if (a && (a.max > 0 || a.value > 0))
-    return tt(e);
-  const s = o.type;
-  return s === "feat" ? qt() : s === "consumable" ? {
+    return et(e);
+  const s = i.type;
+  return s === "feat" ? It() : s === "consumable" ? {
     available: e.quantity
-  } : s === "weapon" ? Ut(e) : null;
+  } : s === "weapon" ? Mt(e) : null;
 };
-function Mt(o, e) {
+function Ot(i, e) {
   let t = null, a = null;
   if (e.type === "attribute") {
-    const s = getProperty(o.system, e.target);
+    const s = getProperty(i.system, e.target);
     typeof s == "number" ? t = s : t = 0;
   } else if (e.type === "ammo" || e.type === "material") {
-    const s = o.items.get(e.target);
+    const s = i.items.get(e.target);
     s ? t = s.system.quantity : t = 0;
   } else if (e.type === "charges") {
-    const s = o.items.get(e.target);
-    s ? { available: t, maximum: a } = tt(s.system) : t = 0;
+    const s = i.items.get(e.target);
+    s ? { available: t, maximum: a } = et(s.system) : t = 0;
   }
   return t !== null ? (e.amount > 1 && (t = Math.floor(t / e.amount), a !== null && (a = Math.floor(a / e.amount))), { available: t, maximum: a }) : null;
 }
-function tt(o) {
-  let e = o.uses.value, t = o.uses.max;
-  const a = o.quantity;
+function et(i) {
+  let e = i.uses.value, t = i.uses.max;
+  const a = i.quantity;
   return a && (e = e + (a - 1) * t, t = t * a), { available: e, maximum: t };
 }
-function qt(o) {
+function It(i) {
   return null;
 }
-function Ut(o) {
-  return o.properties.thr && !o.properties.ret ? { available: o.quantity, maximum: null } : null;
+function Mt(i) {
+  return i.properties.thr && !i.properties.ret ? { available: i.quantity, maximum: null } : null;
 }
-class Dt {
+class qt {
   constructor() {
   }
   build(e, t) {
     return this.settingShowNoUses = game.settings.get("action-pack-enhanced", "show-no-uses"), this.settingShowUnpreparedCantrips = game.settings.get("action-pack-enhanced", "show-unprepared-cantrips"), this.settingShowUnpreparedSpells = game.settings.get("action-pack-enhanced", "show-unprepared-spells"), this.settingSortAlphabetically = game.settings.get("action-pack-enhanced", "sort-alphabetic"), this.settingShowWeaponMastery = game.settings.get("action-pack-enhanced", "show-weapon-mastery"), e.map((a) => this.prepareActor(a, t));
   }
   prepareActor(e, t) {
-    var P, v;
-    const a = e.system, s = !!e.itemTypes.feat.find((f) => f.name === "Ritual Adept"), n = e.getFlag("action-pack-enhanced", "weaponSets") || [], i = [];
+    var O, v;
+    const a = e.system, s = !!e.itemTypes.feat.find((f) => f.name === "Ritual Adept"), n = e.getFlag("action-pack-enhanced", "weaponSets") || [], o = [];
     for (let f = 0; f < 3; f++) {
-      const b = n[f] || { main: null, off: null, active: !1 }, w = { index: f, main: null, off: null, active: b.active };
-      if (b.main) {
-        const k = fromUuidSync(b.main);
-        k && (w.main = { uuid: b.main, img: k.img, rarity: k.system.rarity, name: k.name });
+      const y = n[f] || { main: null, off: null, active: !1 }, w = { index: f, main: null, off: null, active: y.active };
+      if (y.main) {
+        const k = fromUuidSync(y.main);
+        k && (w.main = { uuid: y.main, img: k.img, rarity: k.system.rarity, name: k.name });
       }
-      if (b.off) {
-        const k = fromUuidSync(b.off);
-        k && (w.off = { uuid: b.off, img: k.img, rarity: k.system.rarity, name: k.name });
+      if (y.off) {
+        const k = fromUuidSync(y.off);
+        k && (w.off = { uuid: y.off, img: k.img, rarity: k.system.rarity, name: k.name });
       }
-      i.push(w);
+      o.push(w);
     }
     let r = {
       equipped: {
         items: [],
         title: "action-pack-enhanced.category.weapon",
-        weaponSets: i,
+        weaponSets: o,
         groups: {
           unequipped: { items: [], title: "action-pack-enhanced.flag.unequipped-title" },
           shield: { items: [], title: "action-pack-enhanced.flag.shield-title" }
@@ -753,29 +753,29 @@ class Dt {
           innate: { items: [], title: "action-pack-enhanced.category.innate" },
           atwill: { items: [], title: "action-pack-enhanced.category.atwill" },
           pact: { items: [], title: "action-pack-enhanced.category.pact" },
-          ...[...Array(10).keys()].reduce((f, b) => (f[`spell${b}`] = { items: [], title: `action-pack-enhanced.category.spell${b}`, cost: 0 }, f), {})
+          ...[...Array(10).keys()].reduce((f, y) => (f[`spell${y}`] = { items: [], title: `action-pack-enhanced.category.spell${y}`, cost: 0 }, f), {})
         }
       },
       passive: { items: [], title: "action-pack-enhanced.category.passive" }
     };
     const l = ["consumable", "container", "equipment", "feat", "loot", "spell", "tool", "weapon"];
-    for (const [f, b] of Object.entries(e.itemTypes))
+    for (const [f, y] of Object.entries(e.itemTypes))
       if (l.includes(f))
-        for (const w of b)
+        for (const w of y)
           this._processItem(w, f, r, e, s);
-    const d = Object.values(e.spellcastingClasses ?? {}).reduce((f, b) => {
+    const d = Object.values(e.spellcastingClasses ?? {}).reduce((f, y) => {
       var k;
-      const w = (k = b.system.spellcasting) == null ? void 0 : k.preparation;
+      const w = (k = y.system.spellcasting) == null ? void 0 : k.preparation;
       return w != null && w.max && (f.value += w.value ?? 0, f.max += w.max), f;
     }, { value: 0, max: 0 });
     d.max > 0 && (r.spell.prepared = d);
-    const c = game.modules.find((f) => f.id === "wm5e") && ((P = game.modules.get("wm5e")) == null ? void 0 : P.active);
-    if (e.type === "character" && c && e.itemTypes.feat.find((b) => b.name === "Weapon Mastery" || b.name === "Weapon Master")) {
-      const b = e.getFlag("action-pack-enhanced", "masterySelectionPending");
-      r.equipped.forceOpen = b;
+    const c = game.modules.find((f) => f.id === "wm5e") && ((O = game.modules.get("wm5e")) == null ? void 0 : O.active);
+    if (e.type === "character" && c && e.itemTypes.feat.find((y) => y.name === "Weapon Mastery" || y.name === "Weapon Master")) {
+      const y = e.getFlag("action-pack-enhanced", "masterySelectionPending");
+      r.equipped.forceOpen = y;
     }
-    const p = (v = game.combat) == null ? void 0 : v.combatants.find((f) => f.actor === e), m = p && !p.initiative, g = game.modules.get("dnd5e-spellpoints"), y = g && (g != null && g.active) ? getSpellPointsItem(e) : null, S = this.sortItems(this.removeEmptySections(r)), x = this.addLegendaryActionUses(
-      y ? this.addSpellPointUses(S, y, a) : this.addSpellLevelUses(S, a),
+    const p = (v = game.combat) == null ? void 0 : v.combatants.find((f) => f.actor === e), m = p && !p.initiative, g = game.modules.get("dnd5e-spellpoints"), b = g && (g != null && g.active) ? getSpellPointsItem(e) : null, S = this.sortItems(this.removeEmptySections(r)), x = this.addLegendaryActionUses(
+      b ? this.addSpellPointUses(S, b, a) : this.addSpellLevelUses(S, a),
       a
     );
     return {
@@ -788,35 +788,35 @@ class Dt {
   }
   _processItem(e, t, a, s, n) {
     var p;
-    const i = e.system, r = It(e), l = this.settingShowNoUses || !r || r.available, d = ((p = i == null ? void 0 : i.activities) == null ? void 0 : p.size) > 0, c = e.getFlag("action-pack-enhanced", "hidden");
-    if (e.type === "equipment" && (i.identified && i.identifier === "shield" || e.name.includes("Shield")) && (i.equipped ? a.equipped.groups.shield.items.push({ item: e, uses: r }) : a.equipped.groups.unequipped.items.push({ item: e, uses: r })), l && d && !c)
+    const o = e.system, r = Pt(e), l = this.settingShowNoUses || !r || r.available, d = ((p = o == null ? void 0 : o.activities) == null ? void 0 : p.size) > 0, c = e.getFlag("action-pack-enhanced", "hidden");
+    if (e.type === "equipment" && (o.identified && o.identifier === "shield" || e.name.includes("Shield")) && (o.equipped ? a.equipped.groups.shield.items.push({ item: e, uses: r }) : a.equipped.groups.unequipped.items.push({ item: e, uses: r })), l && d && !c)
       switch (t) {
         case "feat":
-          this._prepareFeat(e, i, r, a);
+          this._prepareFeat(e, o, r, a);
           break;
         case "spell":
-          this._prepareSpell(e, i, r, a, n);
+          this._prepareSpell(e, o, r, a, n);
           break;
         case "weapon":
-          this._prepareWeapon(e, i, r, a);
+          this._prepareWeapon(e, o, r, a);
           break;
         case "equipment":
-          this._prepareEquipment(e, i, r, a);
+          this._prepareEquipment(e, o, r, a);
           break;
         case "consumable":
-          this._prepareConsumable(e, i, r, a);
+          this._prepareConsumable(e, o, r, a);
           break;
         case "facility":
           break;
         default:
-          this._prepareOther(e, i, r, a);
+          this._prepareOther(e, o, r, a);
           break;
       }
     else s.type === "npc" && a.passive.items.push({ item: e, uses: r });
   }
   _prepareFeat(e, t, a, s) {
     var l, d;
-    const n = et(e);
+    const n = Ye(e);
     if (n.has("legendary")) {
       s.legendary.items.push({ item: e, uses: a });
       return;
@@ -825,8 +825,8 @@ class Dt {
       s.lair.items.push({ item: e, uses: a });
       return;
     }
-    const i = (l = t.type) == null ? void 0 : l.value, r = (d = t.type) == null ? void 0 : d.subtype;
-    r && s.feature.groups[r] ? s.feature.groups[r].items.push({ item: e, uses: a }) : i && s.feature.groups[i] ? s.feature.groups[i].items.push({ item: e, uses: a }) : s.feature.groups.general.items.push({ item: e, uses: a });
+    const o = (l = t.type) == null ? void 0 : l.value, r = (d = t.type) == null ? void 0 : d.subtype;
+    r && s.feature.groups[r] ? s.feature.groups[r].items.push({ item: e, uses: a }) : o && s.feature.groups[o] ? s.feature.groups[o].items.push({ item: e, uses: a }) : s.feature.groups.general.items.push({ item: e, uses: a });
   }
   _prepareSpell(e, t, a, s, n) {
     var r;
@@ -889,7 +889,7 @@ class Dt {
     return Object.entries(e).reduce((a, [s, n]) => (t(n) && (a[s] = n), a), {});
   }
   addSpellPointUses(e, t, a) {
-    var i, r, l, d, c, p, m, g, y;
+    var o, r, l, d, c, p, m, g, b;
     const s = {
       0: 0,
       1: 2,
@@ -902,7 +902,7 @@ class Dt {
       8: 11,
       9: 13
     }, n = {
-      available: ((r = (i = t.system) == null ? void 0 : i.uses) == null ? void 0 : r.value) || 0,
+      available: ((r = (o = t.system) == null ? void 0 : o.uses) == null ? void 0 : r.value) || 0,
       maximum: ((d = (l = t.system) == null ? void 0 : l.uses) == null ? void 0 : d.max) || 0
     };
     if (e.spell) {
@@ -912,13 +912,13 @@ class Dt {
         x && (x.cost = s[S]);
       }
     }
-    return (m = (p = a.spells) == null ? void 0 : p.pact) != null && m.max && ((y = (g = e.spell) == null ? void 0 : g.groups) != null && y.pact) && (e.spell.groups.pact.uses = {
+    return (m = (p = a.spells) == null ? void 0 : p.pact) != null && m.max && ((b = (g = e.spell) == null ? void 0 : g.groups) != null && b.pact) && (e.spell.groups.pact.uses = {
       available: a.spells.pact.value,
       maximum: a.spells.pact.max
     }), e;
   }
   addSpellLevelUses(e, t) {
-    var a, s, n, i, r;
+    var a, s, n, o, r;
     for (let l = 1; l <= 9; l++) {
       const d = (a = e.spell) == null ? void 0 : a.groups[`spell${l}`];
       if (d) {
@@ -926,7 +926,7 @@ class Dt {
         d.uses = { available: c.value, maximum: c.max };
       }
     }
-    return (n = (s = t.spells) == null ? void 0 : s.pact) != null && n.max && ((r = (i = e.spell) == null ? void 0 : i.groups) != null && r.pact) && (e.spell.groups.pact.uses = {
+    return (n = (s = t.spells) == null ? void 0 : s.pact) != null && n.max && ((r = (o = e.spell) == null ? void 0 : o.groups) != null && r.pact) && (e.spell.groups.pact.uses = {
       available: t.spells.pact.value,
       maximum: t.spells.pact.max
     }), e;
@@ -945,9 +945,9 @@ class Dt {
     }), e;
   }
 }
-function Rt(o) {
+function Ut(i) {
   var n;
-  const { updateTray: e, updateTrayState: t } = o, a = !!((n = game.modules.get("dnd5e-spellpoints")) != null && n.active);
+  const { updateTray: e, updateTrayState: t } = i, a = !!((n = game.modules.get("dnd5e-spellpoints")) != null && n.active);
   function s() {
     return game.settings.get("action-pack-enhanced", "tray-display") === "always";
   }
@@ -1671,20 +1671,20 @@ function Rt(o) {
     editable: [
       { key: "KeyE", modifiers: [] }
     ],
-    onDown: (i) => {
+    onDown: (o) => {
       s() || ($("#ape-app").toggleClass("is-open"), $("#ape-app .ape-skill-container").removeClass("is-open"));
     }
   });
 }
-const De = "action-pack-enhanced", at = "https://raw.githubusercontent.com/averagejoe77/action-pack-enhanced/main", zt = `${at}/module.json`, Nt = `${at}/CHANGELOG.md`, Re = 5e3;
-class Ht {
+const De = "action-pack-enhanced", Dt = "https://www.dungeonsandderps.com/foundry-modules/update-check.php?module=action-pack-enhanced", zt = 5e3;
+class Rt {
   constructor() {
-    this.installedVersion = null, this.latestVersion = null, this.hasUpdate = !1, this.changelogEntries = [], this.checked = !1;
+    this.installedVersion = null, this.latestVersion = null, this.hasUpdate = !1, this.checked = !1;
   }
   /**
-   * Fetches the latest published manifest + changelog and compares against the
-   * installed version. Only does real work once per session. Never throws - any
-   * failure (offline, GitHub unreachable, unexpected format) just leaves hasUpdate
+   * Fetches the latest published version and compares against the installed
+   * version. Only does real work once per session. Never throws - any failure
+   * (offline, endpoint unreachable, unexpected format) just leaves hasUpdate
    * false so the badge quietly shows nothing new rather than breaking the tray.
    */
   async check() {
@@ -1693,43 +1693,26 @@ class Ht {
     const e = game.modules.get(De);
     if (this.installedVersion = (e == null ? void 0 : e.version) ?? null, !!this.installedVersion)
       try {
-        const t = await fetch(zt, { cache: "no-store", signal: AbortSignal.timeout(Re) });
+        const t = await fetch(Dt, { cache: "no-store", signal: AbortSignal.timeout(zt) });
         if (!t.ok) return;
         const a = await t.json();
-        if (this.latestVersion = a.version ?? null, !this.latestVersion || (this.hasUpdate = foundry.utils.isNewerVersion(this.latestVersion, this.installedVersion), !this.hasUpdate)) return;
-        const s = await fetch(Nt, { cache: "no-store", signal: AbortSignal.timeout(Re) });
-        if (!s.ok) return;
-        const n = await s.text();
-        this.changelogEntries = this._parseChangelog(n, this.installedVersion);
+        if (this.latestVersion = a.version ?? null, !this.latestVersion) return;
+        this.hasUpdate = foundry.utils.isNewerVersion(this.latestVersion, this.installedVersion);
       } catch (t) {
         console.warn(`${De} | version check failed`, t);
       }
   }
-  /**
-   * Parses "## [x.y.z] - date" sections (newest-first, matching this repo's
-   * CHANGELOG.md convention) and keeps only entries newer than the installed version.
-   */
-  _parseChangelog(e, t) {
-    const a = [], s = /^##\s*\[([^\]]+)\]\s*-\s*(.+)$/gm, n = [...e.matchAll(s)];
-    for (let i = 0; i < n.length; i++) {
-      const [r, l, d] = n[i];
-      if (!foundry.utils.isNewerVersion(l, t)) break;
-      const c = n[i].index + r.length, p = i + 1 < n.length ? n[i + 1].index : e.length, g = [...e.slice(c, p).matchAll(/^-\s+(.+)$/gm)].map((y) => y[1].trim());
-      a.push({ version: l, date: d.trim(), items: g });
-    }
-    return a;
-  }
 }
-const G = new Ht();
+const ee = new Rt();
 /**
  * @license
  * Copyright 2019 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const te = globalThis, ge = te.ShadowRoot && (te.ShadyCSS === void 0 || te.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, st = Symbol(), ze = /* @__PURE__ */ new WeakMap();
-let jt = class {
+const te = globalThis, ge = te.ShadowRoot && (te.ShadyCSS === void 0 || te.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, tt = Symbol(), ze = /* @__PURE__ */ new WeakMap();
+let Nt = class {
   constructor(e, t, a) {
-    if (this._$cssResult$ = !0, a !== st) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
+    if (this._$cssResult$ = !0, a !== tt) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
     this.cssText = e, this.t = t;
   }
   get styleSheet() {
@@ -1745,52 +1728,52 @@ let jt = class {
     return this.cssText;
   }
 };
-const Bt = (o) => new jt(typeof o == "string" ? o : o + "", void 0, st), Lt = (o, e) => {
-  if (ge) o.adoptedStyleSheets = e.map((t) => t instanceof CSSStyleSheet ? t : t.styleSheet);
+const Ht = (i) => new Nt(typeof i == "string" ? i : i + "", void 0, tt), Bt = (i, e) => {
+  if (ge) i.adoptedStyleSheets = e.map((t) => t instanceof CSSStyleSheet ? t : t.styleSheet);
   else for (const t of e) {
     const a = document.createElement("style"), s = te.litNonce;
-    s !== void 0 && a.setAttribute("nonce", s), a.textContent = t.cssText, o.appendChild(a);
+    s !== void 0 && a.setAttribute("nonce", s), a.textContent = t.cssText, i.appendChild(a);
   }
-}, Ne = ge ? (o) => o : (o) => o instanceof CSSStyleSheet ? ((e) => {
+}, Re = ge ? (i) => i : (i) => i instanceof CSSStyleSheet ? ((e) => {
   let t = "";
   for (const a of e.cssRules) t += a.cssText;
-  return Bt(t);
-})(o) : o;
+  return Ht(t);
+})(i) : i;
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const { is: Ft, defineProperty: Wt, getOwnPropertyDescriptor: Gt, getOwnPropertyNames: Vt, getOwnPropertySymbols: Xt, getPrototypeOf: Kt } = Object, O = globalThis, He = O.trustedTypes, Zt = He ? He.emptyScript : "", le = O.reactiveElementPolyfillSupport, V = (o, e) => o, he = { toAttribute(o, e) {
+const { is: jt, defineProperty: Lt, getOwnPropertyDescriptor: Ft, getOwnPropertyNames: Wt, getOwnPropertySymbols: Vt, getPrototypeOf: Gt } = Object, P = globalThis, Ne = P.trustedTypes, Xt = Ne ? Ne.emptyScript : "", le = P.reactiveElementPolyfillSupport, V = (i, e) => i, he = { toAttribute(i, e) {
   switch (e) {
     case Boolean:
-      o = o ? Zt : null;
+      i = i ? Xt : null;
       break;
     case Object:
     case Array:
-      o = o == null ? o : JSON.stringify(o);
+      i = i == null ? i : JSON.stringify(i);
   }
-  return o;
-}, fromAttribute(o, e) {
-  let t = o;
+  return i;
+}, fromAttribute(i, e) {
+  let t = i;
   switch (e) {
     case Boolean:
-      t = o !== null;
+      t = i !== null;
       break;
     case Number:
-      t = o === null ? null : Number(o);
+      t = i === null ? null : Number(i);
       break;
     case Object:
     case Array:
       try {
-        t = JSON.parse(o);
+        t = JSON.parse(i);
       } catch {
         t = null;
       }
   }
   return t;
-} }, nt = (o, e) => !Ft(o, e), je = { attribute: !0, type: String, converter: he, reflect: !1, useDefault: !1, hasChanged: nt };
-Symbol.metadata ?? (Symbol.metadata = Symbol("metadata")), O.litPropertyMetadata ?? (O.litPropertyMetadata = /* @__PURE__ */ new WeakMap());
+} }, at = (i, e) => !jt(i, e), He = { attribute: !0, type: String, converter: he, reflect: !1, useDefault: !1, hasChanged: at };
+Symbol.metadata ?? (Symbol.metadata = Symbol("metadata")), P.litPropertyMetadata ?? (P.litPropertyMetadata = /* @__PURE__ */ new WeakMap());
 let N = class extends HTMLElement {
   static addInitializer(e) {
     this._$Ei(), (this.l ?? (this.l = [])).push(e);
@@ -1798,35 +1781,35 @@ let N = class extends HTMLElement {
   static get observedAttributes() {
     return this.finalize(), this._$Eh && [...this._$Eh.keys()];
   }
-  static createProperty(e, t = je) {
+  static createProperty(e, t = He) {
     if (t.state && (t.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((t = Object.create(t)).wrapped = !0), this.elementProperties.set(e, t), !t.noAccessor) {
       const a = Symbol(), s = this.getPropertyDescriptor(e, a, t);
-      s !== void 0 && Wt(this.prototype, e, s);
+      s !== void 0 && Lt(this.prototype, e, s);
     }
   }
   static getPropertyDescriptor(e, t, a) {
-    const { get: s, set: n } = Gt(this.prototype, e) ?? { get() {
+    const { get: s, set: n } = Ft(this.prototype, e) ?? { get() {
       return this[t];
-    }, set(i) {
-      this[t] = i;
+    }, set(o) {
+      this[t] = o;
     } };
-    return { get: s, set(i) {
+    return { get: s, set(o) {
       const r = s == null ? void 0 : s.call(this);
-      n == null || n.call(this, i), this.requestUpdate(e, r, a);
+      n == null || n.call(this, o), this.requestUpdate(e, r, a);
     }, configurable: !0, enumerable: !0 };
   }
   static getPropertyOptions(e) {
-    return this.elementProperties.get(e) ?? je;
+    return this.elementProperties.get(e) ?? He;
   }
   static _$Ei() {
     if (this.hasOwnProperty(V("elementProperties"))) return;
-    const e = Kt(this);
+    const e = Gt(this);
     e.finalize(), e.l !== void 0 && (this.l = [...e.l]), this.elementProperties = new Map(e.elementProperties);
   }
   static finalize() {
     if (this.hasOwnProperty(V("finalized"))) return;
     if (this.finalized = !0, this._$Ei(), this.hasOwnProperty(V("properties"))) {
-      const t = this.properties, a = [...Vt(t), ...Xt(t)];
+      const t = this.properties, a = [...Wt(t), ...Vt(t)];
       for (const s of a) this.createProperty(s, t[s]);
     }
     const e = this[Symbol.metadata];
@@ -1845,8 +1828,8 @@ let N = class extends HTMLElement {
     const t = [];
     if (Array.isArray(e)) {
       const a = new Set(e.flat(1 / 0).reverse());
-      for (const s of a) t.unshift(Ne(s));
-    } else e !== void 0 && t.push(Ne(e));
+      for (const s of a) t.unshift(Re(s));
+    } else e !== void 0 && t.push(Re(e));
     return t;
   }
   static _$Eu(e, t) {
@@ -1875,7 +1858,7 @@ let N = class extends HTMLElement {
   }
   createRenderRoot() {
     const e = this.shadowRoot ?? this.attachShadow(this.constructor.shadowRootOptions);
-    return Lt(e, this.constructor.elementStyles), e;
+    return Bt(e, this.constructor.elementStyles), e;
   }
   connectedCallback() {
     var e;
@@ -1900,31 +1883,31 @@ let N = class extends HTMLElement {
     var n;
     const a = this.constructor.elementProperties.get(e), s = this.constructor._$Eu(e, a);
     if (s !== void 0 && a.reflect === !0) {
-      const i = (((n = a.converter) == null ? void 0 : n.toAttribute) !== void 0 ? a.converter : he).toAttribute(t, a.type);
-      this._$Em = e, i == null ? this.removeAttribute(s) : this.setAttribute(s, i), this._$Em = null;
+      const o = (((n = a.converter) == null ? void 0 : n.toAttribute) !== void 0 ? a.converter : he).toAttribute(t, a.type);
+      this._$Em = e, o == null ? this.removeAttribute(s) : this.setAttribute(s, o), this._$Em = null;
     }
   }
   _$AK(e, t) {
-    var n, i;
+    var n, o;
     const a = this.constructor, s = a._$Eh.get(e);
     if (s !== void 0 && this._$Em !== s) {
       const r = a.getPropertyOptions(s), l = typeof r.converter == "function" ? { fromAttribute: r.converter } : ((n = r.converter) == null ? void 0 : n.fromAttribute) !== void 0 ? r.converter : he;
       this._$Em = s;
       const d = l.fromAttribute(t, r.type);
-      this[s] = d ?? ((i = this._$Ej) == null ? void 0 : i.get(s)) ?? d, this._$Em = null;
+      this[s] = d ?? ((o = this._$Ej) == null ? void 0 : o.get(s)) ?? d, this._$Em = null;
     }
   }
   requestUpdate(e, t, a, s = !1, n) {
-    var i;
+    var o;
     if (e !== void 0) {
       const r = this.constructor;
-      if (s === !1 && (n = this[e]), a ?? (a = r.getPropertyOptions(e)), !((a.hasChanged ?? nt)(n, t) || a.useDefault && a.reflect && n === ((i = this._$Ej) == null ? void 0 : i.get(e)) && !this.hasAttribute(r._$Eu(e, a)))) return;
+      if (s === !1 && (n = this[e]), a ?? (a = r.getPropertyOptions(e)), !((a.hasChanged ?? at)(n, t) || a.useDefault && a.reflect && n === ((o = this._$Ej) == null ? void 0 : o.get(e)) && !this.hasAttribute(r._$Eu(e, a)))) return;
       this.C(e, t, a);
     }
     this.isUpdatePending === !1 && (this._$ES = this._$EP());
   }
-  C(e, t, { useDefault: a, reflect: s, wrapped: n }, i) {
-    a && !(this._$Ej ?? (this._$Ej = /* @__PURE__ */ new Map())).has(e) && (this._$Ej.set(e, i ?? t ?? this[e]), n !== !0 || i !== void 0) || (this._$AL.has(e) || (this.hasUpdated || a || (t = void 0), this._$AL.set(e, t)), s === !0 && this._$Em !== e && (this._$Eq ?? (this._$Eq = /* @__PURE__ */ new Set())).add(e));
+  C(e, t, { useDefault: a, reflect: s, wrapped: n }, o) {
+    a && !(this._$Ej ?? (this._$Ej = /* @__PURE__ */ new Map())).has(e) && (this._$Ej.set(e, o ?? t ?? this[e]), n !== !0 || o !== void 0) || (this._$AL.has(e) || (this.hasUpdated || a || (t = void 0), this._$AL.set(e, t)), s === !0 && this._$Em !== e && (this._$Eq ?? (this._$Eq = /* @__PURE__ */ new Set())).add(e));
   }
   async _$EP() {
     this.isUpdatePending = !0;
@@ -1944,13 +1927,13 @@ let N = class extends HTMLElement {
     if (!this.isUpdatePending) return;
     if (!this.hasUpdated) {
       if (this.renderRoot ?? (this.renderRoot = this.createRenderRoot()), this._$Ep) {
-        for (const [n, i] of this._$Ep) this[n] = i;
+        for (const [n, o] of this._$Ep) this[n] = o;
         this._$Ep = void 0;
       }
       const s = this.constructor.elementProperties;
-      if (s.size > 0) for (const [n, i] of s) {
-        const { wrapped: r } = i, l = this[n];
-        r !== !0 || this._$AL.has(n) || l === void 0 || this.C(n, void 0, i, l);
+      if (s.size > 0) for (const [n, o] of s) {
+        const { wrapped: r } = o, l = this[n];
+        r !== !0 || this._$AL.has(n) || l === void 0 || this.C(n, void 0, o, l);
       }
     }
     let e = !1;
@@ -1994,56 +1977,56 @@ let N = class extends HTMLElement {
   firstUpdated(e) {
   }
 };
-N.elementStyles = [], N.shadowRootOptions = { mode: "open" }, N[V("elementProperties")] = /* @__PURE__ */ new Map(), N[V("finalized")] = /* @__PURE__ */ new Map(), le == null || le({ ReactiveElement: N }), (O.reactiveElementVersions ?? (O.reactiveElementVersions = [])).push("2.1.2");
+N.elementStyles = [], N.shadowRootOptions = { mode: "open" }, N[V("elementProperties")] = /* @__PURE__ */ new Map(), N[V("finalized")] = /* @__PURE__ */ new Map(), le == null || le({ ReactiveElement: N }), (P.reactiveElementVersions ?? (P.reactiveElementVersions = [])).push("2.1.2");
 /**
  * @license
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const X = globalThis, Be = (o) => o, ae = X.trustedTypes, Le = ae ? ae.createPolicy("lit-html", { createHTML: (o) => o }) : void 0, it = "$lit$", T = `lit$${Math.random().toFixed(9).slice(2)}$`, ot = "?" + T, Jt = `<${ot}>`, D = document, K = () => D.createComment(""), Z = (o) => o === null || typeof o != "object" && typeof o != "function", fe = Array.isArray, Qt = (o) => fe(o) || typeof (o == null ? void 0 : o[Symbol.iterator]) == "function", ce = `[ 	
-\f\r]`, W = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Fe = /-->/g, We = />/g, I = RegExp(`>|${ce}(?:([^\\s"'>=/]+)(${ce}*=${ce}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), Ge = /'/g, Ve = /"/g, rt = /^(?:script|style|textarea|title)$/i, Yt = (o) => (e, ...t) => ({ _$litType$: o, strings: e, values: t }), u = Yt(1), R = Symbol.for("lit-noChange"), h = Symbol.for("lit-nothing"), Xe = /* @__PURE__ */ new WeakMap(), M = D.createTreeWalker(D, 129);
-function lt(o, e) {
-  if (!fe(o) || !o.hasOwnProperty("raw")) throw Error("invalid template strings array");
-  return Le !== void 0 ? Le.createHTML(e) : e;
+const G = globalThis, Be = (i) => i, ae = G.trustedTypes, je = ae ? ae.createPolicy("lit-html", { createHTML: (i) => i }) : void 0, st = "$lit$", T = `lit$${Math.random().toFixed(9).slice(2)}$`, nt = "?" + T, Kt = `<${nt}>`, D = document, X = () => D.createComment(""), K = (i) => i === null || typeof i != "object" && typeof i != "function", fe = Array.isArray, Zt = (i) => fe(i) || typeof (i == null ? void 0 : i[Symbol.iterator]) == "function", ce = `[ 	
+\f\r]`, W = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, Le = /-->/g, Fe = />/g, I = RegExp(`>|${ce}(?:([^\\s"'>=/]+)(${ce}*=${ce}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`, "g"), We = /'/g, Ve = /"/g, it = /^(?:script|style|textarea|title)$/i, Jt = (i) => (e, ...t) => ({ _$litType$: i, strings: e, values: t }), u = Jt(1), z = Symbol.for("lit-noChange"), h = Symbol.for("lit-nothing"), Ge = /* @__PURE__ */ new WeakMap(), M = D.createTreeWalker(D, 129);
+function ot(i, e) {
+  if (!fe(i) || !i.hasOwnProperty("raw")) throw Error("invalid template strings array");
+  return je !== void 0 ? je.createHTML(e) : e;
 }
-const ea = (o, e) => {
-  const t = o.length - 1, a = [];
-  let s, n = e === 2 ? "<svg>" : e === 3 ? "<math>" : "", i = W;
+const Qt = (i, e) => {
+  const t = i.length - 1, a = [];
+  let s, n = e === 2 ? "<svg>" : e === 3 ? "<math>" : "", o = W;
   for (let r = 0; r < t; r++) {
-    const l = o[r];
+    const l = i[r];
     let d, c, p = -1, m = 0;
-    for (; m < l.length && (i.lastIndex = m, c = i.exec(l), c !== null); ) m = i.lastIndex, i === W ? c[1] === "!--" ? i = Fe : c[1] !== void 0 ? i = We : c[2] !== void 0 ? (rt.test(c[2]) && (s = RegExp("</" + c[2], "g")), i = I) : c[3] !== void 0 && (i = I) : i === I ? c[0] === ">" ? (i = s ?? W, p = -1) : c[1] === void 0 ? p = -2 : (p = i.lastIndex - c[2].length, d = c[1], i = c[3] === void 0 ? I : c[3] === '"' ? Ve : Ge) : i === Ve || i === Ge ? i = I : i === Fe || i === We ? i = W : (i = I, s = void 0);
-    const g = i === I && o[r + 1].startsWith("/>") ? " " : "";
-    n += i === W ? l + Jt : p >= 0 ? (a.push(d), l.slice(0, p) + it + l.slice(p) + T + g) : l + T + (p === -2 ? r : g);
+    for (; m < l.length && (o.lastIndex = m, c = o.exec(l), c !== null); ) m = o.lastIndex, o === W ? c[1] === "!--" ? o = Le : c[1] !== void 0 ? o = Fe : c[2] !== void 0 ? (it.test(c[2]) && (s = RegExp("</" + c[2], "g")), o = I) : c[3] !== void 0 && (o = I) : o === I ? c[0] === ">" ? (o = s ?? W, p = -1) : c[1] === void 0 ? p = -2 : (p = o.lastIndex - c[2].length, d = c[1], o = c[3] === void 0 ? I : c[3] === '"' ? Ve : We) : o === Ve || o === We ? o = I : o === Le || o === Fe ? o = W : (o = I, s = void 0);
+    const g = o === I && i[r + 1].startsWith("/>") ? " " : "";
+    n += o === W ? l + Kt : p >= 0 ? (a.push(d), l.slice(0, p) + st + l.slice(p) + T + g) : l + T + (p === -2 ? r : g);
   }
-  return [lt(o, n + (o[t] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), a];
+  return [ot(i, n + (i[t] || "<?>") + (e === 2 ? "</svg>" : e === 3 ? "</math>" : "")), a];
 };
-class J {
+class Z {
   constructor({ strings: e, _$litType$: t }, a) {
     let s;
     this.parts = [];
-    let n = 0, i = 0;
-    const r = e.length - 1, l = this.parts, [d, c] = ea(e, t);
-    if (this.el = J.createElement(d, a), M.currentNode = this.el.content, t === 2 || t === 3) {
+    let n = 0, o = 0;
+    const r = e.length - 1, l = this.parts, [d, c] = Qt(e, t);
+    if (this.el = Z.createElement(d, a), M.currentNode = this.el.content, t === 2 || t === 3) {
       const p = this.el.content.firstChild;
       p.replaceWith(...p.childNodes);
     }
     for (; (s = M.nextNode()) !== null && l.length < r; ) {
       if (s.nodeType === 1) {
-        if (s.hasAttributes()) for (const p of s.getAttributeNames()) if (p.endsWith(it)) {
-          const m = c[i++], g = s.getAttribute(p).split(T), y = /([.?@])?(.*)/.exec(m);
-          l.push({ type: 1, index: n, name: y[2], strings: g, ctor: y[1] === "." ? aa : y[1] === "?" ? sa : y[1] === "@" ? na : ne }), s.removeAttribute(p);
+        if (s.hasAttributes()) for (const p of s.getAttributeNames()) if (p.endsWith(st)) {
+          const m = c[o++], g = s.getAttribute(p).split(T), b = /([.?@])?(.*)/.exec(m);
+          l.push({ type: 1, index: n, name: b[2], strings: g, ctor: b[1] === "." ? ea : b[1] === "?" ? ta : b[1] === "@" ? aa : ne }), s.removeAttribute(p);
         } else p.startsWith(T) && (l.push({ type: 6, index: n }), s.removeAttribute(p));
-        if (rt.test(s.tagName)) {
+        if (it.test(s.tagName)) {
           const p = s.textContent.split(T), m = p.length - 1;
           if (m > 0) {
             s.textContent = ae ? ae.emptyScript : "";
-            for (let g = 0; g < m; g++) s.append(p[g], K()), M.nextNode(), l.push({ type: 2, index: ++n });
-            s.append(p[m], K());
+            for (let g = 0; g < m; g++) s.append(p[g], X()), M.nextNode(), l.push({ type: 2, index: ++n });
+            s.append(p[m], X());
           }
         }
-      } else if (s.nodeType === 8) if (s.data === ot) l.push({ type: 2, index: n });
+      } else if (s.nodeType === 8) if (s.data === nt) l.push({ type: 2, index: n });
       else {
         let p = -1;
         for (; (p = s.data.indexOf(T, p + 1)) !== -1; ) l.push({ type: 7, index: n }), p += T.length - 1;
@@ -2056,14 +2039,14 @@ class J {
     return a.innerHTML = e, a;
   }
 }
-function j(o, e, t = o, a) {
-  var i, r;
-  if (e === R) return e;
-  let s = a !== void 0 ? (i = t._$Co) == null ? void 0 : i[a] : t._$Cl;
-  const n = Z(e) ? void 0 : e._$litDirective$;
-  return (s == null ? void 0 : s.constructor) !== n && ((r = s == null ? void 0 : s._$AO) == null || r.call(s, !1), n === void 0 ? s = void 0 : (s = new n(o), s._$AT(o, t, a)), a !== void 0 ? (t._$Co ?? (t._$Co = []))[a] = s : t._$Cl = s), s !== void 0 && (e = j(o, s._$AS(o, e.values), s, a)), e;
+function B(i, e, t = i, a) {
+  var o, r;
+  if (e === z) return e;
+  let s = a !== void 0 ? (o = t._$Co) == null ? void 0 : o[a] : t._$Cl;
+  const n = K(e) ? void 0 : e._$litDirective$;
+  return (s == null ? void 0 : s.constructor) !== n && ((r = s == null ? void 0 : s._$AO) == null || r.call(s, !1), n === void 0 ? s = void 0 : (s = new n(i), s._$AT(i, t, a)), a !== void 0 ? (t._$Co ?? (t._$Co = []))[a] = s : t._$Cl = s), s !== void 0 && (e = B(i, s._$AS(i, e.values), s, a)), e;
 }
-class ta {
+class Yt {
   constructor(e, t) {
     this._$AV = [], this._$AN = void 0, this._$AD = e, this._$AM = t;
   }
@@ -2076,13 +2059,13 @@ class ta {
   u(e) {
     const { el: { content: t }, parts: a } = this._$AD, s = ((e == null ? void 0 : e.creationScope) ?? D).importNode(t, !0);
     M.currentNode = s;
-    let n = M.nextNode(), i = 0, r = 0, l = a[0];
+    let n = M.nextNode(), o = 0, r = 0, l = a[0];
     for (; l !== void 0; ) {
-      if (i === l.index) {
+      if (o === l.index) {
         let d;
-        l.type === 2 ? d = new Y(n, n.nextSibling, this, e) : l.type === 1 ? d = new l.ctor(n, l.name, l.strings, this, e) : l.type === 6 && (d = new ia(n, this, e)), this._$AV.push(d), l = a[++r];
+        l.type === 2 ? d = new Q(n, n.nextSibling, this, e) : l.type === 1 ? d = new l.ctor(n, l.name, l.strings, this, e) : l.type === 6 && (d = new sa(n, this, e)), this._$AV.push(d), l = a[++r];
       }
-      i !== (l == null ? void 0 : l.index) && (n = M.nextNode(), i++);
+      o !== (l == null ? void 0 : l.index) && (n = M.nextNode(), o++);
     }
     return M.currentNode = D, s;
   }
@@ -2091,7 +2074,7 @@ class ta {
     for (const a of this._$AV) a !== void 0 && (a.strings !== void 0 ? (a._$AI(e, a, t), t += a.strings.length - 2) : a._$AI(e[t])), t++;
   }
 }
-class Y {
+class Q {
   get _$AU() {
     var e;
     return ((e = this._$AM) == null ? void 0 : e._$AU) ?? this._$Cv;
@@ -2111,7 +2094,7 @@ class Y {
     return this._$AB;
   }
   _$AI(e, t = this) {
-    e = j(this, e, t), Z(e) ? e === h || e == null || e === "" ? (this._$AH !== h && this._$AR(), this._$AH = h) : e !== this._$AH && e !== R && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : Qt(e) ? this.k(e) : this._(e);
+    e = B(this, e, t), K(e) ? e === h || e == null || e === "" ? (this._$AH !== h && this._$AR(), this._$AH = h) : e !== this._$AH && e !== z && this._(e) : e._$litType$ !== void 0 ? this.$(e) : e.nodeType !== void 0 ? this.T(e) : Zt(e) ? this.k(e) : this._(e);
   }
   O(e) {
     return this._$AA.parentNode.insertBefore(e, this._$AB);
@@ -2120,26 +2103,26 @@ class Y {
     this._$AH !== e && (this._$AR(), this._$AH = this.O(e));
   }
   _(e) {
-    this._$AH !== h && Z(this._$AH) ? this._$AA.nextSibling.data = e : this.T(D.createTextNode(e)), this._$AH = e;
+    this._$AH !== h && K(this._$AH) ? this._$AA.nextSibling.data = e : this.T(D.createTextNode(e)), this._$AH = e;
   }
   $(e) {
     var n;
-    const { values: t, _$litType$: a } = e, s = typeof a == "number" ? this._$AC(e) : (a.el === void 0 && (a.el = J.createElement(lt(a.h, a.h[0]), this.options)), a);
+    const { values: t, _$litType$: a } = e, s = typeof a == "number" ? this._$AC(e) : (a.el === void 0 && (a.el = Z.createElement(ot(a.h, a.h[0]), this.options)), a);
     if (((n = this._$AH) == null ? void 0 : n._$AD) === s) this._$AH.p(t);
     else {
-      const i = new ta(s, this), r = i.u(this.options);
-      i.p(t), this.T(r), this._$AH = i;
+      const o = new Yt(s, this), r = o.u(this.options);
+      o.p(t), this.T(r), this._$AH = o;
     }
   }
   _$AC(e) {
-    let t = Xe.get(e.strings);
-    return t === void 0 && Xe.set(e.strings, t = new J(e)), t;
+    let t = Ge.get(e.strings);
+    return t === void 0 && Ge.set(e.strings, t = new Z(e)), t;
   }
   k(e) {
     fe(this._$AH) || (this._$AH = [], this._$AR());
     const t = this._$AH;
     let a, s = 0;
-    for (const n of e) s === t.length ? t.push(a = new Y(this.O(K()), this.O(K()), this, this.options)) : a = t[s], a._$AI(n), s++;
+    for (const n of e) s === t.length ? t.push(a = new Q(this.O(X()), this.O(X()), this, this.options)) : a = t[s], a._$AI(n), s++;
     s < t.length && (this._$AR(a && a._$AB.nextSibling, s), t.length = s);
   }
   _$AR(e = this._$AA.nextSibling, t) {
@@ -2166,20 +2149,20 @@ class ne {
   }
   _$AI(e, t = this, a, s) {
     const n = this.strings;
-    let i = !1;
-    if (n === void 0) e = j(this, e, t, 0), i = !Z(e) || e !== this._$AH && e !== R, i && (this._$AH = e);
+    let o = !1;
+    if (n === void 0) e = B(this, e, t, 0), o = !K(e) || e !== this._$AH && e !== z, o && (this._$AH = e);
     else {
       const r = e;
       let l, d;
-      for (e = n[0], l = 0; l < n.length - 1; l++) d = j(this, r[a + l], t, l), d === R && (d = this._$AH[l]), i || (i = !Z(d) || d !== this._$AH[l]), d === h ? e = h : e !== h && (e += (d ?? "") + n[l + 1]), this._$AH[l] = d;
+      for (e = n[0], l = 0; l < n.length - 1; l++) d = B(this, r[a + l], t, l), d === z && (d = this._$AH[l]), o || (o = !K(d) || d !== this._$AH[l]), d === h ? e = h : e !== h && (e += (d ?? "") + n[l + 1]), this._$AH[l] = d;
     }
-    i && !s && this.j(e);
+    o && !s && this.j(e);
   }
   j(e) {
     e === h ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, e ?? "");
   }
 }
-class aa extends ne {
+class ea extends ne {
   constructor() {
     super(...arguments), this.type = 3;
   }
@@ -2187,7 +2170,7 @@ class aa extends ne {
     this.element[this.name] = e === h ? void 0 : e;
   }
 }
-class sa extends ne {
+class ta extends ne {
   constructor() {
     super(...arguments), this.type = 4;
   }
@@ -2195,12 +2178,12 @@ class sa extends ne {
     this.element.toggleAttribute(this.name, !!e && e !== h);
   }
 }
-class na extends ne {
+class aa extends ne {
   constructor(e, t, a, s, n) {
     super(e, t, a, s, n), this.type = 5;
   }
   _$AI(e, t = this) {
-    if ((e = j(this, e, t, 0) ?? h) === R) return;
+    if ((e = B(this, e, t, 0) ?? h) === z) return;
     const a = this._$AH, s = e === h && a !== h || e.capture !== a.capture || e.once !== a.once || e.passive !== a.passive, n = e !== h && (a === h || s);
     s && this.element.removeEventListener(this.name, this, a), n && this.element.addEventListener(this.name, this, e), this._$AH = e;
   }
@@ -2209,7 +2192,7 @@ class na extends ne {
     typeof this._$AH == "function" ? this._$AH.call(((t = this.options) == null ? void 0 : t.host) ?? this.element, e) : this._$AH.handleEvent(e);
   }
 }
-class ia {
+class sa {
   constructor(e, t, a) {
     this.element = e, this.type = 6, this._$AN = void 0, this._$AM = t, this.options = a;
   }
@@ -2217,19 +2200,19 @@ class ia {
     return this._$AM._$AU;
   }
   _$AI(e) {
-    j(this, e);
+    B(this, e);
   }
 }
-const pe = X.litHtmlPolyfillSupport;
-pe == null || pe(J, Y), (X.litHtmlVersions ?? (X.litHtmlVersions = [])).push("3.3.2");
-const oa = (o, e, t) => {
+const pe = G.litHtmlPolyfillSupport;
+pe == null || pe(Z, Q), (G.litHtmlVersions ?? (G.litHtmlVersions = [])).push("3.3.2");
+const na = (i, e, t) => {
   const a = (t == null ? void 0 : t.renderBefore) ?? e;
   let s = a._$litPart$;
   if (s === void 0) {
     const n = (t == null ? void 0 : t.renderBefore) ?? null;
-    a._$litPart$ = s = new Y(e.insertBefore(K(), n), n, void 0, t ?? {});
+    a._$litPart$ = s = new Q(e.insertBefore(X(), n), n, void 0, t ?? {});
   }
-  return s._$AI(o), s;
+  return s._$AI(i), s;
 };
 /**
  * @license
@@ -2248,7 +2231,7 @@ let A = class extends N {
   }
   update(e) {
     const t = this.render();
-    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = oa(t, this.renderRoot, this.renderOptions);
+    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(e), this._$Do = na(t, this.renderRoot, this.renderOptions);
   }
   connectedCallback() {
     var e;
@@ -2259,11 +2242,11 @@ let A = class extends N {
     super.disconnectedCallback(), (e = this._$Do) == null || e.setConnected(!1);
   }
   render() {
-    return R;
+    return z;
   }
 };
-var Ye;
-A._$litElement$ = !0, A.finalized = !0, (Ye = U.litElementHydrateSupport) == null || Ye.call(U, { LitElement: A });
+var Qe;
+A._$litElement$ = !0, A.finalized = !0, (Qe = U.litElementHydrateSupport) == null || Qe.call(U, { LitElement: A });
 const de = U.litElementPolyfillSupport;
 de == null || de({ LitElement: A });
 (U.litElementVersions ?? (U.litElementVersions = [])).push("4.2.2");
@@ -2272,8 +2255,8 @@ de == null || de({ LitElement: A });
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const ra = { CHILD: 2 }, la = (o) => (...e) => ({ _$litDirective$: o, values: e });
-class ca {
+const ia = { CHILD: 2 }, oa = (i) => (...e) => ({ _$litDirective$: i, values: e });
+class ra {
   constructor(e) {
   }
   get _$AU() {
@@ -2294,13 +2277,13 @@ class ca {
  * Copyright 2017 Google LLC
  * SPDX-License-Identifier: BSD-3-Clause
  */
-class me extends ca {
+class me extends ra {
   constructor(e) {
-    if (super(e), this.it = h, e.type !== ra.CHILD) throw Error(this.constructor.directiveName + "() can only be used in child bindings");
+    if (super(e), this.it = h, e.type !== ia.CHILD) throw Error(this.constructor.directiveName + "() can only be used in child bindings");
   }
   render(e) {
     if (e === h || e == null) return this._t = void 0, this.it = e;
-    if (e === R) return e;
+    if (e === z) return e;
     if (typeof e != "string") throw Error(this.constructor.directiveName + "() called with a non-string value");
     if (e === this.it) return this._t;
     this.it = e;
@@ -2309,11 +2292,11 @@ class me extends ca {
   }
 }
 me.directiveName = "unsafeHTML", me.resultType = 1;
-const pa = la(me), da = [
+const la = oa(me), ca = [
   { name: "Elf", type: "Elf Lineage", values: ["Drow", "High", "Wood"] },
   { name: "Tiefling", type: "Fiendish Legacy", values: ["Abyssal", "Chthonic", "Infernal"] }
 ];
-class ct extends A {
+class rt extends A {
   // Use Light DOM to inherit global styles
   createRenderRoot() {
     return this;
@@ -2353,28 +2336,28 @@ class ct extends A {
     e.preventDefault(), e.stopPropagation(), this.api.deleteItem(this.item);
   }
   render() {
-    var we, _e, Se, Ae, Ce, xe, Ee, Te, Oe, Pe, Ie, Me, qe;
+    var we, _e, Se, Ae, Ce, xe, Ee, Te, Pe, Oe, Ie, Me, qe;
     if (!this.item) return h;
-    const e = this.item.system, t = this.item.actor, a = e.rarity !== "" ? e.rarity : this.item.type === "weapon" ? "common" : "", s = this.item.type === "spell", n = e.method === "innate", i = this.uses && (!s || n), r = (we = e.properties) == null ? void 0 : we.has("ritual"), l = (_e = e.properties) == null ? void 0 : _e.has("concentration"), d = et(this.item), c = d.has("bonus"), p = d.has("reaction"), m = d.has("legendary"), g = d.has("lair"), y = (Se = this.item) == null ? void 0 : Se.hasRecharge, S = !this.item.isOnCooldown, x = e.equipped, P = this.item.type === "equipment" && (e.identified && e.identifier === "shield" || this.item.name.includes("Shield"));
+    const e = this.item.system, t = this.item.actor, a = e.rarity !== "" ? e.rarity : this.item.type === "weapon" ? "common" : "", s = this.item.type === "spell", n = e.method === "innate", o = this.uses && (!s || n), r = (we = e.properties) == null ? void 0 : we.has("ritual"), l = (_e = e.properties) == null ? void 0 : _e.has("concentration"), d = Ye(this.item), c = d.has("bonus"), p = d.has("reaction"), m = d.has("legendary"), g = d.has("lair"), b = (Se = this.item) == null ? void 0 : Se.hasRecharge, S = !this.item.isOnCooldown, x = e.equipped, O = this.item.type === "equipment" && (e.identified && e.identifier === "shield" || this.item.name.includes("Shield"));
     let v = null;
     if (this.item.type === "weapon" && ((Ae = e.ammunition) != null && Ae.type)) {
-      const F = (e.ammunitionOptions ?? []).reduce((bt, vt) => bt + (vt.item.system.quantity || 0), 0), Ue = (Ee = (xe = (Ce = CONFIG.DND5E.consumableTypes) == null ? void 0 : Ce.ammo) == null ? void 0 : xe.subtypes) == null ? void 0 : Ee[e.ammunition.type];
+      const F = (e.ammunitionOptions ?? []).reduce((ft, yt) => ft + (yt.item.system.quantity || 0), 0), Ue = (Ee = (xe = (Ce = CONFIG.DND5E.consumableTypes) == null ? void 0 : Ce.ammo) == null ? void 0 : xe.subtypes) == null ? void 0 : Ee[e.ammunition.type];
       v = { label: Ue ? game.i18n.localize(Ue) : e.ammunition.type, total: F };
     }
     let f = null;
-    if (y && ((Te = e.uses) != null && Te.recovery)) {
+    if (b && ((Te = e.uses) != null && Te.recovery)) {
       const _ = e.uses.recovery.find((F) => F.period === "recharge");
       _ && (f = _.formula);
     }
-    let b = !1, w = !1, k = "";
-    if (game.modules.find((_) => _.id === "wm5e") && ((Oe = game.modules.get("wm5e")) != null && Oe.active) && (b = e.mastery || !1, b && this.item.type === "weapon")) {
-      const _ = (Pe = e.type) == null ? void 0 : Pe.baseItem, F = new Set(this.masteryIds || ((qe = (Me = (Ie = t.system.traits) == null ? void 0 : Ie.weaponProf) == null ? void 0 : Me.mastery) == null ? void 0 : qe.value) || []);
-      w = _ && F.has(_), k = game.i18n.localize(`action-pack-enhanced.masteries.${b}`);
+    let y = !1, w = !1, k = "";
+    if (game.modules.find((_) => _.id === "wm5e") && ((Pe = game.modules.get("wm5e")) != null && Pe.active) && (y = e.mastery || !1, y && this.item.type === "weapon")) {
+      const _ = (Oe = e.type) == null ? void 0 : Oe.baseItem, F = new Set(this.masteryIds || ((qe = (Me = (Ie = t.system.traits) == null ? void 0 : Ie.weaponProf) == null ? void 0 : Me.mastery) == null ? void 0 : qe.value) || []);
+      w = _ && F.has(_), k = game.i18n.localize(`action-pack-enhanced.masteries.${y}`);
     }
-    const z = !!t.itemTypes.feat.find((_) => _.name === "Ritual Adept"), L = e.prepared === 0 && !(r && z);
+    const R = !!t.itemTypes.feat.find((_) => _.name === "Ritual Adept"), L = e.prepared === 0 && !(r && R);
     let ie = !1;
     L && !this.canManage && (ie = !0, `${game.i18n.localize("action-pack-enhanced.flag.unprepared-title")}${game.i18n.localize("action-pack-enhanced.flag.unprepared")}`);
-    const ft = this.canManage && e.quantity !== void 0, yt = this.canManage && s && e.method === "spell" && e.prepared !== 2;
+    const mt = this.canManage && e.quantity !== void 0, gt = this.canManage && s && e.method === "spell" && e.prepared !== 2;
     return u`
             <div class="item-name rollable flexrow ${L && !this.canManage ? "unprepared" : ""}">
                 ${this.canManage ? u`
@@ -2391,13 +2374,13 @@ class ct extends A {
                 <div class="item-name-wrap flexrow">
                     <h4 @mousedown="${this._onClick}">
                         <span class="item-text ${a}">${this.item.name}</span>
-                        ${i ? u` (${this.uses.available}${this.uses.maximum ? "/" + this.uses.maximum : ""})` : h}
+                        ${o ? u` (${this.uses.available}${this.uses.maximum ? "/" + this.uses.maximum : ""})` : h}
                         ${v ? u` <span class="item-ammo">(${v.label}: ${v.total})</span>` : h}
                     </h4>
-                    ${this.showWeaponMastery ? this._renderWeaponMastery(b, w, k) : h}
+                    ${this.showWeaponMastery ? this._renderWeaponMastery(y, w, k) : h}
                 </div>
 
-                ${ft ? u`
+                ${mt ? u`
                     <span class="item-qty" title="${game.i18n.localize("action-pack-enhanced.manage.quantity-title")}">
                         <span class="item-qty-display" @mousedown="${(_) => _.stopPropagation()}" @click="${this._toggleQtyInput}">x${e.quantity}</span>
                         <input type="text" class="item-qty-input" value="${e.quantity}"
@@ -2416,16 +2399,16 @@ class ct extends A {
                 ${m ? u`<div class="legendary flag" title="${game.i18n.localize("action-pack-enhanced.flag.legendary-title")}">${game.i18n.localize("action-pack-enhanced.flag.legendary")}</div>` : h}
                 ${g ? u`<div class="lair flag" title="${game.i18n.localize("action-pack-enhanced.flag.lair-title")}">${game.i18n.localize("action-pack-enhanced.flag.lair")}</div>` : h}
 
-                ${y ? S ? u`<div class="flag"><i class="fas fa-bolt"></i></div>` : u`<div class="flag"><a class="rollable item-recharge" @mousedown="${this._onRecharge}"><i class="fas fa-dice-six"></i> ${f}+</a></div>` : h}
+                ${b ? S ? u`<div class="flag"><i class="fas fa-bolt"></i></div>` : u`<div class="flag"><a class="rollable item-recharge" @mousedown="${this._onRecharge}"><i class="fas fa-dice-six"></i> ${f}+</a></div>` : h}
 
-                ${yt && !ie ? u`
+                ${gt && !ie ? u`
                     <div class="prepared-toggle flag ${L ? "unprepared" : "prepared"}"
                         title="${game.i18n.localize(L ? "action-pack-enhanced.manage.unprepared-toggle-title" : "action-pack-enhanced.manage.prepared-title")}"
                         @mousedown="${this._onTogglePrepared}">
                         <i class="${e.prepared === 1 ? "fas" : "far"} fa-sun"></i>
                     </div>
                 ` : ie ? u`<div class="unprepared flag" title="${game.i18n.localize("action-pack-enhanced.flag.unprepared-title")}">${game.i18n.localize("action-pack-enhanced.flag.unprepared")}</div>` : h}
-                ${(this.item.type === "weapon" || P) && !x ? u`<div class="unequipped flag" title="${game.i18n.localize("action-pack-enhanced.flag.unequipped-title")}" @mousedown="${this._onEquip}">${game.i18n.localize("action-pack-enhanced.flag.unequipped")}</div>` : h}
+                ${(this.item.type === "weapon" || O) && !x ? u`<div class="unequipped flag" title="${game.i18n.localize("action-pack-enhanced.flag.unequipped-title")}" @mousedown="${this._onEquip}">${game.i18n.localize("action-pack-enhanced.flag.unequipped")}</div>` : h}
                 
             </div>
 
@@ -2439,7 +2422,7 @@ class ct extends A {
             ${this.expanded ? u`
                 <div class="item-summary" style="display:block">
                     ${this._renderItemDetails()}
-                    ${this.description ? u`<p>${pa(this.description.description)}</p>` : u`<i class="fas fa-spinner fa-spin"></i>`}
+                    ${this.description ? u`<p>${la(this.description.description)}</p>` : u`<i class="fas fa-spinner fa-spin"></i>`}
                     <div class="item-properties">
                         ${this._renderItemProperties(this.item)}
                     </div>
@@ -2452,7 +2435,7 @@ class ct extends A {
   }
   _renderItemDetails() {
     const e = this.item, t = e.actor;
-    let a = At(e), s = null;
+    let a = _t(e), s = null;
     return e.type === "spell" && e.getFlag("dnd5e", "advancementOrigin") && (s = this._getItemSource(e, t)), u`
             ${s ? u`<p><strong>Source:</strong> ${s.name} (${s.type})</p>` : h}
             ${a.school ? u`<p><strong>School:</strong> ${a.school}</p>` : h}
@@ -2463,8 +2446,8 @@ class ct extends A {
         `;
   }
   _renderItemProperties(e) {
-    var n, i, r, l, d;
-    const t = ((n = e == null ? void 0 : e.labels) == null ? void 0 : n.properties) || [], a = e.labels.hasOwnProperty("damageTypes") ? (r = (i = e == null ? void 0 : e.labels) == null ? void 0 : i.damageTypes) != null && r.includes(",") ? (l = e == null ? void 0 : e.labels) == null ? void 0 : l.damageTypes.split(",") : [(d = e == null ? void 0 : e.labels) == null ? void 0 : d.damageTypes] : [], s = [];
+    var n, o, r, l, d;
+    const t = ((n = e == null ? void 0 : e.labels) == null ? void 0 : n.properties) || [], a = e.labels.hasOwnProperty("damageTypes") ? (r = (o = e == null ? void 0 : e.labels) == null ? void 0 : o.damageTypes) != null && r.includes(",") ? (l = e == null ? void 0 : e.labels) == null ? void 0 : l.damageTypes.split(",") : [(d = e == null ? void 0 : e.labels) == null ? void 0 : d.damageTypes] : [], s = [];
     if (a.length > 0) {
       const p = a.map((m) => ({ label: m })).map((m) => m.label);
       s.push(...p);
@@ -2482,9 +2465,9 @@ class ct extends A {
     return (s = game.modules.get("wm5e")) != null && s.active && e ? u`<div class="mastery ${t ? "active" : "inactive"} flag">${a}</div>` : h;
   }
   _getItemSource(e, t) {
-    var n, i;
+    var n, o;
     let a = null;
-    const s = (i = (n = e.flags) == null ? void 0 : n.dnd5e) == null ? void 0 : i.advancementOrigin;
+    const s = (o = (n = e.flags) == null ? void 0 : n.dnd5e) == null ? void 0 : o.advancementOrigin;
     if (s) {
       const r = s.split(".");
       if (r.length >= 1) {
@@ -2494,8 +2477,8 @@ class ct extends A {
         else if (d && d.type === "race") {
           const c = d.name;
           let p = "";
-          const m = c.split(", ")[0], g = c.split(", ")[1], y = da.find((S) => S.name === m && S.values.includes(g));
-          y ? p = `${g} ${y.type}` : p = "Species Trait", a = { name: `${m}`, type: `${p}` };
+          const m = c.split(", ")[0], g = c.split(", ")[1], b = ca.find((S) => S.name === m && S.values.includes(g));
+          b ? p = `${g} ${b.type}` : p = "Species Trait", a = { name: `${m}`, type: `${p}` };
         } else
           a = null;
       }
@@ -2503,7 +2486,7 @@ class ct extends A {
     return a;
   }
 }
-E(ct, "properties", {
+E(rt, "properties", {
   // Foundry mutates Item documents in place, so the reference passed down never
   // changes even when system.prepared/quantity/etc. do. Force a re-render on every
   // reassignment instead of relying on Lit's default reference-equality check.
@@ -2516,8 +2499,8 @@ E(ct, "properties", {
   showWeaponMastery: { type: Boolean },
   canManage: { type: Boolean }
 });
-customElements.define("ape-item", ct);
-class pt extends A {
+customElements.define("ape-item", rt);
+class lt extends A {
   _openJournal(e) {
     fromUuid(e).then((t) => {
       var a;
@@ -2596,14 +2579,14 @@ class pt extends A {
             ${this.items && this.items.length > 0 ? u`
                 <div class="ape-items">
                     ${this.items.map((t) => {
-      var a, s, n, i, r;
+      var a, s, n, o, r;
       return u`
                         <ape-item class="ape-item item"
                             data-item-uuid="${t.item.uuid}"
                             .item="${t.item}"
                             .uses="${t.uses}"
                             .api="${this.api}"
-                            .masteryIds="${(r = (i = (n = (s = (a = this.actor) == null ? void 0 : a.system) == null ? void 0 : s.traits) == null ? void 0 : n.weaponProf) == null ? void 0 : i.mastery) == null ? void 0 : r.value}"
+                            .masteryIds="${(r = (o = (n = (s = (a = this.actor) == null ? void 0 : a.system) == null ? void 0 : s.traits) == null ? void 0 : n.weaponProf) == null ? void 0 : o.mastery) == null ? void 0 : r.value}"
                             .showWeaponMastery="${this.showWeaponMastery}"
                             .canManage="${this.canManage}">
                         </ape-item>
@@ -2627,7 +2610,7 @@ class pt extends A {
         `;
   }
 }
-E(pt, "properties", {
+E(lt, "properties", {
   title: { type: String },
   uses: { type: Object },
   prepared: { type: Object },
@@ -2649,8 +2632,8 @@ E(pt, "properties", {
   showWeaponMastery: { type: Boolean },
   canManage: { type: Boolean }
 });
-customElements.define("ape-section", pt);
-class dt extends A {
+customElements.define("ape-section", lt);
+class ct extends A {
   constructor() {
     var e;
     super(), this.isOpen = !0, this.showCost = !!((e = game.modules.get("dnd5e-spellpoints")) != null && e.active);
@@ -2666,9 +2649,9 @@ class dt extends A {
   }
   render() {
     if (!this.group) return h;
-    const { items: e, uses: t, title: a, cost: s } = this.group, n = e && e.length > 0, i = t && t.maximum, r = s || null;
-    if (!n && !i) return h;
-    const l = i && this.showSpellDots, d = t && this.showSpellUses, c = r && this.showCost, p = [
+    const { items: e, uses: t, title: a, cost: s } = this.group, n = e && e.length > 0, o = t && t.maximum, r = s || null;
+    if (!n && !o) return h;
+    const l = o && this.showSpellDots, d = t && this.showSpellUses, c = r && this.showCost, p = [
       "flexrow",
       "ape-group-header",
       l ? "has-dots" : "",
@@ -2709,7 +2692,7 @@ class dt extends A {
         `;
   }
 }
-E(dt, "properties", {
+E(ct, "properties", {
   group: { type: Object },
   groupName: { type: String },
   api: { type: Object },
@@ -2721,8 +2704,8 @@ E(dt, "properties", {
   forceOpen: { type: Boolean },
   canManage: { type: Boolean }
 });
-customElements.define("ape-group", dt);
-class ut extends A {
+customElements.define("ape-group", ct);
+class pt extends A {
   createRenderRoot() {
     return this;
   }
@@ -2731,7 +2714,7 @@ class ut extends A {
   }
   render() {
     if (!this.actorData) return h;
-    const { actor: e, name: t, sections: a, needsInitiative: s } = this.actorData, n = e.system.attributes.hp, i = e.system.attributes.ac.value, r = e.type, l = n.value <= 0 && r === "character", d = e.system.attributes.inspiration;
+    const { actor: e, name: t, sections: a, needsInitiative: s } = this.actorData, n = e.system.attributes.hp, o = e.system.attributes.ac.value, r = e.type, l = n.value <= 0 && r === "character", d = e.system.attributes.inspiration;
     return u`
             <div class="ape-actor-header">
                 <div class="ape-actor-header-wrap">
@@ -2747,7 +2730,7 @@ class ut extends A {
                     </a>
                     <span class="ape-actor-ac">
                         <img class="ape-actor-ac-icon" src="/modules/action-pack-enhanced/images/ac-icon.svg">
-                        <span class="ape-actor-ac-display">${i}</span>
+                        <span class="ape-actor-ac-display">${o}</span>
                     </span>
                 </div>
             </div>
@@ -2820,13 +2803,13 @@ class ut extends A {
         `;
   }
   _renderExperience(e) {
-    const t = e.system.details, a = t.xp.pct, s = t.xp.max, n = t.xp.min, i = t.xp.value;
+    const t = e.system.details, a = t.xp.pct, s = t.xp.max, n = t.xp.min, o = t.xp.value;
     return u`
             <div class="ape-actor-xp bar-group">
                 <div class="bar-label">
                     <span>XP</span>
                     <span class="ape-actor-xp-info">
-                        <span class="ape-actor-xp-current" @click="${this._toggleXpActions}">${i}</span>
+                        <span class="ape-actor-xp-current" @click="${this._toggleXpActions}">${o}</span>
                         <span class="ape-actor-xp-separator"> / </span>
                         <span class="ape-actor-xp-max">${s}</span>
                     </span>
@@ -2836,19 +2819,19 @@ class ut extends A {
                     <button class="ape-actor-xp-close" @click="${this._toggleXpActions}">close</button>
                     <p>Choose an amount to add to or subtract from ${e.name}'s XP</p>
                     <div class="ape-actor-xp-increment">
-                        <button class="ape-actor-xp-button" ?disabled="${i >= s}" @click="${() => this.api.updateXP(e, i + 1)}">+1</button>
-                        <button class="ape-actor-xp-button" ?disabled="${i >= s}" @click="${() => this.api.updateXP(e, i + 10)}">+10</button>
-                        <button class="ape-actor-xp-button" ?disabled="${i >= s}" @click="${() => this.api.updateXP(e, i + 100)}">+100</button>
-                        <button class="ape-actor-xp-button" ?disabled="${i >= s}" @click="${() => this.api.updateXP(e, i + 1e3)}">+1000</button>
+                        <button class="ape-actor-xp-button" ?disabled="${o >= s}" @click="${() => this.api.updateXP(e, o + 1)}">+1</button>
+                        <button class="ape-actor-xp-button" ?disabled="${o >= s}" @click="${() => this.api.updateXP(e, o + 10)}">+10</button>
+                        <button class="ape-actor-xp-button" ?disabled="${o >= s}" @click="${() => this.api.updateXP(e, o + 100)}">+100</button>
+                        <button class="ape-actor-xp-button" ?disabled="${o >= s}" @click="${() => this.api.updateXP(e, o + 1e3)}">+1000</button>
                     </div>
                     <div class="ape-actor-xp-decrement">
-                        <button class="ape-actor-xp-button" ?disabled="${i <= n}" @click="${() => this.api.updateXP(e, i - 1)}">-1</button>
-                        <button class="ape-actor-xp-button" ?disabled="${i <= n}" @click="${() => this.api.updateXP(e, i - 10)}">-10</button>
-                        <button class="ape-actor-xp-button" ?disabled="${i <= n}" @click="${() => this.api.updateXP(e, i - 100)}">-100</button>
-                        <button class="ape-actor-xp-button" ?disabled="${i <= n}" @click="${() => this.api.updateXP(e, i - 1e3)}">-1000</button>
+                        <button class="ape-actor-xp-button" ?disabled="${o <= n}" @click="${() => this.api.updateXP(e, o - 1)}">-1</button>
+                        <button class="ape-actor-xp-button" ?disabled="${o <= n}" @click="${() => this.api.updateXP(e, o - 10)}">-10</button>
+                        <button class="ape-actor-xp-button" ?disabled="${o <= n}" @click="${() => this.api.updateXP(e, o - 100)}">-100</button>
+                        <button class="ape-actor-xp-button" ?disabled="${o <= n}" @click="${() => this.api.updateXP(e, o - 1e3)}">-1000</button>
                     </div>
                     <div class="ape-actor-xp-max">
-                        <button class="ape-actor-xp-button" ?disabled="${i >= s}" @click="${() => this.api.updateXP(e, s)}">Max</button>
+                        <button class="ape-actor-xp-button" ?disabled="${o >= s}" @click="${() => this.api.updateXP(e, s)}">Max</button>
                     </div>
                 </div>
             </div>
@@ -2861,22 +2844,22 @@ class ut extends A {
     this[`_${e}Open`] = !this[`_${e}Open`], this.requestUpdate();
   }
   _renderRaceClass(e) {
-    const t = Pt(e);
+    const t = Tt(e);
     return u`<div style="display:contents" .innerHTML="${t}"></div>`;
   }
   _renderPlayerInfo(e) {
-    var g, y, S, x, P;
+    var g, b, S, x, O;
     const t = e.system.traits ?? {}, a = ((g = e.system.attributes) == null ? void 0 : g.senses) ?? {}, s = (v, f) => {
-      const b = t[v], w = Array.from((b == null ? void 0 : b.value) ?? []).map((z) => dnd5e.documents.Trait.keyLabel(z, { trait: f })), k = dnd5e.utils.splitSemicolons((b == null ? void 0 : b.custom) ?? "");
+      const y = t[v], w = Array.from((y == null ? void 0 : y.value) ?? []).map((R) => dnd5e.documents.Trait.keyLabel(R, { trait: f })), k = dnd5e.utils.splitSemicolons((y == null ? void 0 : y.custom) ?? "");
       return [...w, ...k];
-    }, n = a.units ?? "ft", i = Object.entries(a.ranges ?? {}).filter(([, v]) => v > 0).map(([v, f]) => `${CONFIG.DND5E.senses[v] ?? v}: ${f}${n}`), r = ((y = e.system.attributes) == null ? void 0 : y.movement) ?? {}, l = r.units ?? "ft", d = Object.entries(CONFIG.DND5E.movementTypes).filter(([v, f]) => !f.hidden && (r[v] || v === "walk")).map(([v, f]) => `${v === "fly" && r.hover ? game.i18n.format("DND5E.MOVEMENT.HoverSpeed", { speed: f.label }) : f.label}: ${r[v] ?? 0}${l}`), c = /* @__PURE__ */ new Map();
+    }, n = a.units ?? "ft", o = Object.entries(a.ranges ?? {}).filter(([, v]) => v > 0).map(([v, f]) => `${CONFIG.DND5E.senses[v] ?? v}: ${f}${n}`), r = ((b = e.system.attributes) == null ? void 0 : b.movement) ?? {}, l = r.units ?? "ft", d = Object.entries(CONFIG.DND5E.movementTypes).filter(([v, f]) => !f.hidden && (r[v] || v === "walk")).map(([v, f]) => `${v === "fly" && r.hover ? game.i18n.format("DND5E.MOVEMENT.HoverSpeed", { speed: f.label }) : f.label}: ${r[v] ?? 0}${l}`), c = /* @__PURE__ */ new Map();
     for (const v of e.itemTypes.weapon) {
       const f = (S = v.system.type) == null ? void 0 : S.baseItem;
       f && !c.has(f) && c.set(f, v);
     }
-    const p = Array.from(((P = (x = t.weaponProf) == null ? void 0 : x.mastery) == null ? void 0 : P.value) ?? []).map((v) => {
-      var k, z;
-      const f = dnd5e.documents.Trait.keyLabel(v, { trait: "weapon" }), b = (k = c.get(v)) == null ? void 0 : k.system.mastery, w = b ? game.i18n.localize(((z = CONFIG.DND5E.weaponMasteries[b]) == null ? void 0 : z.label) ?? b) : null;
+    const p = Array.from(((O = (x = t.weaponProf) == null ? void 0 : x.mastery) == null ? void 0 : O.value) ?? []).map((v) => {
+      var k, R;
+      const f = dnd5e.documents.Trait.keyLabel(v, { trait: "weapon" }), y = (k = c.get(v)) == null ? void 0 : k.system.mastery, w = y ? game.i18n.localize(((R = CONFIG.DND5E.weaponMasteries[y]) == null ? void 0 : R.label) ?? y) : null;
       return w ? `${f}: ${w}` : f;
     }), m = [
       { trait: "speed", icon: "fas fa-person-running", label: "Speed", values: d },
@@ -2887,7 +2870,7 @@ class ut extends A {
       { trait: "languages", icon: "fas fa-flag", label: "Languages", values: s("languages", "languages") },
       { trait: "armor", icon: "fas fa-shield", label: "Armor Proficiencies", values: s("armorProf", "armor") },
       { trait: "weapon", icon: "fas fa-swords", label: "Weapon Proficiencies", values: s("weaponProf", "weapon") },
-      { trait: "senses", icon: "fas fa-eye", label: "Senses", values: i },
+      { trait: "senses", icon: "fas fa-eye", label: "Senses", values: o },
       { trait: "mastery", icon: "fas fa-award", label: "Weapon Masteries", values: p }
     ];
     return u`
@@ -2963,13 +2946,13 @@ class ut extends A {
                 <div class="ape-accordion-body">
                     <div class="ape-conditions">
                         ${t.map(([a, s]) => {
-      const n = e.statuses.has(a), i = game.i18n.localize(s.name);
+      const n = e.statuses.has(a), o = game.i18n.localize(s.name);
       return u`
                                 <span class="ape-condition-chip ${n ? "active" : ""}"
-                                    title="${i}"
+                                    title="${o}"
                                     @click="${() => this.api.toggleCondition(e, a)}">
                                     <img class="ape-condition-icon" src="${s.img}">
-                                    <span class="ape-condition-label">${i}</span>
+                                    <span class="ape-condition-label">${o}</span>
                                 </span>
                             `;
     })}
@@ -3021,15 +3004,15 @@ class ut extends A {
       const n = e.system.abilities[s.key];
       return u`
                                 <span class="ape-ability">
-                                    <span class="ape-ability-label">${s.key}<br>${n.value}</span>
+                                    <span class="ape-ability-label ${n.proficient === 1 ? "proficient" : ""}">${s.key}<br>${n.value}</span>
                                     <a class="fas fa-dice-d20 ape-ability-check" 
                                         title="${s.label} check"
-                                        @click="${(i) => this.api.rollAbilityCheck(e, s.key, i)}">
+                                        @click="${(o) => this.api.rollAbilityCheck(e, s.key, o)}">
                                         <span class="ape-ability-text">${re(n.mod)}</span>
                                     </a>
                                     <a class="fas fa-dice-d20 ape-ability-save" 
                                         title="${s.label} saving throw"
-                                        @click="${(i) => this.api.rollSavingThrow(e, s.key, i)}">
+                                        @click="${(o) => this.api.rollSavingThrow(e, s.key, o)}">
                                         <span class="ape-ability-text">${re(n.save.value)}</span>
                                     </a>
                                 </span>
@@ -3049,8 +3032,8 @@ class ut extends A {
                 </h2>
                 <div class="ape-accordion-body ape-skills">
                     ${Object.keys(a).map((s) => {
-      const n = a[s], i = t[s];
-      if (!i) return h;
+      const n = a[s], o = t[s];
+      if (!o) return h;
       let r = "far fa-circle";
       return n.proficient === 0.5 ? r = "fas fa-adjust" : n.proficient === 1 ? r = "fas fa-check" : n.proficient === 2 && (r = "fas fa-star"), u`
                             <div class="ape-skill-row flexrow ${n.proficient === 1 ? "proficient" : n.proficient === 2 ? "expert" : ""}"
@@ -3058,7 +3041,7 @@ class ut extends A {
                                 @contextmenu="${(l) => this.api.rollSkill(e, s, l, !0)}">
                                 <span class="ape-skill-icon ${r}"></span>
                                 <span class="ape-skill-ability">${n.ability}</span>
-                                <span class="ape-skill-label">${i.label}</span>
+                                <span class="ape-skill-label">${o.label}</span>
                                 <span class="ape-skill-bonus">${re(n.total)}</span>
                                 <span class="ape-skill-passive">(${n.passive})</span>
                             </div>
@@ -3069,9 +3052,9 @@ class ut extends A {
         `;
   }
   _renderDeathSaves(e) {
-    const t = e.system.attributes.death.failure, a = e.system.attributes.death.success, s = (i, r, l) => Array.from({ length: 3 }).map((d, c) => u`
-                <span class="ape-death-dot ${c < i ? "filled" : ""}">
-                    ${c < i ? u`<span class="fas ${l}"></span>` : h}
+    const t = e.system.attributes.death.failure, a = e.system.attributes.death.success, s = (o, r, l) => Array.from({ length: 3 }).map((d, c) => u`
+                <span class="ape-death-dot ${c < o ? "filled" : ""}">
+                    ${c < o ? u`<span class="fas ${l}"></span>` : h}
                 </span>
             `), n = t < 3 && a < 3;
     return u`
@@ -3081,7 +3064,7 @@ class ut extends A {
                 </span>
                 <span class="ape-death-icon" 
                     style="${n ? "cursor:pointer" : "cursor:default"}"
-                    @mousedown="${n ? (i) => this.api.rollDeathSave(e, i) : null}"></span>
+                    @mousedown="${n ? (o) => this.api.rollDeathSave(e, o) : null}"></span>
                 <span class="ape-death-throws saved">
                     ${s(a, "saved", "fa-check")}
                 </span>
@@ -3113,7 +3096,7 @@ class ut extends A {
     });
   }
 }
-E(ut, "properties", {
+E(pt, "properties", {
   actorData: { type: Object },
   // The object returned by data-builder
   globalData: { type: Object },
@@ -3125,9 +3108,9 @@ E(ut, "properties", {
   _abilitiesOpen: { state: !1 },
   _conditionsOpen: { state: !1 }
 });
-customElements.define("ape-actor", ut);
-const Ke = "action-pack-enhanced", Ze = "patreon-auth-data";
-class ua {
+customElements.define("ape-actor", pt);
+const Xe = "action-pack-enhanced", Ke = "patreon-auth-data";
+class pa {
   _generateState() {
     return foundry.utils.randomID();
   }
@@ -3143,19 +3126,19 @@ class ua {
     for (let n = 1; n <= s; n++) {
       await this._delay(a), t == null || t(n, s);
       try {
-        const i = await fetch(`${q.backend.authCheckUrl}?state=${encodeURIComponent(e)}`);
-        if (!i.ok) continue;
-        const r = await i.json();
+        const o = await fetch(`${q.backend.authCheckUrl}?state=${encodeURIComponent(e)}`);
+        if (!o.ok) continue;
+        const r = await o.json();
         if (r != null && r.authenticated)
           return { authenticated: !0, tier: r.tier, source: r.source ?? "patreon", timestamp: Date.now(), state: e };
-      } catch (i) {
-        console.warn("action-pack-enhanced | patreon auth poll failed", i);
+      } catch (o) {
+        console.warn("action-pack-enhanced | patreon auth poll failed", o);
       }
     }
     return null;
   }
   async _persistAuth(e) {
-    await game.settings.set(Ke, Ze, e), await H.refresh({ force: !0 });
+    await game.settings.set(Xe, Ke, e), await H.refresh({ force: !0 });
   }
   /**
    * Opens a dialog that walks the user through connecting their Patreon account.
@@ -3177,9 +3160,9 @@ class ua {
         icon: "fab fa-patreon",
         default: !0,
         callback: async (t, a, s) => {
-          const n = s.element.querySelector(".ape-patreon-status"), i = this._generateState(), r = this._getAuthUrl(i);
+          const n = s.element.querySelector(".ape-patreon-status"), o = this._generateState(), r = this._getAuthUrl(o);
           window.open(r, "_blank"), n && (n.textContent = game.i18n.localize("action-pack-enhanced.premium.waiting"));
-          const l = await this._pollForAuth(i, (d, c) => {
+          const l = await this._pollForAuth(o, (d, c) => {
             n && (n.textContent = game.i18n.format("action-pack-enhanced.premium.waiting-attempt", { attempt: d, max: c }));
           });
           return l ? (await this._persistAuth(l), n && (n.textContent = game.i18n.format("action-pack-enhanced.premium.connected", { tier: l.tier ?? "" })), !0) : (ui.notifications.warn(game.i18n.localize("action-pack-enhanced.premium.auth-failed")), !1);
@@ -3203,19 +3186,19 @@ class ua {
       rejectClose: !1,
       yes: { label: game.i18n.localize("action-pack-enhanced.premium.disconnect") },
       no: { label: game.i18n.localize("action-pack-enhanced.dialog.cancel") }
-    }) && (await game.settings.set(Ke, Ze, null), await H.clear());
+    }) && (await game.settings.set(Xe, Ke, null), await H.clear());
   }
 }
-const Je = new ua();
-class ht extends A {
+const Ze = new pa();
+class dt extends A {
   createRenderRoot() {
     return this;
   }
   _onConnect(e) {
-    e.stopPropagation(), Je.connect();
+    e.stopPropagation(), Ze.connect();
   }
   _onDisconnect(e) {
-    e.stopPropagation(), Je.disconnect();
+    e.stopPropagation(), Ze.disconnect();
   }
   render() {
     return game.user.isGM ? this._renderGmBadge() : this._renderPlayerBadge();
@@ -3244,14 +3227,14 @@ class ht extends A {
         `;
   }
 }
-E(ht, "properties", {
+E(dt, "properties", {
   authData: { type: Object },
   // this browser's own connection (GM-relevant)
   tableEntitlement: { type: Object }
   // world setting the GM publishes to (player-relevant)
 });
-customElements.define("ape-premium-badge", ht);
-class mt extends A {
+customElements.define("ape-premium-badge", dt);
+class ut extends A {
   createRenderRoot() {
     return this;
   }
@@ -3259,36 +3242,22 @@ class mt extends A {
     return !game.user.isGM || !this.installedVersion ? h : u`
             <div class="ape-version-badge ${this.hasUpdate ? "has-update" : "up-to-date"}">
                 v${this.installedVersion}
-                ${this.hasUpdate ? this._renderTooltip() : h}
-            </div>
-        `;
-  }
-  _renderTooltip() {
-    return u`
-            <div class="ape-version-tooltip">
-                <div class="ape-version-tooltip-header">
-                    ${game.i18n.format("action-pack-enhanced.version.update-available", { version: this.latestVersion })}
-                </div>
-                ${this.changelogEntries.map((e) => u`
-                    <div class="ape-version-entry">
-                        <div class="ape-version-entry-title">
-                            ${e.version}${e.date ? u` <span class="ape-version-entry-date">${e.date}</span>` : h}
-                        </div>
-                        <ul>${e.items.map((t) => u`<li>${t}</li>`)}</ul>
+                ${this.hasUpdate ? u`
+                    <div class="ape-version-tooltip">
+                        ${game.i18n.format("action-pack-enhanced.version.update-available", { version: this.latestVersion })}
                     </div>
-                `)}
+                ` : h}
             </div>
         `;
   }
 }
-E(mt, "properties", {
+E(ut, "properties", {
   installedVersion: { type: String },
   hasUpdate: { type: Boolean },
-  latestVersion: { type: String },
-  changelogEntries: { type: Array }
+  latestVersion: { type: String }
 });
-customElements.define("ape-version-badge", mt);
-class gt extends A {
+customElements.define("ape-version-badge", ut);
+class ht extends A {
   createRenderRoot() {
     return this;
   }
@@ -3341,10 +3310,9 @@ class gt extends A {
     return u`
             <div class="ape-header-bar">
                 <ape-version-badge
-                    .installedVersion="${G.installedVersion}"
-                    .hasUpdate="${G.hasUpdate}"
-                    .latestVersion="${G.latestVersion}"
-                    .changelogEntries="${G.changelogEntries}">
+                    .installedVersion="${ee.installedVersion}"
+                    .hasUpdate="${ee.hasUpdate}"
+                    .latestVersion="${ee.latestVersion}">
                 </ape-version-badge>
                 <ape-premium-badge
                     .authData="${game.settings.get("action-pack-enhanced", "patreon-auth-data")}"
@@ -3354,24 +3322,24 @@ class gt extends A {
         `;
   }
 }
-E(gt, "properties", {
+E(ht, "properties", {
   data: { type: Object },
   // Contains actors
   globalData: { type: Object },
   // Contains abilityColumns, showSpellDots
   api: { type: Object }
 });
-customElements.define("ape-app", gt);
-let se, Q, Qe, ue;
-function ha(o) {
-  var i;
-  if (!o || o === "") return null;
-  let e = o.split(".");
+customElements.define("ape-app", ht);
+let se, J, Je, ue;
+function da(i) {
+  var o;
+  if (!i || i === "") return null;
+  let e = i.split(".");
   if (e[0] === "Compendium")
     return null;
   const [t, a] = e.slice(0, 2);
   e = e.slice(2);
-  const s = (i = CONFIG[t]) == null ? void 0 : i.collection.instance;
+  const s = (o = CONFIG[t]) == null ? void 0 : o.collection.instance;
   if (!s) return null;
   let n = s.get(a);
   for (; n && e.length > 1; ) {
@@ -3380,102 +3348,102 @@ function ha(o) {
   }
   return n || null;
 }
-function $a(o) {
-  if (o instanceof CONFIG.Actor.documentClass)
-    return o;
-  if (o instanceof CONFIG.Token.documentClass)
-    return o.object.actor;
+function ba(i) {
+  if (i instanceof CONFIG.Actor.documentClass)
+    return i;
+  if (i instanceof CONFIG.Token.documentClass)
+    return i.object.actor;
 }
 function ye() {
-  const o = canvas.tokens.controlled.map((t) => t.actor), e = document.querySelector("#ape-app");
-  e && (game.combat && o.includes(Q) ? e.classList.add("is-current-combatant") : e.classList.remove("is-current-combatant"));
+  const i = canvas.tokens.controlled.map((t) => t.actor), e = document.querySelector("#ape-app");
+  e && (game.combat && i.includes(J) ? e.classList.add("is-current-combatant") : e.classList.remove("is-current-combatant"));
 }
 Hooks.on("ready", async () => {
-  var o, e;
+  var i, e;
   if (!document.querySelector("#ape-app")) {
     const t = document.createElement("ape-app");
     t.id = "ape-app", t.classList.add("ape-container"), game.modules.get("foundry-taskbar") && t.classList.add("has-taskbar");
     const a = document.getElementById("interface");
-    a && document.body.insertBefore(t, a), Qe = new St(), t.api = Qe;
+    a && document.body.insertBefore(t, a), Je = new wt(), t.api = Je;
   }
-  se = (e = (o = game.combat) == null ? void 0 : o.turns.find((t) => {
+  se = (e = (i = game.combat) == null ? void 0 : i.turns.find((t) => {
     var a;
     return t.id == ((a = game.combat) == null ? void 0 : a.current.combatantId);
-  })) == null ? void 0 : e.actor, Q = se, be() && $("#ape-app").addClass("is-open always-on"), game.user.isGM && H.isAuthenticated() && await H.refresh(), ke(), game.user.isGM && G.check().then(() => C());
+  })) == null ? void 0 : e.actor, J = se, be() && $("#ape-app").addClass("is-open always-on"), game.user.isGM && H.isAuthenticated() && await H.refresh(), ke(), game.user.isGM && ee.check().then(() => C());
 });
-function ma() {
-  const o = game.settings.get("action-pack-enhanced", "tray-display");
-  return o === "selected" || o === "auto";
+function ua() {
+  const i = game.settings.get("action-pack-enhanced", "tray-display");
+  return i === "selected" || i === "auto";
 }
 function be() {
   return game.settings.get("action-pack-enhanced", "tray-display") === "always";
 }
-function B() {
-  const o = canvas.tokens.controlled.filter((e) => {
+function j() {
+  const i = canvas.tokens.controlled.filter((e) => {
     var t;
     return ["character", "npc"].includes((t = e.actor) == null ? void 0 : t.type);
   });
-  return o.length ? o.map((e) => e.actor) : game.user.character && game.settings.get("action-pack-enhanced", "assume-default-character") ? [game.user.character] : [];
+  return i.length ? i.map((e) => e.actor) : game.user.character && game.settings.get("action-pack-enhanced", "assume-default-character") ? [game.user.character] : [];
 }
 Hooks.on("controlToken", async () => {
   ke();
 });
-Hooks.on("updateActor", (o) => {
-  B().includes(o) && C();
+Hooks.on("updateActor", (i) => {
+  j().includes(i) && C();
 });
-function ga(o) {
-  const e = document.querySelector(`ape-actor[data-actor-uuid="${o.uuid}"]`);
+function ha(i) {
+  const e = document.querySelector(`ape-actor[data-actor-uuid="${i.uuid}"]`);
   e && e.requestUpdate();
 }
-function ve(o) {
-  B().includes(o.parent) && ga(o.parent);
+function ve(i) {
+  j().includes(i.parent) && ha(i.parent);
 }
-Hooks.on("createActiveEffect", (o) => {
-  ve(o);
+Hooks.on("createActiveEffect", (i) => {
+  ve(i);
 });
-Hooks.on("updateActiveEffect", (o) => {
-  ve(o);
+Hooks.on("updateActiveEffect", (i) => {
+  ve(i);
 });
-Hooks.on("deleteActiveEffect", (o) => {
-  ve(o);
+Hooks.on("deleteActiveEffect", (i) => {
+  ve(i);
 });
-function $e(o) {
-  B().includes(o.actor) && C();
+function $e(i) {
+  j().includes(i.actor) && C();
 }
-Hooks.on("updateItem", (o) => {
-  $e(o);
+Hooks.on("updateItem", (i) => {
+  $e(i);
 });
-Hooks.on("deleteItem", (o) => {
-  $e(o);
+Hooks.on("deleteItem", (i) => {
+  $e(i);
 });
-Hooks.on("createItem", (o) => {
-  $e(o);
+Hooks.on("createItem", (i) => {
+  $e(i);
 });
-Hooks.on("updateSetting", (o) => {
-  (o.key === "action-pack-enhanced.patreon-auth-data" || o.key === "action-pack-enhanced.patreon-gm-entitlement") && C();
+Hooks.on("updateSetting", (i) => {
+  (i.key === "action-pack-enhanced.patreon-auth-data" || i.key === "action-pack-enhanced.patreon-gm-entitlement") && C();
 });
-Hooks.on("updateCombat", (o) => {
+Hooks.on("updateCombat", (i) => {
   var e;
-  Q = (e = o.turns.find((t) => t.id == o.current.combatantId)) == null ? void 0 : e.actor, ye(), se = Q;
+  J = (e = i.turns.find((t) => t.id == i.current.combatantId)) == null ? void 0 : e.actor, ye(), se = J;
 });
-Hooks.on("createCombatant", (o) => {
-  B().includes(o.actor) && C();
+Hooks.on("createCombatant", (i) => {
+  j().includes(i.actor) && C();
 });
-Hooks.on("updateCombatant", (o, e) => {
-  B().includes(o.actor) && C();
+Hooks.on("updateCombatant", (i, e) => {
+  j().includes(i.actor) && C();
 });
-Hooks.on("deleteCombat", (o) => {
-  game.combat || (Q = null, se = null, ye());
+Hooks.on("deleteCombat", (i) => {
+  game.combat || (J = null, se = null, ye());
 });
 Hooks.on("init", () => {
-  Rt({
+  Ut({
     updateTray: C,
     updateTrayState: ke
   });
 });
-Hooks.on("getSceneControlButtons", (o) => {
+Hooks.on("getSceneControlButtons", (i) => {
   if (game.settings.get("action-pack-enhanced", "use-control-button") && !be()) {
-    const e = o.tokens.tools;
+    const e = i.tokens.tools;
     e && (e.apeApp = {
       name: "apeApp",
       title: game.i18n.localize("action-pack-enhanced.control-icon"),
@@ -3489,23 +3457,23 @@ Hooks.on("getSceneControlButtons", (o) => {
   }
 });
 function ke() {
-  const o = $("#ape-app");
-  ma() && (canvas.tokens.controlled.filter((t) => {
+  const i = $("#ape-app");
+  ua() && (canvas.tokens.controlled.filter((t) => {
     var a;
     return ["character", "npc"].includes((a = t.actor) == null ? void 0 : a.type);
-  }).length ? o.addClass("is-open") : o.removeClass("is-open")), be() ? o.addClass("is-open always-on") : o.removeClass("always-on"), ye(), C();
+  }).length ? i.addClass("is-open") : i.removeClass("is-open")), be() ? i.addClass("is-open always-on") : i.removeClass("always-on"), ye(), C();
 }
 async function C() {
-  ue || (ue = new Dt());
-  const o = B(), e = ue.build(o, {
+  ue || (ue = new qt());
+  const i = j(), e = ue.build(i, {
     /* scrollPosition stub */
   });
-  function t(g, y) {
-    return g && [y, g].join("-");
+  function t(g, b) {
+    return g && [b, g].join("-");
   }
-  const a = t(game.settings.get("action-pack-enhanced", "icon-size"), "icon"), s = t(game.settings.get("action-pack-enhanced", "tray-size"), "tray"), n = game.settings.get("action-pack-enhanced", "show-spell-dots"), i = game.settings.get("action-pack-enhanced", "show-spell-uses"), r = game.settings.get("action-pack-enhanced", "show-weapon-mastery"), l = game.settings.get("action-pack-enhanced", "static-info"), d = Object.entries(CONFIG.DND5E.abilities), c = [
-    d.slice(0, 3).map(([g, y]) => ({ key: g, label: y.label })),
-    d.slice(3, 6).map(([g, y]) => ({ key: g, label: y.label }))
+  const a = t(game.settings.get("action-pack-enhanced", "icon-size"), "icon"), s = t(game.settings.get("action-pack-enhanced", "tray-size"), "tray"), n = game.settings.get("action-pack-enhanced", "show-spell-dots"), o = game.settings.get("action-pack-enhanced", "show-spell-uses"), r = game.settings.get("action-pack-enhanced", "show-weapon-mastery"), l = game.settings.get("action-pack-enhanced", "static-info"), d = Object.entries(CONFIG.DND5E.abilities), c = [
+    d.slice(0, 3).map(([g, b]) => ({ key: g, label: b.label })),
+    d.slice(3, 6).map(([g, b]) => ({ key: g, label: b.label }))
   ];
   let p = !1;
   try {
@@ -3521,43 +3489,43 @@ async function C() {
   }, m.globalData = {
     abilityColumns: c,
     showSpellDots: n,
-    showSpellUses: i,
+    showSpellUses: o,
     showWeaponMastery: r,
     staticInfo: l,
     canManage: p
   });
 }
-Hooks.on("dnd5e.getItemContextOptions", (o, e) => {
+Hooks.on("dnd5e.getItemContextOptions", (i, e) => {
   var t;
-  (t = o.system.activation) != null && t.type && o.system.activation.type !== "none" && (o.getFlag("action-pack-enhanced", "hidden") ? e.push({
+  (t = i.system.activation) != null && t.type && i.system.activation.type !== "none" && (i.getFlag("action-pack-enhanced", "hidden") ? e.push({
     name: game.i18n.localize("action-pack-enhanced.item-context.show"),
     icon: "<i class='fas fa-eye'></i>",
     callback: async () => {
-      await o.setFlag("action-pack-enhanced", "hidden", !1), C();
+      await i.setFlag("action-pack-enhanced", "hidden", !1), C();
     }
   }) : e.push({
     name: game.i18n.localize("action-pack-enhanced.item-context.hide"),
     icon: "<i class='fas fa-eye-slash'></i>",
     callback: async () => {
-      await o.setFlag("ape", "hidden", !0), C();
+      await i.setFlag("ape", "hidden", !0), C();
     }
   }));
 });
-Hooks.on("dropCanvasData", (o, e, t) => {
+Hooks.on("dropCanvasData", (i, e, t) => {
   var a;
   if (e.type === "ActionPackItem" && e.uuid) {
-    const s = ha(e.uuid);
+    const s = da(e.uuid);
     if (!s) return;
-    const n = o.tokens.placeables.find((i) => e.x >= i.x && e.x <= i.x + i.w && e.y >= i.y && e.y <= i.y + i.h);
+    const n = i.tokens.placeables.find((o) => e.x >= o.x && e.x <= o.x + o.w && e.y >= o.y && e.y <= o.y + o.h);
     if (n) {
-      const i = (a = s.system) == null ? void 0 : a.activities;
-      if (!i) return;
-      (i.contents[0].target.affects.count || 1) === 1 && n.setTarget(!0, { user: game.user, releaseOthers: !0, groupSelection: !0 });
+      const o = (a = s.system) == null ? void 0 : a.activities;
+      if (!o) return;
+      (o.contents[0].target.affects.count || 1) === 1 && n.setTarget(!0, { user: game.user, releaseOthers: !0, groupSelection: !0 });
     }
     return s.use({ event: t }), !1;
   }
 });
 export {
-  $a as fudgeToActor
+  ba as fudgeToActor
 };
 //# sourceMappingURL=ape.mjs.map

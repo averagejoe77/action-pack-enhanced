@@ -85,8 +85,7 @@ export class ApeApp extends LitElement {
                 <ape-version-badge
                     .installedVersion="${versionCheck.installedVersion}"
                     .hasUpdate="${versionCheck.hasUpdate}"
-                    .latestVersion="${versionCheck.latestVersion}"
-                    .changelogEntries="${versionCheck.changelogEntries}">
+                    .latestVersion="${versionCheck.latestVersion}">
                 </ape-version-badge>
                 <ape-premium-badge
                     .authData="${game.settings.get("action-pack-enhanced", "patreon-auth-data")}"

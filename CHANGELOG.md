@@ -2,6 +2,13 @@
 
 All notable changes to Action Pack Enhanced are documented in this file.
 
+## [1.4.2] - 2026-07-23
+- **Added custom tracking badges**: Added my own tracking badges becasue third party badges kept failing.
+- **Added Ability Check/Save Proficiency**: Abilities that you are proficient in are no labled in green text in the Ability Check/Save section.
+
+  ## Updated ##
+- **Version indicator**: Updated the checking of the version number to use my own custom checking url rather than the raw github user content api. 
+
 ## [1.4.0] - 2026-07-16
 - Added ammo display next to the weapon name for weapons that use ammo (Bows, Crossbows, etc)
 - Added prepared spell count to the Spell section header for classes that have prepared spells; it won't stop you from preparing every spell you have though... maybe on the next update
